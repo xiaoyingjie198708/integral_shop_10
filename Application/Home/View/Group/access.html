@@ -1,0 +1,81 @@
+{__NOLAYOUT__}
+<notempty name="return_rules">
+<div class="widget-box" style="margin-top:0;">
+    <div class="widget-title" style="height:auto;">
+        <ul class="nav nav-tabs" style="overflow:hidden;min-height:36px;margin:0;">
+            <volist name="return_rules" id="rule_title" key="title_i">
+            <li class="{:set_class(1,$title_i,'active')}" style="border-bottom:1px solid #ddd;border-right:1px solid #ddd;margin:0;"><a style="border:none;" data-toggle="tab" href="#tab_{$title_i}">{$rule_title.name}</a></li>
+            </volist>
+        </ul>
+    </div>
+    <div class="widget-content tab-content other_rules_box" data-id="{$id}">
+        <volist name="return_rules" id="rules" key="rules_i">
+        <div id="tab_{$rules_i}" class="tab-pane {:set_class(1,$rules_i,'active')}">
+        <div class="dataTables_wrapper">
+            <div class="accordion" id="collapse-group{$rules_i}" style="margin-bottom:0;">
+                <volist name="rules.value" id="rule" empty=" 暂无权限">
+                <div class="accordion-group widget-box rule_all_box"  id="del_{$rule.id}">
+                    <div class="accordion-heading rule_parent_box">
+                        <div class="widget-title">
+                            <span class="icon">
+                                <input type="checkbox" autocomplete="off" data-id="{$rule.id}" {$rule.checked} class="check_all_btn" />
+                            </span>
+                            <a data-parent="#collapse-group{$rules_i}" href="#collapseG{$rule.id}" data-toggle="collapse">
+                                <h5 style="width:50%;" id="name_{$rule.id}">{$rule.name}<notempty name="rule.title">（{$rule.title}）</notempty></h5>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="collapse accordion-body rule_body_box" id="collapseG{$rule.id}">
+                        <div class="widget-content">
+                            <table class="table table_list border-bottom with-check access_list">
+                                <tbody>
+                                    <volist name="rule.son" id="rule_son">
+                                    <tr id="del_{$rule_son.id}">
+                                        <td><input type="checkbox" data-id="{$rule_son.id}" {$rule_son.checked} autocomplete="off" /></td>
+                                        <td id="name_{$rule_son.id}">{$rule_son.name}<notempty name="rule_son.title">（{$rule_son.title}）</notempty></td>
+                                    </tr>
+                                    </volist>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                </volist>
+            </div>
+        </div>
+        </div>
+        </volist>
+    </div>
+</div>
+</notempty>
+<script type="text/javascript">
+    $('.other_rules_box input[type=checkbox]').uniform();
+    $('.other_rules_box input[type=checkbox]').die().live('click',function() {
+        var _this = $(this);        
+        if(_this.data('send') == 'off') return false;
+        var _status = _this.attr('checked') ? 1 : 0;
+        if(!_this.hasClass('check_all_btn')) setCheckBtn();
+        var _user_rules = getCheckBtn();
+        _this.data('send','off');
+        $.post('__URL__/set_group_rules',{rules:_user_rules,id:_this.parents('.other_rules_box').data('id')},function(data) {_this.data('send','on');},'json');
+    });
+    function getCheckBtn() {
+        var _return = '';
+        $('.other_rules_box input[type=checkbox]').each(function() {
+            if ($(this).attr('checked')) _return += $(this).data('id')+',';
+        });
+        return _return;
+    }
+    function setCheckBtn() {
+        $('.other_rules_box .check_all_btn').each(function() {
+            var _body = $(this).parents('.rule_all_box').find('.rule_body_box input[type=checkbox]');
+            if (_body.length) {
+                var _bool = false;
+                _body.each(function() {if ($(this).attr('checked')) {_bool = true;return false;}});
+                $(this).attr('checked',_bool);
+                if (_bool) $(this).parent().addClass('checked');
+                else $(this).parent().removeClass('checked');
+            }
+        });
+    }
+</script>

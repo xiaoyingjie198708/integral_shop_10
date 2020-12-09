@@ -1,0 +1,101 @@
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<link rel="stylesheet" href="__PUBLIC__/css/jquery.gritter.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>用户组列表</h5><a class="btn btn-success btn-mini" href="javascript:;" id="add_group"><i class="icon-plus icon-white"></i> 添加用户组</a></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered with-check table-center">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>用户组名称</th>
+                        <th>用户组状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <volist name="admin_group" id="group">
+                    <tr>
+                        <td>{$group.id}</td>
+                        <td>{$group.name}</td>
+                        <td>
+                            <div class="btn-group change_status">
+                                <a data-group="{$group.id}" data-status="1" class="btn btn-mini {:set_class('1',$group['status'],'btn-success active')}">ON</a>
+                                <a data-group="{$group.id}" data-status="0" class="btn btn-mini {:set_class('0',$group['status'],'active')}">OFF</a>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="javascript:;" class="btn btn-mini access_edit" data-id="{$group.id}" data-title="{$group.name}"><i class="icon-eye-open"></i> 编辑权限</a>&nbsp;
+                            <a href="javascript:;" class="btn btn-mini group_edit" data-id="{$group.id}" data-title="{$group.name}"><i class="icon-edit"></i> 编辑</a>&nbsp;
+                            <a href="javascript:;" data-id="{$group.id}" data-title="{$group.name}" class="btn btn-mini group_del"><i class="icon-trash"></i> 删除</a>
+                        </td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $("#add_group").click(function () {
+            tipwindows('添加菜单', getAddBox());
+        });
+        function getAddBox() {
+            var _return = '';
+            $.ajaxSetup({async: false});
+            $.post("{:U('Group/get_add_info')}", {}, function (data) {
+                _return = data.info;
+            }, 'json');
+            return _return;
+        }
+    $('.change_status a').click(function() {
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (_this.hasClass('active')) return false;
+        _this.data('send','off');
+        $.post('__URL__/change_group_status',{id:_this.data('group'),status:_this.data('status')},function(data) {
+            _this.data('send','on');
+            if(!data.status) alert(data.info);
+            else {
+                _this.parent().find('a').removeClass('active');
+                _this.addClass('active');
+                if (_this.index() == 1) _this.prev().removeClass('btn-success');
+                else _this.addClass('btn-success');
+            }
+        },'json');
+    });
+    $('.group_edit').click(function() {
+        tipwindows($(this).data('title')+" - 编辑",getEditBox($(this).data('id')));
+    });
+    function getEditBox(_id) {
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post('__URL__/get_group_info',{id:_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+    $('.access_edit').click(function() {
+        tipwindows($(this).data('title')+" - 编辑权限",getAccessBox($(this).data('id')),800,500);
+    });
+    function getAccessBox(_id) {
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post('__URL__/set_group_access',{id:_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+    $('.group_del').click(function() {
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (confirm('确认删除 '+$(this).data('title')+' 吗？')) {
+            _this.data('send','off');
+            $.post('__URL__/delete',{id:$(this).data('id')},function(data) {
+                _this.data('send','on');
+                if (data.status) location.reload();
+                else alert(data.info);
+            });
+        }
+    });
+</script>

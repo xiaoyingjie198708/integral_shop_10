@@ -1,0 +1,38 @@
+<div id="content">
+    <div id="content-header"></div>
+    <div id="breadcrumb">
+        <a href="javascript:;" class="current"><i class="icon icon-user"></i> 基本信息</a>
+    </div>
+    <div class="container-fluid">
+        <div class="widget-box">
+            <div class="widget-title">
+                <ul class="nav nav-tabs" style="max-width:800px;">
+                    <li class="active"><a href="javascript:;">基本信息</a></li>
+                    <li><a href="{:U('Self/login_history')}">登录历史</a></li>
+                    <li><a href="{:U('Self/update_password')}">修改密码</a></li>
+                </ul>
+            </div>
+            <div class="widget-content">
+                <table class="table border-bottom">
+                    <tbody>
+                        <tr>
+                            <td width="100">真实姓名：</td>
+                            <td>{$user['realname'] ? $user['realname'] : $user['username']}</td>
+                        </tr>
+                        <tr>
+                            <td width="100">所属分组：</td>
+                            <td>{$user_group}</td>
+                        </tr>
+                        <tr>
+                            <td width="100">上次登录：</td>
+                            <td>{$login.login_ip} ({$login.time|date="Y-m-d H:i:s",###})</td>
+                        </tr>
+                        <tr>
+                            <td width="100">登录次数：</td>
+                            <td>{$login_num} <a style="margin-left:10px;" href="{:U('Self/login_history')}">登录历史</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>

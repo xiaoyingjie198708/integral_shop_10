@@ -1,0 +1,44 @@
+{__NOLAYOUT__}
+<style>
+.tab-left{border:1px solid #ddd; overflow:hidden;background-color:#fff;width:99%;}
+.tab-left .nav{float:left;}
+.tab-left .nav li{float:none;border-bottom:1px solid #ddd;border-right:1px solid #ddd;height:40px;line-height:40px;padding:0 8px;text-align:center;font-weight:bold;background-color:#f9f9f9;}
+.tab-left .nav li.active{border-right:none;background-color:#fff;color:#444;}
+.tab-left .nav li a{background-color:#f9f9f9;color:#999;}
+.tab-left .nav li.active a{color:#444;background-color:#fff;}
+.tab-left .tab-content{border:none;}
+.conf_data_list{list-style:none;padding-left:20px;}
+.conf_data_list li{border-bottom:1px solid #ddd;margin-bottom:10px;padding-bottom:10px;}
+.conf_data_list li label{display:inline-block;height:auto;}
+.conf_data_list li:last-child{border-bottom:none;}
+</style>
+<div class="widget-box tab-left" style="margin-top:0;width: 80%;">
+    <ul class="nav">
+        <volist name="goods_conf_list" id="conf1" key="conf1_i">
+        <li class="{:set_class(1,$conf1_i,'active')}">
+            <a data-toggle="tab" href="#tab_conf_{$conf1.param_category_id}">{$conf1.category_name}</a>
+        </li>
+        </volist>
+    </ul>
+    <div class="widget-content tab-content" style="min-height: 120px;">
+        <volist name="goods_conf_list" id="conf1" key="conf1_i">
+        <div id="tab_conf_{$conf1.param_category_id}" class="tab-pane {:set_class(1,$conf1_i,'active')}">
+            <ul class="conf_data_list" style="margin:0;text-align:left;">
+            <volist name="conf1.child" id="conf2" empty="暂无内容">
+                <li>
+                    <b>{$conf2.param_name}：</b>
+                    <span>
+                        <select class="goods_conf" name="goods_conf_{$conf2.param_id}" id="goods_conf_{$conf2.param_id}" style="min-width: 140px;max-height: 30px;">
+                            <option value=" ">请选择</option>
+                            <volist name="conf2.child" id="conf3">
+                                <option value="{$conf3.param_value_id}" {$conf3.selected}>{$conf3.param_value}</option>
+                            </volist>
+                        </select>
+                    </span>
+                </li>
+            </volist>
+            </ul>
+        </div>
+        </volist>
+    </div>
+</div>

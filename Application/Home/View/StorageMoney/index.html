@@ -1,0 +1,77 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-zh-CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/export.jquery.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title"><h5>储值卡订单明细列表</h5></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>订单编号</th>
+                        <th>订单状态</th>
+                        <th>会员账号</th>
+                        <th>商品名称</th>
+                        <th>订单总价</th>
+                        <th>收现金额</th>
+                        <th>储值卡金额</th>
+                        <th>文惠券金额</th>
+                        <th>收款总额</th>
+                        <th>支付时间</th>
+                        <th>支付方式</th>
+                        <th>文惠券编码</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="12">没有任何数据~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                        <tr>
+                            <td>{$info.order_cur_id}</td>
+                            <td>{$info.order_status|id2name='order_status',###}</td>
+                            <td>{$info.member_account}</td>
+                            <td>{$info.goods_name}</td>
+                            <td>{$info.pay_cash|price_format}</td>
+                            <td>{$info.real_pay_cash|price_format}</td>
+                            <td>{$info.real_pay_storage_money|price_format}</td>
+                            <td>{$info.wh_value|price_format}</td>
+                            <td>{$info.real_total_value|price_format}</td>
+                            <td>{$info.pay_time}</td>
+                            <td>{$info.payment_type|id2name='payment_type',###}</td>
+                            <td>{$info.coupon_code}</td>
+                        </tr>
+                    </volist>
+                    <tr>
+                        <td colspan="4">合计</td>
+                        <td>{$total_data.pay_cash|price_format}</td>
+                        <td>{$total_data.real_pay_cash|price_format}</td>
+                        <td>{$total_data.real_pay_storage_money|price_format}</td>
+                        <td>{$total_data.wh_value|price_format}</td>
+                        <td>{$total_data.real_total_value|price_format}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+ /*--------------------------------------------------------------------------导出订单-----------------------------------------------------------------*/
+    $("#explode_order").export({
+       'payment_type[]':$("select[name='payment_type[]']").val(),
+       'order_status[]':$("select[name='order_status[]']").val(),
+       'label_id':$("input[name='label_id']").val(),
+       'pay_start':$("input[name='pay_start']").val(),
+       'pay_end':$("input[name='pay_end']").val(),
+    });  
+</script>

@@ -1,0 +1,145 @@
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/jquery.gritter.css" />
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<style>
+    .controls label{display:inline-block; height:20px; padding:4px 10px 4px 0;margin-bottom:0;}
+</style>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>查看赠品活动</h5><a class="btn btn-success btn-mini" href="{:back_list_url()}"><i class="icon-share-alt icon-white"></i> 返回列表</a></div>
+        <div class="widget-content nopadding">
+            <form class="form-horizontal">
+            <div class="control-group">
+                <label class="control-label">活动名称：</label>
+                <div class="controls">{$info.activity_name}</div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">促销平台：</label>
+                <div class="controls">
+                    <if condition="$info['is_pc'] gt 0 ">
+                        <label>PC端</label>
+                    </if>
+                    <if condition="$info['is_wap'] gt 0 ">
+                        <label>WAP端</label>
+                    </if>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">使用有效期：</label>
+                <div class="controls">
+                    {$info.start_time}
+                    &nbsp;~&nbsp;
+                    {$info.end_time}
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">规则描述：</label>
+                <div class="controls">{$info.activity_remark}</div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">状态：</label>
+                <div class="controls">{$info.status|id2name='activity_status',###}</div>
+            </div>
+            <if condition="$info['check_time'] != ''">
+                <div class="control-group">
+                    <label class="control-label">审核时间：</label>
+                    <div class="controls">{$info.check_time}</div>
+                </div>
+            </if>
+            <if condition="$info['refuse_reason'] != ''">
+                <div class="control-group">
+                    <label class="control-label">拒绝原因：</label>
+                    <div class="controls">{$info.refuse_reason}</div>
+                </div>
+            </if>
+            <div class="control-group">
+                <label class="control-label">主品：</label>
+                <div class="controls">
+                     <table class="table table-bordered table-center" style="margin-top: 10px;">
+                        <thead>
+                            <tr>
+                                <th>商品编码</th>
+                                <th>物料编码</th>
+                                <th>商品名称</th>
+                                <th>商家名称</th>
+                                <th>购买数量</th>
+                            </tr>
+                        </thead>
+                        <tbody id="main_goods_box">
+                            <volist name="mian_goods" id="goods">
+                                <tr>
+                                    <td>{$goods.goods_code}</td>
+                                    <td>{$goods.goods_materiel_code}</td>
+                                    <td>{$goods.goods_name}</td>
+                                    <td>{$goods.shops_name}</td>
+                                    <td>{$goods.count}</td>
+                                </tr>
+                            </volist>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">促品：</label>
+                <div class="controls">
+                     <table class="table table-bordered table-center" style="margin-top: 10px;">
+                        <thead>
+                            <tr>
+                                <th>商品编码</th>
+                                <th>物料编码</th>
+                                <th>商品名称</th>
+                                <th>商家名称</th>
+                                <th>赠送数量</th>
+                            </tr>
+                        </thead>
+                        <tbody id="promote_goods_box">
+                            <volist name="promote_goods" id="goods">
+                                <tr>
+                                    <td>{$goods.goods_code}</td>
+                                    <td>{$goods.goods_materiel_code}</td>
+                                    <td>{$goods.goods_name}</td>
+                                    <td>{$goods.shops_name}</td>
+                                    <td>{$goods.count}</td>
+                                </tr>
+                            </volist>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">是否捆绑送券：</label>
+                <div class="controls">
+                    {$send_coupon == 1 ? '是' : '否'}
+                </div>
+            </div>
+            <div class="control-group" id="coupon_box" style="{$send_coupon == 1 ? '' : 'display: none;'}">
+                <label class="control-label">赠送券：</label>
+                <div class="controls">
+                     <table class="table table-bordered table-center" style="margin-top: 10px;">
+                        <thead>
+                            <tr>
+                                <th>优惠券编码</th>
+                                <th>优惠券名称</th>
+                                <th>优惠券类型</th>
+                                <th>金额</th>
+                                <th>使用有效期</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coupon_tbody">
+                            <volist name="coupon_list" id="coupon">
+                                <tr>
+                                    <td>{$coupon.coupon_code}</td>
+                                    <td>{$coupon.coupon_name}</td>
+                                    <td>{$coupon.coupon_use_type|id2name='coupon_use_type',###}</td>
+                                    <td>{$coupon.coupon_value}</td>
+                                    <td>{$coupon.valid_start_time} ~ {$coupon.valid_end_time}</td>
+                                </tr>
+                            </volist>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</div>

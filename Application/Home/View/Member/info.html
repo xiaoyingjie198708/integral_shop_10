@@ -1,0 +1,167 @@
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<style>
+    .form-horizontal .controls{*display:block-inline;}
+    .controls > .radio:first-child, .controls > .checkbox:first-child{padding-top:0;}
+    .controls label{display:inline-block; height:20px; padding:4px 10px 4px 0;margin-bottom:0;}
+    .form-horizontal .control-label{padding-top:10px;}
+    .tab-left{border:1px solid #ddd; overflow:hidden;background-color:#fff;width:99%;}
+    .tab-left .nav{float:left;}
+    .tab-left .nav li{float:none;border-bottom:1px solid #ddd;border-right:1px solid #ddd;height:40px;line-height:40px;padding:0 8px;text-align:center;font-weight:bold;background-color:#f9f9f9;}
+    .tab-left .nav li.active{border-right:none;background-color:#fff;color:#444;}
+    .tab-left .nav li a{background-color:#f9f9f9;color:#999;}
+    .tab-left .nav li.active a{color:#444;background-color:#fff;}
+    .tab-left .tab-content{border:none;}
+</style>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box">
+            <ul class="nav nav-tabs">
+                <volist name="member_label" id="label" key="label_i">
+                <li class="{:set_class(1,$label_i,'active')}"><a data-toggle="tab" href="#tab_{$label_i}">{$label}</a></li>
+                </volist>
+            </ul>
+            <a class="btn btn-success btn-mini" href="{:back_list_url()}"><i class="icon-share-alt icon-white"></i> 返回列表</a>
+        </div>
+        <div class="widget-content" style="padding:0;margin-top:12px;border-top:1px solid #eee;">
+            <form id="edit_goods_form" class="form-horizontal tab-content" method="post" autocomplete="off" />
+                <div class="tab-pane active" id="tab_1" data-step="1">
+                    <div class="control-group">
+                        <label class="control-label">会员编码：</label>
+                        <div class="controls">{$info.member_code}</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">会员账号：</label>
+                        <div class="controls">{$info.member_account}</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">会员姓名：</label>
+                        <div class="controls">{$info.nick_name}</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">手机号码：</label>
+                        <div class="controls">{$info.username}</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">会员卡号：</label>
+                        <div class="controls">{$info.card_number}</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">会员等级：</label>
+                        <div class="controls">{$info.tier_name}</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">等级编码：</label>
+                        <div class="controls">{$info.tier_code}</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">等级折扣：</label>
+                        <div class="controls">{$info.tier_disCount}</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">当前积分：</label>
+                        <div class="controls">{$info.current_point}</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">会员状态：</label>
+                        <div class="controls">{$info.state_code|id2name='member_status',###}</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">校验状态：</label>
+                        <div class="controls">{$info.validate_state|id2name='member_verified',###}</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">储值卡金额：</label>
+                        <div class="controls">{$info.storage_money}</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">储值卡状态：</label>
+                        <div class="controls">{$info.storage_state|id2name='storage_state',###}</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">注册时间：</label>
+                        <div class="controls">{$info.create_time}</div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">更新时间：</label>
+                        <div class="controls">{$info.update_time}</div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_2"  data-step="2">
+                    <table class="table table_list table-bordered table-center">
+                        <thead>
+                            <tr>
+                                <th>优惠券名称</th>
+                                <th>优惠券编码</th>
+                                <th>优惠券金额</th>
+                                <th>有效期开始时间</th>
+                                <th>有效期结束时间</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <empty name="coupon_list">
+                            <tr>
+                                <td colspan="6">该用户还没有获得任何优惠券</td>
+                            </tr>
+                        </empty>
+                        <volist name="coupon_list" id="coupon_info">
+                            <tr>
+                                <td>{$coupon_info.coupon_name}</td>
+                                <td>{$coupon_info.coupon_code}</td>
+                                <td>{$coupon_info.coupon_value}</td>
+                                <td>{$coupon_info.valid_start_time}</td>
+                                <td>{$coupon_info.valid_end_time}</td>
+                                <td>{$coupon_info.coupon_status|id2name='user_coupon_status',###}</td>
+                            </tr>
+                        </volist>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane" id="tab_3"  data-step="3">
+                    <table class="table table_list table-bordered table-center">
+                        <thead>
+                            <tr>
+                                <th>订单编码</th>
+                                <th>商品名称</th>
+                                <th>使用编码</th>
+                                <th>类型</th>
+                                <th>状态</th>
+                                <th width="200px;">备注</th>
+                                <th>获得时间</th>
+                                <th>有效期</th>
+                                <th>更新时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <empty name="code_list">
+                            <tr>
+                                <td colspan="8">该用户还没有获得任何使用码</td>
+                            </tr>
+                        </empty>
+                        <volist name="code_list" id="code_info">
+                            <tr>
+                                <td>{$code_info.order_cur_id}</td>
+                                <td>{$code_info.goods_name}</td>
+                                <td>{$code_info.use_code}</td>
+                                <td>{$code_info.code_type|id2name='code_type',###}</td>
+                                <td>{$code_info.status|id2name='code_status',###}</td>
+                                <td>{$code_info.remark}</td>
+                                <td>{$code_info.create_time}</td>
+                                <td>
+                                    <if condition="$code_info.valid_time eq 0 ">
+                                        无限制
+                                        <else />
+                                        {$code_info.valid_time|date='Y-m-d',###}
+                                    </if>
+                                </td>
+                                <td>{$code_info.update_time}</td>
+                            </tr>
+                        </volist>
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

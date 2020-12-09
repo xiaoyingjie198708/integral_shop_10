@@ -1,0 +1,70 @@
+<script src="__PUBLIC__/js/select2.min.js"></script>
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<div class="container-fluid">
+	<div class="widget-box">
+		<div class="widget-title add_box"><h5>调查问题列表</h5><a class="send_sms btn btn-success btn-mini" href="{:U('ActivityQuestion/add')}"><i class="icon-plus icon-white"></i> 添加活动问题</a></div>
+		<div class="widget-content">
+			<div class="dataTables_wrapper">
+				<table class="table table_list table-bordered data-table table-center">
+                                    <thead>
+                                            <tr>
+                                                <th>问题标题</th>
+                                                <th>状态</th>
+                                                <th>添加时间</th>
+                                                <th>操作</th>
+                                            </tr>
+                                    </thead>
+                                    <tbody>
+                                    <volist name='list' id='question'>
+                                            <tr>
+                                                <td>{$question.title}</td>
+                                                <td>
+                                                    <div class="btn-group change_status">
+                                                        <a data-id="{$question.id}" data-status="1" class="btn btn-mini {:set_class('1',$question['status'],'btn-success active')}">ON</a>
+                                                        <a data-id="{$question.id}" data-status="2" class="btn btn-mini {:set_class('2',$question['status'],'active')}">OFF</a>
+                                                    </div>						
+                                                </td>
+                                                <td>{$question.create_time}</td>
+                                                <td>
+                                                    <a title="编辑" class="store_edit btn btn-mini" href="{:U('ActivityQuestion/update',array('id'=>$question['id']))}"><i class="icon-edit"></i> 编辑 </a>	
+                                                    <a title="删除" class="del btn btn-mini" data-title="{$question.title}" data-id="{$question.id}" href="javascript:void(0)"><i class="icon-trash"></i> 删除 </a>								
+                                                </td>
+                                            </tr>
+                                    </volist>
+                                    </tbody>
+                            </table>
+				<notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>				
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+        $('.change_status a').click(function() {
+            var _this = $(this);
+            if(_this.data('send') == 'off') return false;
+            if (_this.hasClass('active')) return false;
+            _this.data('send','off');
+            $.post("{:U('ActivityQuestion/change_status')}",{id:_this.data('id'),status:_this.data('status')},function(data) {
+                _this.data('send','on');
+                if(!data.status) alert(data.info);
+                else {
+                    _this.parent().find('a').removeClass('active');
+                    _this.addClass('active');
+                    if (_this.index() == 1) _this.prev().removeClass('btn-success');
+                    else _this.addClass('btn-success');
+                }
+            },'json');
+        });
+	$(".del").click(function(){
+            _this=$(this);
+            if(confirm("您确定要删除 "+_this.data('title')+" 吗")){
+            $.getJSON("{:U('ActivityQuestion/change_status')}",{id:_this.data("id"),status:0},function(data){
+                    if(data.status){
+                        alert(data.info);
+                        location.reload();
+                    }else{
+                        alert(data.info);
+                    }
+            })}
+	});	
+</script>

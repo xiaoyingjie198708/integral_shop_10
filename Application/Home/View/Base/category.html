@@ -1,0 +1,131 @@
+{__NOLAYOUT__}
+<div class="container-fluid" style="padding:0;padding-bottom:20px;" id="choose_goods_sku_common_box">
+    <div class="widget-box nomargin">
+        <div class="widget-title"><h5>商品分类列表</h5><span class="label label-info">共 {$count|default=0} 个</span></div>
+        <div class="widget-content">
+            <div style="margin-top:0;" class="widget-box collapsible widget_box_search">
+                <form autocomplete="off" action="{:U('Base/choose_shops')}" id="choose_shops_common_form" ajax="true" method="post">
+                    <input type="hidden" name="callback" value="{$Think.request.callback|htmlspecialchars}" />
+                    <input type="hidden" name="type" value="{$Think.request.type|htmlspecialchars}" />
+                    <div class="widget-title">
+                        <a href="javascript:;"><span class="icon"><i class="icon-search"></i></span><h5>条件筛选</h5></a>
+                    </div>
+                    <div class="collapse in" style="overflow:visible;">
+                        <div class="widget-content search_box1">
+                            <ul class="search_ul">
+                                <li class="search_li">
+                                    商品分类：
+                                    <div class="btn-group">
+                                        <button data-toggle="dropdown" class="btn" style="min-width:120px;" type="button">{$serial_parent_info.serial_name|default="请选择商品分类"}</button>
+                                        <button data-toggle="dropdown" class="btn dropdown-toggle" type="button"><span class="caret"></span></button>
+                                        <input type="hidden" class="serial_id_common" value="{$serial_parent_info.id}" />
+                                        <ul class="dropdown-menu">
+                                            <li><a href="javascript:;" data-value="0">请选择商品分类</a></li>
+                                            <li class="divider"></li>
+                                            <volist name="serial_list" id="serial">
+                                            <li><a href="javascript:;" data-value="{$serial.id}">{$serial.serial_name}</a></li>
+                                            </volist>
+                                        </ul>
+                                    </div>
+                                    <volist name="serial_list_other" id="serial_other">
+                                    <div class="btn-group">
+                                        <button data-toggle="dropdown" class="btn" style="min-width:120px;" type="button">{$serial_other['info']['serial_name']|default="请选择商品分类"}</button>
+                                        <button data-toggle="dropdown" class="btn dropdown-toggle" type="button"><span class="caret"></span></button>
+                                        <input type="hidden" class="serial_id_common" value="{$serial_other['info']['id']}" />
+                                        <ul class="dropdown-menu">
+                                            <li><a href="javascript:;" data-value="0">请选择商品分类</a></li>
+                                            <li class="divider"></li>
+                                            <volist name="serial_other.list" id="s_other">
+                                            <li><a href="javascript:;" data-value="{$s_other.id}">{$s_other.serial_name}</a></li>
+                                            </volist>
+                                        </ul>
+                                    </div>
+                                    </volist>
+                                </li>
+                                <li style="clear:both;"></li>
+                                <li class="search_li">
+                                编码/名称：<input type="text" value="{$Think.request.search|htmlspecialchars}" placeholder="请输入商品编码/SKU名称" name="search">
+                                </li>
+                                <li class="search_li">
+                                SKU状态：
+                                    <div class="btn-group">
+                                        <button data-toggle="dropdown" class="btn" style="min-width:120px;" type="button">
+                                        <if condition="$Think.request.sku_status neq null">
+                                        {$Think.request.sku_status||htmlspecialchars,id2name="sku_status",###}
+                                        <else />
+                                        请选择SKU状态
+                                        </if>
+                                        </button>
+                                        <button data-toggle="dropdown" class="btn dropdown-toggle" type="button"><span class="caret"></span></button>
+                                        <input type="hidden" name="sku_status" value="{$Think.request.sku_status|htmlspecialchars}" />
+                                        <ul class="dropdown-menu sku_status_box">
+                                            <li><a href="javascript:;" data-value="">请选择SKU状态</a></li>
+                                            <li class="divider"></li>
+                                            <volist name="sku_status" id="sku_s" key="sku_i">
+                                            <li><a href="javascript:;" data-value="{$sku_i}">{$sku_s}</a></li>
+                                            </volist>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="search_li"><input type="hidden" id="serial_id" name="serial_id" value="{:I('serial_id')}" /><button type="submit" class="btn btn-primary"><i class="icon-search icon-white"></i> 筛选</button></li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div style="margin-bottom:5px;overflow:hidden;">
+                <div id="choose_goods_sku_common_ex" style="width:86%;float:left;"></div>
+                <div style="float:right;">
+                    <a href="javascript:;" id="submit_choose_goods_sku" class="btn btn-success">确定</a>
+                    <a href="javascript:;" id="reset_choose_goods_sku" class="btn btn btn-danger">清空</a>
+                </div>
+            </div>            
+            <table class="table table_list table-bordered table-center with-check">
+                <thead>
+                    <tr>
+                        <th>
+                            <if condition="$Think.request.type eq 1">
+                                &nbsp;
+                            <else />
+                                <input type="checkbox" class="choose_goods_sku_common_checkbox_all" />
+                            </if>
+                        </th>
+                        <th>ID</th>
+                        <th>商品编码</th>                        
+                        <th>商品名称</th>                        
+                        <th>SKU名称</th>
+                        <th>PN码/扩展码</th>
+                        <th>SKU状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <volist name="sku_list" id="sku">
+                    <tr>
+                        <td>
+                        <if condition="$Think.request.type eq 1">
+                        <input type="radio" class="choose_goods_sku_common_checkbox_info" name="choose_goods_sku_radio" value="{$sku.id}" data-name="{$sku.sku_name}" />
+                        <else />
+                        <input type="checkbox" class="choose_goods_sku_common_checkbox_info" value="{$sku.id}" data-name="{$sku.sku_name}" />
+                        </if>
+                        </td>
+                        <td>{$sku.id}</td>
+                        <td>{$sku.commodity_code}</td>
+                        <td>{$sku.goods_name}</td>
+                        <td>{$sku.sku_name}</td>
+                        <td>{$sku.goods_pn_code|default="--"} / {$sku.goods_extern_code|default="--"}</td>
+                        <td>
+                            <span class="badge status" data-id="{$sku.id}" data-status="{$sku.sku_status}">
+                                {:id2name('sku_status',$sku['sku_status'])}
+                            </span>
+                        </td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul id="choose_goods_sku_common_page_box">{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    
+</script>

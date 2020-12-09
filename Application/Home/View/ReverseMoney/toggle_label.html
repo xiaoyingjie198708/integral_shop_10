@@ -1,0 +1,87 @@
+{__NOLAYOUT__}
+<div style="margin-bottom: 10px;">
+    <a href="javascript:;" class="btn btn-mini add_comment" data-order_id="{$info.reverse_order_id}"><i class="icon-edit"></i> 添加备注</a>
+    <if condition="$reverse_money['reverse_status'] eq 4">
+        <a href="javascript:;" class="btn btn-mini update_order" data-order_id="{$info.reverse_order_id}" data-type="1"><i class="icon-ok"></i> 审核通过</a>
+        <a href="javascript:;" class="btn btn-mini update_order" data-order_id="{$info.reverse_order_id}" data-type="2"><i class="icon-remove"></i> 审核失败</a>
+    </if>
+</div>
+<if condition="$type eq 1">
+    <div>
+        <table class="table table-bordered">
+            <tr>
+                <td>反向订单编号：</td>
+                <td>{$info.order_cur_id}</td>
+                <td>原订单号</td>
+                <td>{$info.forward_order_cur_id}</td>
+            </tr>
+            <tr>
+                <td>申请设备：</td>
+                <td>{$info.order_way|id2name='order_way',###}</td>
+                <td>状态：</td>
+                <td>{$info.order_status|id2name='reverse_order_status',###}</td>
+            </tr>
+            <tr>
+                <td>用户备注信息</td>
+                <td colspan="3">{$info.comment}</td>
+            </tr>
+        </table>
+    </div>
+    <elseif condition="$type eq 2"/>
+    <div>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>商品编码</th>
+                    <th>商品名称</th>
+                    <th>销售价</th>
+                    <th>数量</th>
+                    <th>使用积分</th>
+                    <th>优惠券</th>
+                    <th>优惠码</th>
+                    <th>储值卡</th>
+                    <th>商家</th>
+                </tr>
+            </thead>
+            <tbody>
+            <volist name='order_goods_list' id='order_goods'>
+                <tr>
+                    <td>{$order_goods.goods_code}</td>
+                    <td>{$order_goods.goods_name}</td>
+                    <td>{$order_goods.goods_price}</td>
+                    <td>{$order_goods.numbers}</td>
+                    <td>{$order_goods.use_integral|default='0'}</td>
+                     <td>{$order_goods.coupon_txt|default='未使用'}</td>
+                    <td>{$order_goods.coupon_code_txt|default='未使用'}</td>
+                    <td>{$order_goods.storage_money|default='未使用'}</td>
+                    <td>{$order_goods.shops_name}</td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+     <elseif condition="$type eq 3"/>
+        <div>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>备注内容</th>
+                        <th>备注时间</th>
+                        <th>备注人</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <empty name="comment_list">
+                    <tr><td colspan="3">没有备注信息</td></tr>
+                </empty>
+                <volist name='comment_list' id='comment_info'>
+                    <tr>
+                        <td>{$comment_info.comment}</td>
+                        <td>{$comment_info.create_time}</td>
+                        <td>{$comment_info.user_name}</td>
+                    </tr>
+                </volist>
+                </tbody>
+            </table>
+        </div>
+</if>

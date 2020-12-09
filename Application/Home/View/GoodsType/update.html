@@ -1,0 +1,86 @@
+{__NOLAYOUT__}
+<style>
+.form-horizontal .control-label{width:100px;}
+.form-horizontal .controls{margin-left:120px;}
+.form-horizontal .form-actions{padding-left:120px;}
+.select2-results{max-height:300px;}
+</style>
+<div class="widget-box" style="margin:0;">
+    <div class="widget-content nopadding">
+        <form class="form-horizontal add_form" ajax="true" action="{:U('GoodsType/update')}" autocomplete="off">   
+            <div class="control-group">
+                <label class="control-label">类型名称：</label>
+                <div class="controls">
+                    <input type="text" name="type_name" empty="请输入类型名称" id="type_name" value="{$info.type_name}" />
+                </div>
+            </div>
+<!--            <div class="control-group">
+                <label class="control-label">物理类别：</label>
+                <div class="controls">
+                    <select name="physics_type_id" id="physics_type_id" style="min-width: 150px;">
+                        <option value=" ">请选择物理类别</option>
+                        <foreach name="Think.config.physics_type" item="type" key="type_i">
+                            <option value="{$type_i}" {$info['physics_type_id'] == $type_i ? 'selected' : ''}>{$type}</option>
+                        </foreach>
+                    </select>
+                </div>
+            </div>-->
+            <div class="control-group">
+                <label class="control-label">类型状态：</label>
+                <div class="controls">
+                    <div class="btn-group change_status">
+                        <a data-status="1" class="btn btn-mini {:set_class('1',$info['type_status'],'btn-success active')}">上架</a>
+                        <a data-status="2" class="btn btn-mini {:set_class('2',$info['type_status'],'active')}">下架</a>
+                    </div>
+                </div>
+                <input type="hidden" id="type_status" name="type_status" value="{$info.type_status}" />
+            </div>
+            <div class="form-actions">
+                <input type="hidden" name="type_id" id="type_id" value="{$info.type_id}"/>
+                <input type="submit" value="提交" class="btn" />
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+$('select').select2();
+$('.change_status a').click(function() {
+    var _this = $(this);
+    if (_this.hasClass('active')) return false;
+    _this.parent().find('a').removeClass('active');
+    _this.addClass('active');
+    if (_this.index() == 1) _this.prev().removeClass('btn-success');
+    else _this.addClass('btn-success');
+    $('#type_status').val($(this).data('status'));
+});
+$('.add_form').form({
+     start:function() {
+        $('.error').removeClass('error');
+        remove_error();
+    },
+    error:function(data,_this) {
+        if (_this) {
+            error(data,_this);
+            $('.error').removeClass('error');
+            _this.parents('.control-group').addClass('error');
+        }else alert(data);
+    },
+    ajaxcallback:function(data) {
+        if (data.status) {
+            tip_close();
+            location.reload();
+        }else {
+            if (data.data) {
+                var _obj = $('#'+data.data);
+                $('.error').removeClass('error');
+                _obj.parents('.control-group').addClass('error');
+                _obj.focus();
+                error(data.info,_obj);
+            }else {
+                alert(data.info);
+                tip_close();
+            }
+        }
+    }
+});
+</script>

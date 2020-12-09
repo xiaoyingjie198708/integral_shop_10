@@ -1,0 +1,51 @@
+{__NOLAYOUT__}
+<div class="widget-box" style="margin:0;">
+    <div class="widget-content nopadding">
+        <form class="form-horizontal send_sms_form" ajax="true" action="{:U('SMSLog/send_sms')}" autocomplete="off">   
+            <div class="control-group">
+                <label class="control-label">手机号码：</label>
+                <div class="controls"><input type="text" name="phone" id="phone" placeholder="请输入手机号码" empty="请输入手机号码"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">短信内容：</label>
+                <div class="controls">
+                    <textarea id="sms_content" name="sms_content" placeholder="请输入短信内容" empty="请输入短信内容"></textarea>
+                </div>
+            </div>
+            <div class="form-actions">
+                <input type="submit" value="提交" class="btn" />
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+$('.send_sms_form').form({
+     start:function() {
+        $('.error').removeClass('error');
+        remove_error();
+    },
+    error:function(data,_this) {
+        if (_this) {
+            error(data,_this);
+            $('.error').removeClass('error');
+            _this.parents('.control-group').addClass('error');
+        }else alert(data);
+    },
+    ajaxcallback:function(data) {
+        if (data.status) {
+            tip_close();
+            location.reload();
+        }else {
+            if (data.data) {
+                var _obj = $('#'+data.data);
+                $('.error').removeClass('error');
+                _obj.parents('.control-group').addClass('error');
+                _obj.focus();
+                error(data.info,_obj);
+            }else {
+                alert(data.info);
+            }
+        }
+    }
+});
+</script>

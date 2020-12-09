@@ -1,0 +1,78 @@
+{__NOLAYOUT__}
+<style>
+.form-horizontal .control-label{width:100px;}
+.form-horizontal .controls{margin-left:120px;}
+.form-horizontal .form-actions{padding-left:120px;}
+.controls label{display:inline-block; height:20px; padding:4px 10px 4px 0;margin-bottom:0;}
+</style>
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<div class="widget-box" style="margin:0;">
+    <div class="widget-content nopadding">
+        <form class="form-horizontal update_menu_form" ajax="true" action="{:U('Menu/update')}" autocomplete="off">   
+            <div class="control-group">
+                <label class="control-label">菜单名称：</label>
+                <div class="controls">
+                    <input type="text" name="name" empty="请输入菜单名称" id="name" value="{$info.name}" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">菜单路径：</label>
+                <div class="controls">
+                    <input type="text" name="url" id="url" value="{$info.url}" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">菜单排序：</label>
+                <div class="controls">
+                    <input type="text" style="width:100px;" name="sort" id="sort" value="{$info.sort}" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">左边显示：</label>
+                <div class="controls">
+                    <label><input type="radio" name="is_show" value="1" {$info['is_show'] == 1 ? 'checked' : ''}/>是</label>
+                    <label><input type="radio" name="is_show" value="0" {$info['is_show'] == 0 ? 'checked' : ''}/>否</label>
+                </div>
+            </div>
+            <div class="form-actions">
+                <input type="hidden" id="id" name="id" value="{$info.id}" />
+                <input type="hidden" id="p_id" name="p_id" value="{$info.p_id}" />
+                <input type="submit" value="提交" class="btn" />
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+$('input[type=checkbox],input[type=radio]').uniform(); //美化checkbox，radio按钮
+$('.update_menu_form').form({
+     start:function() {
+        $('.error').removeClass('error');
+        remove_error();
+    },
+    error:function(data,_this) {
+        if (_this) {
+            error(data,_this);
+            $('.error').removeClass('error');
+            _this.parents('.control-group').addClass('error');
+        }else alert(data);
+    },
+    ajaxcallback:function(data) {
+        if (data.status) {
+            $('#name_'+data.info).html(data.data);
+            tip_close();
+        }else {
+            if (data.data) {
+                var _obj = $('#'+data.data);
+                $('.error').removeClass('error');
+                _obj.parents('.control-group').addClass('error');
+                _obj.focus();
+                error(data.info,_obj);
+            }else {
+                alert(data.info);
+                tip_close();
+            }
+        }
+    }
+});
+</script>

@@ -1,0 +1,42 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>库存操作日志列表</h5></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>商品编码</th>
+                        <th>商品名称</th>
+                        <th>操作账号</th>
+                        <th>操作类型</th>
+                        <th>操作数量</th>
+                        <th>商家</th>
+                        <th>创建时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="7">还没有任何商品库存操作日志信息~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                    <tr>
+                        <td>{$info.goods_code}</td>
+                        <td>{$info.goods_name}</td>
+                        <td>{$info.user_name}</td>
+                        <td>{$info.stock_type|id2name='stock_type',###}</td>
+                        <td>{$info.handle_number}</td>
+                        <td>{$info.shops_name}</td>
+                        <td>{$info.create_time}</td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>

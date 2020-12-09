@@ -1,0 +1,304 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/jquery.gritter.css" />
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.gritter.min.js"></script>
+<style>
+    .controls label{display:inline-block; height:20px; padding:4px 10px 4px 0;margin-bottom:0;}
+</style>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>维护优惠码关联信息</h5><a class="btn btn-success btn-mini" href="{:back_list_url()}"><i class="icon-share-alt icon-white"></i> 返回列表</a></div>
+        <div class="widget-content">
+        <form class="form-horizontal" method="post" ajax="true" id="add_form" autocomplete="off">
+            <input type="hidden" name="coupon_code_id" id="coupon_code_id" value="{$info.coupon_code_id}"/>
+            <div class="control-group">
+                <label class="control-label">优惠码名称：</label>
+                <div class="controls"><input type="text" name="coupon_code_name" id="coupon_code_name" empty="请输入优惠券名称" placeholder="请输入优惠券名称" value="{$info.coupon_code_name}" disabled/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">优惠码类型：</label>
+                <div class="controls">
+                    <foreach name="Think.config.coupon_use_type" item="type" key="type_i">
+                        <label><input type="radio" name="coupon_use_type" value="{$type_i}" {$type_i == $info['coupon_use_type'] ? 'checked' : ''} disabled/>{$type}</label>
+                    </foreach>
+                </div>
+            </div>
+            <if condition="$info['coupon_use_type'] eq 2 ">
+                <div class="control-group">
+                    <label class="control-label">参与商家：</label>
+                    <div class="controls">
+                        <button class="btn btn-success" type="button" id="add_shops"><i class="icon-plus icon-white"></i> 选择商家</button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label"></label>
+                    <div class="controls">
+                        <table class="table table_list table-bordered table-center" style="width: 82%;">
+                             <thead>
+                                <tr>
+                                    <th>商家编码</th>
+                                    <th>商家名称</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <empty name="relation_list">
+                                <tr><td colspan="3">没有添加任何参与商家，请添加</td></tr>
+                            </empty>
+                            <volist name="relation_list" id="shops">
+                                <tr>
+                                    <td>{$shops.relation_code}</td>
+                                    <td>{$shops.shops_name}</td>
+                                    <td>
+                                        <a href="javascript:;" data-id="{$shops.id}" data-title="{$shops.shops_name}" data-relation_id="{$shops.relation_id}" class="btn btn-mini relation_del relation_shops_id"><i class="icon-trash"></i> 删除</a>
+                                    </td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                    </div>
+            </if>
+            <if condition="$info['coupon_use_type'] eq 3 ">
+                <div class="control-group">
+                    <label class="control-label">绑定分类</label>
+                    <div class="controls">
+                        <table class="table table_list table-bordered table-center" style="width: 82%;">
+                            <thead>
+                                <tr>
+                                    <th>分类名称</th>
+                                    <th>分类编码</th>
+                                    <th>状态</th>
+                                    <th>子节点</th>
+                                    <th>分类级别</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <empty name="list">
+                                <td colspan="7">还没有商品分类，请先创建~~~</td>
+                            </empty>
+                                <volist name="list" id="info">
+                                <tr class="tree_list_child list_child_{$info.goods_category_parent_id}" style="{:set_class($info['goods_category_parent_id'],'0','display:none;','>')}" data-path="{$info.goods_category_path}">
+                                    <td class="tree_list" data-tree="{$info.goods_category_level}" style="text-align:left;">
+                                        <a href="javascript:;" data-id="{$info.goods_category_id}" class="list_colse">{$info.goods_category_name}</a>
+                                    </td>
+                                    <td>{$info.goods_category_code}</td>
+                                    <td>
+                                        <span class="badge status" data-id="{$info.goods_category_id}" data-status="{$info.goods_category_status}">
+                                            {:id2name('goods_category_status',$info['goods_category_status'])}
+                                        </span>
+                                    </td>
+                                    <td>{$info.child_node|id2name='child_node',###}</td>
+                                    <td>{$info.goods_category_level}</td>
+                                    <td>
+                                        <if condition="($info['last_node'] gt 0) and ($info['select_node'] eq 0)">
+                                            <a class="btn btn-mini relation_category" href="javascript:;" data-id="{$info['goods_category_id']}"><i class="icon-retweet"></i> 关联</a>
+                                        <elseif condition="$info['select_node'] gt 0"/>
+                                            <a class="btn btn-mini unrelation_category" href="javascript:;" data-id="{$info['goods_category_id']}"><i class="icon-retweet"></i> 取消关联</a>
+                                        <else />
+                                           不可关联 
+                                        </if>
+
+                                    </td>
+                                </tr>
+                                </volist>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </if>
+            <if condition="$info['coupon_use_type'] eq 4">
+                <div class="control-group">
+                    <label class="control-label">绑定商品：</label>
+                    <div class="controls">
+                        <button class="btn btn-success" type="button" id="add_goods_btn"><i class="icon-plus icon-white"></i> 添加商品</button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label"></label>
+                    <div class="controls">
+                        <table class="table table_list table-bordered table-center" style="width: 82%;">
+                             <thead>
+                                <tr>
+                                    <th>商品编码</th>
+                                    <th>物料编码</th>
+                                    <th>商品名称</th>
+                                    <th>商家</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <empty name="relation_list">
+                                <tr><td colspan="5">没有添加任何绑定商品</td></tr>
+                            </empty>
+                            <volist name="relation_list" id="goods_info">
+                                <tr>
+                                    <td>{$goods_info.goods_code}</td>
+                                    <td>{$goods_info.goods_materiel_code}</td>
+                                    <td>{$goods_info.goods_name}</td>
+                                    <td>{$goods_info.shops_name}</td>
+                                    <td>
+                                        <a href="javascript:;" data-id="{$goods_info.id}" data-title="{$goods_info.goods_name}" data-relation_id="{$goods_info.relation_id}" class="btn btn-mini relation_del relation_goods_id"><i class="icon-trash"></i> 删除</a>
+                                    </td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                        <notempty name="relation_page"><div class="pagination alternate page" style="margin-right: 18%;"><ul>{$relation_page}</ul></div></notempty>
+                    </div>
+                </div>
+            </if>
+            <if condition="$info['coupon_use_type'] lt 4 ">
+                <div class="control-group">
+                    <label class="control-label">排除商品：</label>
+                    <div class="controls">
+                        <button class="btn btn-success" type="button" id="exclude_goods_btn"><i class="icon-plus icon-white"></i> 添加商品</button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label"></label>
+                    <div class="controls">
+                        <table class="table table_list table-bordered table-center" style="width: 82%;">
+                             <thead>
+                                <tr>
+                                    <th>商品编码</th>
+                                    <th>物料编码</th>
+                                    <th>商品名称</th>
+                                    <th>商家</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <empty name="exclude_goods_list">
+                                <tr><td colspan="5">没有添加任何排除商品，如果需要排除商品，请添加</td></tr>
+                            </empty>
+                            <volist name="exclude_goods_list" id="exclude_goods">
+                                <tr>
+                                    <td>{$exclude_goods.goods_code}</td>
+                                    <td>{$exclude_goods.goods_materiel_code}</td>
+                                    <td>{$exclude_goods.goods_name}</td>
+                                    <td>{$exclude_goods.shops_name}</td>
+                                    <td>
+                                        <a href="javascript:;" data-id="{$exclude_goods.id}" data-title="{$exclude_goods.goods_name}" class="btn btn-mini goods_del exclude_goods_id" data-goods_id="{$exclude_goods.relation_id}"><i class="icon-trash"></i> 删除</a>
+                                    </td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                        <notempty name="page"><div class="pagination alternate page" style="margin-right: 18%;"><ul>{$page}</ul></div></notempty>
+                    </div>
+                </div>
+            </if>
+        </form>
+    </div>
+</div>
+</div>
+<script type="text/javascript">
+    $('input[type=checkbox],input[type=radio]').uniform(); //美化checkbox，radio按钮
+     var _coupon_id = $('#coupon_code_id').val();
+    /*-----------------------------------------------排除商品-------------------------------------------*/
+    $("#exclude_goods_btn").click(function(){
+        var _ids = new Array();
+        $(".exclude_goods_id").each(function(){
+            _ids.push($(this).data('goods_id'));
+        });
+        choose_goods(_ids,'choose_exclude_goods_success');
+    });
+    
+    function choose_exclude_goods_success(_data){
+        $.post("{:U('CouponCodeEdit/relation_exclude_goods')}",{coupon_code_id:_coupon_id,goods_ids:_data},function(data){
+            if (data.status) location.reload();
+            else alert(data.info);
+        });
+    }
+    /*-----------------------------------------------删除排除商品-----------------------------------------*/
+    $(".goods_del").click(function(){
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (confirm('确认删除 '+$(this).data('title')+' 吗？')) {
+            _this.data('send','off');
+            $.post("{:U('CouponCodeEdit/del_exclude_goods')}",{id:$(this).data('id')},function(data) {
+                _this.data('send','on');
+                if (data.status) location.reload();
+                else alert(data.info);
+            });
+        }
+    });
+    /*-----------------------------------------------关联商家-------------------------------------------*/
+    $("#add_shops").live('click',function(){
+        var _ids = new Array();
+        $(".relation_shops_id").each(function(){
+            _ids.push($(this).data('relation_id'));
+        });
+        choose_shops(_ids,'choose_shops_success');
+    });
+    
+    function choose_shops_success(_data){
+        $.post("{:U('CouponCodeEdit/relation_shops')}",{coupon_code_id:_coupon_id,shops_ids:_data},function(data){
+            if (data.status) location.reload();
+            else alert(data.info);
+        });
+    }
+    
+    /*-----------------------------------------------删除关联-----------------------------------------*/
+    $(".relation_del").click(function(){
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (confirm('确认删除 '+$(this).data('title')+' 吗？')) {
+            _this.data('send','off');
+            $.post("{:U('CouponCodeEdit/del_relation')}",{id:$(this).data('id')},function(data) {
+                _this.data('send','on');
+                if (data.status) location.reload();
+                else alert(data.info);
+            });
+        }
+    });
+   /*-----------------------------------------------关联分类-------------------------------------------*/ 
+    var _status_obj = $.parseJSON('{$Think.config.goods_category_status|json_encode}');
+    $('select').select2();
+    var _badge_class = ['default','badge-success'];
+    $('.badge').each(function() {
+        var _status = $(this).data('status');
+        if(_status > 0) $(this).addClass(_badge_class[_status]);
+    });
+    $(".relation_category").live('click',function(){
+        var _this = $(this);
+        var _category_id = _this.data('id');
+        $.post("{:U('CouponCodeEdit/relation_category')}",{coupon_code_id:_coupon_id,category_id:_category_id},function(data){
+            if(data.status){
+                _this.removeClass('relation_category').addClass('unrelation_category').html('<i class="icon-retweet"></i>取消关联');
+            }else{
+                alert(data.info);
+            }
+        });
+    });
+    $(".unrelation_category").live('click',function(){
+        var _this = $(this);
+        var _category_id = _this.data('id');
+        $.post("{:U('CouponCodeEdit/unrelation_category')}",{coupon_code_id:_coupon_id,category_id:_category_id},function(data){
+            if(data.status){
+                _this.removeClass('unrelation_category').addClass('relation_category').html('<i class="icon-retweet"></i>关联');
+            }else{
+                alert(data.info);
+            }
+        });
+    });
+    /*-----------------------------------------------关联商品-------------------------------------------*/
+    $("#add_goods_btn").click(function(){
+        var _ids = new Array();
+        $(".relation_goods_id").each(function(){
+            _ids.push($(this).data('relation_id'));
+        });
+        choose_goods(_ids,'choose_goods_success');
+    });
+    
+    function choose_goods_success(_data){
+        $.post("{:U('CouponCodeEdit/relation_goods')}",{coupon_code_id:_coupon_id,goods_ids:_data},function(data){
+            if (data.status) location.reload();
+            else alert(data.info);
+        });
+    }
+</script>

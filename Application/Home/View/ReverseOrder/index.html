@@ -1,0 +1,167 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-zh-CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/tip.jquery.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/export.jquery.js"></script>
+<style>
+    .controls label{display:inline-block; height:20px; padding:4px 10px 4px 0;margin-bottom:0;}
+    .tab-left{border:1px solid #ddd; overflow:hidden;background-color:#fff;}
+    .tab-left .nav{float:left;}
+    .tab-left .nav li{float:none;border-bottom:1px solid #ddd;border-right:1px solid #ddd;height:40px;line-height:40px;padding:0 8px;text-align:center;font-weight:bold;background-color:#f9f9f9;}
+    .tab-left .nav li.active{border-right:none;background-color:#fff;color:#444;}
+    .tab-left .nav li a{background-color:#f9f9f9;color:#999;}
+    .tab-left .nav li.active a{color:#444;background-color:#fff;}
+    .tab-left .tab-content{border:none;}
+    .zc_data_list{list-style:none;}
+    .zc_data_list li{float:left; margin:0 8px 8px 0;}
+    .pointer{cursor:pointer;}
+    .warging{border-radius:50%;padding:2px 3px;cursor:pointer;position:absolute;margin-left:4px;}
+</style>
+<style>.select2-results{max-height:218px;overflow:hidden;overflow-y:auto;}</style>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>订单列表</h5></div>
+        <div class="widget-content">
+            {$search_box}
+            <div class="help-block" style="float: left;">
+                提示：点击订单编号和会员账号信息可以查看订单详情
+            </div>
+            <div style="float: right;">
+                <!--<a href="javascript:;" class="btn btn-mini" id="explode_order" data-url="{:U('Order/export')}"><i class="icon-share"></i> 导出</a>-->
+            </div>
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>退换货单号</th>
+                        <th>原始订单号</th>
+                        <th>会员账号</th>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>申请时间</th>
+                        <th>商家</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <empty name="order_list">
+                    <tr><td colspan="7">还没有任何订单信息</td></tr>
+                </empty>
+                <volist name="order_list" id="order">
+                    <tr>
+                        <td><a href="javascript:;" class="quick_view" data-order_id="{$order.reverse_order_id}">{$order.order_cur_id}</a></td>
+                        <td><a href="javascript:;" class="quick_view" data-order_id="{$order.reverse_order_id}">{$order.forward_order_cur_id}</a></td>
+                        <td>{$order.member_account}</td>
+                        <td>{$order.order_type|id2name='reverse_order_type',###}</td>
+                        <td>{$order.order_status|id2name='reverse_order_status',###}</td>
+                        <td>{$order.create_time}</td>
+                        <td>{$order.shops_name}</td>
+                    </tr>
+                </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    /*--------------------------------------------------------------------------切换快捷查看-------------------------------------------------------------*/
+    $(".quick_view").toggle(function () {
+        var _this = $(this);
+        if ($(".quick_tr").length > 0)
+            $(".quick_tr").remove();
+        $.post("{:U('ReverseOrder/quick_view')}", {order_id: _this.data('order_id')}, function (data) {
+            if (data.status) {
+                var _current_tr = _this.parents('tr');
+                var _td_count = _current_tr.find('td').length;
+                _current_tr.after($('<tr class="quick_tr"><td colspan="' + _td_count + '">' + data.info + '</td></tr>'));
+            }
+        });
+    }, function () {
+        $(".quick_tr").remove();
+    });
+    /*--------------------------------------------------------------------------添加备注-----------------------------------------------------------------*/
+    $(".add_comment").live('click',function(){
+        var _order_id = $(this).data('order_id');
+        tipwindows('添加备注',getaddCommentBox(_order_id));
+    });
+    function getaddCommentBox(_order_id){
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post("{:U('ReverseOrder/get_order_comment')}",{order_id:_order_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+    /*--------------------------------------------------------------------------取消订单-----------------------------------------------------------------*/
+    $(".update_order").live('click',function(){
+        var _order_id = $(this).data('order_id');
+        var _type = $(this).data('type');
+        var _title = '';
+        var _action = '';
+        var _order_status = 30;
+        if(_type == 1){
+            _title = '审核通过';
+        }else if(_type == 2){
+            _title = '审核拒绝';
+            _order_status = 20;
+        }else{
+            _title = '取消订单';
+            _order_status = 40;
+        }
+        _action = "{:U('ReverseOrder/get_update_order')}";
+        tipwindows(_title,getUpdateOrderBox(_action,_order_id,_order_status));
+    });
+    function getUpdateOrderBox(_action,_order_id,_order_status){
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post(_action,{order_id:_order_id,order_status:_order_status},function(data){_return = data.info;},'json');
+        return _return;
+    }
+    
+    $(".reverse_money_btn").live('click',function(){
+        var _order_id = $(this).data('order_id');
+        tipwindows('退款申请',getReverseMoneyBox(_order_id));
+    });
+    function getReverseMoneyBox(_order_id){
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post("{:U('ReverseOrder/get_reverse_money')}",{order_id:_order_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+    
+    $(".order_complete_btn").live('click',function(){
+        var _order_id = $(this).data('order_id');
+        $.post("{:U('ReverseOrder/order_complete')}",{order_id:_order_id},function(data){
+            if(data.status){
+                alert(data.info);
+                refresh_label();
+            }else{
+                alert(data.info);
+            }
+        });
+    });
+    /*--------------------------------------------------------------------------导出订单-----------------------------------------------------------------*/
+//    $("#explode_order").export({
+//       create_start:$("input[name='create_start']").val(),
+//       create_end:$("input[name='create_end']").val(),
+//       pay_start:$("input[name='pay_start']").val(),
+//       pay_end:$("input[name='pay_end']").val(),
+//       payment_trade_no:$("input[name='payment_trade_no']").val(),
+//       name:$("input[name='name']").val(),
+//       mobile:$("input[name='mobile']").val(),
+//       order_type:$("select[name='order_type']").val(),
+//       pay_status:$("select[name='pay_status']").val(),
+//       order_cur_id:$("input[name='order_cur_id']").val(),
+//       order_status:$("select[name='order_status']").val(),
+//    });
+    /*--------------------------------------------------------------------------刷新标签-----------------------------------------------------------------*/
+    function refresh_label(){
+//        var _type_id = $("#opt_type").val();
+//        $(".toggle_label").eq(_type_id).trigger('click');
+        location.reload();
+    }
+</script>

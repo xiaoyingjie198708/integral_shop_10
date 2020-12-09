@@ -1,0 +1,220 @@
+{__NOLAYOUT__}
+<notempty name="search_list">
+<div class="widget-box collapsible widget_box_search" style="margin-top:0;">
+    <form method="{$search_list.method|default='get'}" ajax="{$search_list.ajax|default='false'}" id="search_form_box{$search_list.index}" action="{$search_list.url}" autocomplete="off">
+        <div class="widget-title">
+            <a href="javascript:;"><span class="icon"><i class="icon-search"></i></span><h5>条件筛选</h5></a>
+        </div>
+        <div class="collapse" id="search_box{$search_list.index}">
+            <div class="widget-content search_box">
+                <ul class="search_ul">
+                    <volist name="search_list.other" id="other">
+                    <li style="margin-top:10px;" class="{$other['type'] == 'select-ajax' ? 'search_li_ajax' : 'search_li'}">
+                    <switch name="other.type" >
+                        <case value="input">
+                            <div class="show_name" style="text-align:right;float:left">{$other.show_name}：</div>
+                            <div style="float:left">
+                            <input type="text" style="width:300px;" name="{$other.name}" placeholder="{$other.tip}" value="{:I($other['name'],'','trim,htmlspecialchars')}" />
+                            </div>
+                        </case>
+                        <case value="select">
+                            <div class="show_name" style="text-align:right;float:left">{$other.show_name}：</div>
+                            <div style="float:left">
+                                <select name="{$other.name}" style="{$other['multiple'] ? '' : 'min-width:200px;'}" {$other['multiple'] ? 'multiple' : ''}>
+                                <if condition="$other.tip neq ''">
+                                    <option value=" " {:set_class('',I($other['name'],'','htmlspecialchars'),'selected')}>{$other.tip}</option>
+                                </if>
+                                <if condition="$other['multiple']">
+                                    <foreach name="other.select" item="s_val" key="s_key">
+                                    <option value="{$s_key}" {:in_array($s_key,I($other['param_name'],'','htmlspecialchars')) ? 'selected' : ''}>{$s_val}</option>
+                                    </foreach>
+                                <else />
+                                    <foreach name="other.select" item="s_val" key="s_key">
+                                    <option value="{$s_key}" {:set_class($s_key,I($other['name'],'','htmlspecialchars'),'selected')}>{$s_val}</option>
+                                    </foreach>
+                                </if>
+                            </select>
+                            </div>
+                        </case>
+                        <case value="select-ajax">
+                            <style>.{$other.name}{margin-right:10px;}</style>
+                            <div class="show_name" style="text-align:right;float:left">{$other.show_name}：</div>
+                            <div style="float:left">
+                            <volist name="other.select" id="select">
+                                <select class="{$other.name}" data-tip="{$other.tip}" data-select="ajax" style="min-width:200px;" onchange="get_select_ajax_for_search(this,'{$other.url}')">
+                                    <option value=" " {:set_class('',I($other['name'],'','htmlspecialchars'),'selected')}>{$other.tip}</option>
+                                    <foreach name="select" item="s_val" key="s_key">
+                                    <option value="{$s_key}" {:set_class($s_key,explode('_',I($other['name'],'','htmlspecialchars')),'selected','in')}>{$s_val}</option>
+                                    </foreach>
+                                </select> 
+                            </volist>
+                            </div>
+                            <input type="hidden" name="{$other.name}" value="{:I($other['name'],'','htmlspecialchars')}" />
+                        </case>
+                        <case value="date">
+                            <div class="show_name" style="text-align:right;float:left">{$other.show_name}：</div>
+                            <div style="float:left">
+                            <for start="0" end="count($other['name'])">
+                                <input type="text" class="search_date" name="{$other['name'][$i]}" style="width:135px;" placeholder="{$other['tip'][$i]}" value="{:I($other['name'][$i],'','htmlspecialchars,urldecode')}" />{:set_class($i,count($other['name'])-1,'&nbsp;-&nbsp;','<')}
+                            </for>
+                            </div>
+                        </case>
+                        <case value="between">
+                            <div class="show_name" style="text-align:right;float:left">{$other.show_name}：</div>
+                            <div style="float:left">
+                            <for start="0" end="count($other['name'])">
+                                <input type="text" name="{$other['name'][$i]}" style="width:135px;" placeholder="{$other['tip'][$i]}" value="{:I($other['name'][$i],'','htmlspecialchars,urldecode')}" />{:set_class($i,count($other['name'])-1,'&nbsp;-&nbsp;','<')}
+                            </for>
+                            </div>
+                        </case>
+                        <default />
+                        <div class="show_name" style="text-align:right;float:left">{$other.show_name}：</div>
+                        <div style="float:left"><input type="text" style="width:300px;" name="{$other.name}" placeholder="{$other.tip}" value="{:I($other['name'],'','htmlspecialchars')}" /></div>
+                    </switch>
+                    </li>
+                    </volist>
+                </ul>
+            </div>
+        </div>
+        <div class="collapse in">
+            <div class="widget-content search_box">
+                <ul class="search_ul">
+                    <volist name="search_list.main" id="main">
+                    <li class="search_li">
+                    <switch name="main.type" >
+                        <case value="input">
+                            {$main.show_name}：<input type="text" name="{$main.name}" style="width:{$main.width|default=180}px;" placeholder="{$main.tip}" value="{:I($main['name'],'','htmlspecialchars')}" />
+                        </case>
+                        <case value="select">
+                            {$main.show_name}：
+                            <select name="{$main.name}" style="{$main['multiple'] ? '' : 'min-width:200px;'}" {$main['multiple'] ? 'multiple' : ''}>
+                                <if condition="$main.tip neq ''">
+                                    <option value=" " {:set_class('',I($main['name'],'','htmlspecialchars'),'selected')}>{$main.tip}</option>
+                                </if>
+                                <if condition="$main['multiple']">
+                                    <foreach name="main.select" item="s_val" key="s_key">
+                                    <option value="{$s_key}" {:in_array($s_key,I($main['param_name'],'','htmlspecialchars')) ? 'selected' : ''}>{$s_val}</option>
+                                    </foreach>
+                                <else />
+                                    <foreach name="main.select" item="s_val" key="s_key">
+                                    <option value="{$s_key}" {:set_class($s_key,I($main['name'],'','htmlspecialchars'),'selected')}>{$s_val}</option>
+                                    </foreach>
+                                </if>
+                            </select>
+                        </case>
+                        <case value="select-ajax">
+                            <style>.{$main.name}{margin-right:10px;}</style>
+                            <div class="show_name" style="text-align:right;float:left">{$main.show_name}：</div>
+                            <div style="float:left">
+                            <volist name="main.select" id="select">
+                                <select class="{$main.name}" data-tip="{$main.tip}" data-select="ajax" style="min-width:200px;" onchange="get_select_ajax_for_search(this,'{$main.url}')">
+                                    <option value=" " {:set_class('',I($main['name'],'','htmlspecialchars'),'selected')}>{$main.tip}</option>
+                                    <foreach name="select" item="s_val" key="s_key">
+                                    <option value="{$s_key}" {:set_class($s_key,explode('_',I($main['name'],'','htmlspecialchars')),'selected','in')}>{$s_val}</option>
+                                    </foreach>
+                                </select> 
+                            </volist>
+                            </div>
+                            <input type="hidden" name="{$main.name}" value="{:I($main['name'],'','htmlspecialchars')}" />
+                        </case>
+                        <case value="date">
+                            {$main.show_name}：<for start="0" end="count($main['name'])">
+                                <input type="text" class="search_date" name="{$main['name'][$i]}" style="width:135px;" placeholder="{$main['tip'][$i]}" value="{:I($main['name'][$i],'','htmlspecialchars,urldecode')}" />{:set_class($i,count($main['name'])-1,'&nbsp;-&nbsp;','<')}
+                            </for>
+                        </case>
+                        <case value="between">
+                            {$main.show_name}：<for start="0" end="count($main['name'])">
+                                <input type="text" name="{$main['name'][$i]}" style="width:135px;" placeholder="{$main['tip'][$i]}" value="{:I($main['name'][$i],'','htmlspecialchars,urldecode')}" />{:set_class($i,count($main['name'])-1,'&nbsp;-&nbsp;','<')}
+                            </for>
+                        </case>
+                         <case value="hidden">
+                            <input type="hidden" name="{$main.name}" style="width:{$main.width|default=180}px;" placeholder="{$main.tip}" value="{:I($main['name'],'','htmlspecialchars')}" />
+                        </case>
+                        <default />{$main.show_name}：<input type="text" style="width:{$main.width|default=180}px;" name="{$main.name}" placeholder="{$main.tip}" value="{:I($main['name'],'','htmlspecialchars,urldecode')}" />
+                    </switch>
+                    </li>
+                    </volist>
+                    <li class="search_li"><button class="btn btn-primary" type="submit"><i class="icon-search icon-white"></i> 筛选</button></li>
+                    <notempty name="search_list.button">
+                        <volist name="search_list.button" id="button">
+                            <li class="search_li">{$button}</li>
+                        </volist>
+                    </notempty>
+                    <notempty name="search_list.other">
+                    <li class="search_li"><a style="margin-top:15px;" href="#search_box{$search_list.index}" class="more_search" data-toggle="collapse">高级筛选</a></li>
+                    </notempty>
+                </ul>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+if ($(".search_date").length) {
+    $(".search_date").datetimepicker({showSecond: true,timeFormat: 'hh:mm:ss', stepHour: 1,stepMinute: 1,stepSecond: 1});
+}
+$('#search_form_box{$search_list.index}').find('select').each(function() {$(this).select2();});
+var _search_page_name = '{$search_page_name}{$search_list.index}';
+$('.more_search').click(function() {
+    var _lock = $("#search_box{$search_list.index}").hasClass('in');
+    if(!_lock) setCookie(_search_page_name,true);
+    else delCookie(_search_page_name);
+});
+var _search_li_width = 0;
+var _search_show_name_width = 0;
+$('#search_box{$search_list.index} li.search_li').each(function() {
+    if($(this).width() > _search_li_width) _search_li_width = $(this).width();
+});
+$('#search_box{$search_list.index} .show_name').each(function() {
+    if($(this).width() > _search_show_name_width) _search_show_name_width = $(this).width();
+});
+$('#search_box{$search_list.index} li.search_li').width(_search_li_width+1);
+$('#search_box{$search_list.index} .show_name').width(_search_show_name_width);
+if (getCookie(_search_page_name)) $('#search_box{$search_list.index}').addClass('in');
+try {
+    $('#search_form_box{$search_list.index}').form({
+        start:function() {
+            $('#search_form_box{$search_list.index}').find('input,select').each(function() {
+                if (!$.trim($(this).val())) $(this).removeAttr('name');
+                if($(this).data('select') == 'ajax') search_get_last_val($('#search_form_box{$search_list.index}'),$(this).attr('class'));
+            });
+        },
+        ajaxcallback:{$search_list['callback'] ? $search_list['callback'] : '""'}
+    });
+}catch (e) {
+    $('#search_form_box{$search_list.index}').submit(function() {
+        $(this).find('input,select').each(function() {
+            if (!$.trim($(this).val())) $(this).removeAttr('name');
+            if($(this).data('select') == 'ajax') search_get_last_val($('#search_form_box{$search_list.index}'),$(this).attr('class'));
+        });
+    });
+}
+function search_get_last_val(_this,_name) {
+    var _val = [];
+    _this.find('.'+_name).each(function() {
+        if ($.trim($(this).val())) {
+            _val.push($(this).val());
+        }
+    });
+    _this.find('input[name='+_name+']').val(implode('_',_val));
+}
+function get_select_ajax_for_search(_this,_url) {
+    if(!_url) {alert('参数设置错误'); return false;}
+    var _this = $(_this);
+    var _class = _this.attr('class')
+    var _box = _this.parent();
+    _box.find('.'+_class+':gt('+_box.find('.'+_class).index(_this)+')').remove();
+    var _val = _this.val();
+    if(_val <= 0) return false;
+    $.post(_url,{id:_val},function(data) {
+        if (data) {
+            var _select = $('<select class="'+_class+'" data-tip="'+_this.data('tip')+'" data-select="ajax" onchange="get_select_ajax_for_search(this,\''+_url+'\')"></select>').css({'min-width':200}).appendTo(_box);
+            $('<option value=" ">'+_this.data('tip')+'</option>').appendTo(_select);
+            for (var key in data) {
+                $('<option value="'+key+'">'+data[key]+'</option>').appendTo(_select);
+            }
+            _select.select2();
+        }
+    },'json');
+}
+</script>
+</notempty>

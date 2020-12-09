@@ -1,0 +1,64 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-zh-CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/export.jquery.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title"><h5>退货订单明细列表</h5></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>商家名称</th>
+                        <th>订单号</th>
+                        <th>商品名称</th>
+                        <th>商品数量</th>
+                        <th>退现金额</th>
+                        <th>退储值卡金额</th>
+                        <th>退款总金额</th>
+                        <th>退货状态</th>
+                        <th>发起退货时间</th>
+                        <th>最终退货时间</th>
+                        <th>退货原因</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="11">没有任何数据~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                        <tr>
+                            <td>{$info.shops_name}</td>
+                            <td>{$info.order_cur_id}</td>
+                            <td>{$info.goods_name}</td>
+                            <td>{$info.goods_number}</td>
+                            <td>{$info.reverse_cash|price_format}</td>
+                            <td>{$info.reverse_storage_money|price_format}</td>
+                            <td>{$info.total_reverse_value|price_format}</td>
+                            <td>已退款</td>
+                            <td>{$info.create_time}</td>
+                            <td>{$info.update_time}</td>
+                            <td>{$info.comment}</td>
+                        </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+ /*--------------------------------------------------------------------------导出订单-----------------------------------------------------------------*/
+    $("#explode_order").export({
+       'payment_type[]':$("select[name='payment_type[]']").val(),
+       'order_status[]':$("select[name='order_status[]']").val(),
+       'label_id':$("input[name='label_id']").val(),
+       'pay_start':$("input[name='pay_start']").val(),
+       'pay_end':$("input[name='pay_end']").val(),
+    });  
+</script>

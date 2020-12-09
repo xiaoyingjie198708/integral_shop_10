@@ -1,0 +1,148 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>商品配置参数列表</h5><a class="btn btn-success btn-mini" href="javascript:;" id="addParamCategory"><i class="icon-plus icon-white"></i> 添加商品配置参数分类</a></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>参数信息</th>
+                        <th>分类类别</th>
+                        <th>顺序</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="5">还没有任何商品配置参数分类信息，请先创建~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                    <tr class="tree_list_child list_child_{$info.parint_id}" style="{:set_class($info['parint_id'],'0','display:none;','>')}" data-path="{$info.path}">
+                        <td class="tree_list" data-tree="{$info.level}" style="text-align:left;">
+                            <a href="javascript:;" data-id="{$info.show_id}" class="list_colse">{$info.show_name}</a>
+                        </td>
+                        <td>
+                            <if condition="$info['category_type']">
+                                {$info.category_type|id2name='physics_type',###}
+                            <else />
+                                --
+                            </if>
+                        </td>
+                        <td>{$info.show_sort|default='--'}</td>
+                        <td>{$info.create_time}</td>
+                        <td>
+                            <if condition="$info['level'] == 1">
+                                <a href="javascript:;" class="btn btn-mini add_param_name" data-parint_id="{$info.show_id}"><i class=" icon-plus"></i> 添加参数</a>&nbsp;
+                            </if>
+                            <if condition="$info['level'] == 2">
+                                <a href="javascript:;" class="btn btn-mini add_param_value" data-parint_id="{$info.show_id}"><i class="icon-edit"></i> 添加参数值</a>&nbsp;
+                            </if>
+                            
+                            <a href="javascript:;" class="btn btn-mini edit_param" data-id="{$info.show_id}" data-title="{$info.show_name}" data-level="{$info.level}"><i class="icon-edit"></i> 编辑</a>&nbsp;
+                            <a href="javascript:;" data-id="{$info.show_id}" data-title="{$info.show_name}" class="btn btn-mini param_del" data-level="{$info.level}"><i class="icon-trash"></i> 删除</a>
+                        </td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('.param_del').click(function() {
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (confirm('确认删除 '+$(this).data('title')+' 吗？')) {
+            _this.data('send','off');
+            var _level = $(this).data('level');
+            if(_level == 1){
+               $.post("{:U('GoodsParam/delete')}",{param_category_id:$(this).data('id')},function(data) {
+                    _this.data('send','on');
+                    if (data.status) location.reload();
+                    else alert(data.info);
+                }); 
+            }
+            if(_level == 2){
+               $.post("{:U('GoodsParam/delete_param_name')}",{param_id:$(this).data('id')},function(data) {
+                    _this.data('send','on');
+                    if (data.status) location.reload();
+                    else alert(data.info);
+                }); 
+            }
+            if(_level == 3){
+               $.post("{:U('GoodsParam/delete_param_value')}",{param_value_id:$(this).data('id')},function(data) {
+                    _this.data('send','on');
+                    if (data.status) location.reload();
+                    else alert(data.info);
+                }); 
+            }
+        }
+    });
+    
+    $("#addParamCategory").click(function() {
+        tipwindows('添加商品配置参数分类',getAddParamCategoryBox());
+    });
+    function getAddParamCategoryBox() {
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post("{:U('GoodsParam/get_add_page')}",{},function(data){_return = data.info;},'json');
+        return _return;
+    }
+    
+    $(".edit_param").click(function() {
+        var _level = $(this).data('level');
+        if(_level == 1){
+          tipwindows($(this).data('title')+' - 编辑',getEditParamCategoryBox($(this).data('id')));  
+        }
+        if(_level == 2){
+            tipwindows($(this).data('title')+' - 编辑',getEditParamNameBox($(this).data('id')));
+        }
+        if(_level == 3){
+            tipwindows($(this).data('title')+' - 编辑',getEditParamValueBox($(this).data('id')));
+        }
+    });
+    function getEditParamCategoryBox(_id) {
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post("{:U('GoodsParam/get_update_page')}",{param_category_id:_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+    function getEditParamNameBox(_id){
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post("{:U('GoodsParam/get_update_param_name_page')}",{param_id:_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+    function getEditParamValueBox(_id){
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post("{:U('GoodsParam/get_update_param_value_page')}",{param_value_id:_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+    
+    $(".add_param_name").click(function(){
+        tipwindows('添加商品配置参数分类',getAddParamNameBox($(this).data('parint_id')));
+    });
+    
+    function getAddParamNameBox(_id){
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post("{:U('GoodsParam/get_add_param_name_page')}",{parint_id:_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+    $(".add_param_value").click(function(){
+        tipwindows('添加商品配置参数分类',getAddParamValueBox($(this).data('parint_id')));
+    });
+    
+    function getAddParamValueBox(_id){
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post("{:U('GoodsParam/get_add_param_value_page')}",{parint_id:_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+</script>

@@ -1,0 +1,33 @@
+<div id="sidebar">
+    <ul>
+        <volist name="menu_list" id="m_list">
+        <li class="submenu {:set_class($m_list['id'],$choose_menu[1]['id'],'active open')}">
+            <a href="javascript:;"><i class="icon {$m_list.icon}"></i> <span>{$m_list.name}</span></a>
+            <ul>
+                <volist name="m_list.son" id="son">
+                    <if condition="$son['is_show'] gt 0">
+                        <li class="{:set_class($son['id'],$choose_menu[2]['id'],'active')}"><a href="{:U($son['url'] ? $son['url'] : $son['son'][0]['url'])}">{$son.name}</a></li>
+                    </if>
+                </volist>
+            </ul>
+        </li>
+        </volist>
+    </ul>
+</div>
+<if condition="$menu_replace neq 'yes'">
+<div id="content">
+    <div id="content-header">
+        <!-- <notempty name="menu_action.son">
+        <div class="btn-group" style="height:80px;">
+            <volist name="menu_action.son" id="m_son">
+            <a href="{:U($m_son['url'])}" class="btn btn-large tip-bottom {:set_class($m_son['id'],$menu_info['id'],'active')}">{$m_son.name}</a>
+            </volist>
+        </div>
+        </notempty> -->
+    </div>
+    <div id="breadcrumb">
+        <volist name="choose_menu" id="choose" key="choose_i">
+        <a <if condition="$choose_i eq count($choose_menu)">href="javascript:;" class="current"<else />href="{:U($choose['url'],$url_params[$choose_i])}"</if> ><notempty name="choose.icon"><i class="{$choose.icon}"></i></notempty> {$choose.name}</a>
+        </volist>
+    </div>
+</if>

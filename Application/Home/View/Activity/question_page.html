@@ -1,0 +1,60 @@
+{__NOLAYOUT__}
+<style type="text/css">
+	.memlist li{list-style:none;}
+	.clearfix:after,
+	.clearfix:before{content: "";display: table;}
+	.clearfix:after{clear: both;}
+</style>
+{$search_box}
+<div style="border:1px solid #cdcdcd;">  
+	<ul class="memlist fixwidth clearfix" id="q_data_list" style="margin-bottom:0;">
+		<foreach name="data" item="vo" key="k">
+		<li class="clearfix">
+			<div class="left checkboxer" style="padding:3px 0;margin:5px 2px 2px;">
+				<input type="checkbox" value="{$vo.id}" data-title="{$vo.title}" data-type="{$vo.answer_type}" class="checkbox q_data" />{$k+1}、{$vo.title}（{$vo.answer_type}）
+			</div>
+			<div class="left">
+				<volist name="vo.answer" id="answer">
+					<div class="answer">{$answer}</div>
+				</volist>
+			</div>
+		</li>
+		</foreach>
+	</ul>
+	<notempty name="page"><div style="margin-right:20px;" class="pagination alternate page add_goods_suk_page"><ul>{$page}</ul></div></notempty>			
+</div>
+<script type="text/javascript">
+	$('.q_data').uniform();
+	$('.add_goods_suk_page').find('a').click(function() {
+		var _this = $(this);
+		if (_this.attr('href') != 'javascript:;' || _this.attr('href') != '#') {
+			$.get(_this.attr('href'),{},function(data) {
+				if (data.status) {
+					_this.parents('#q_data_box').html(data.info);
+					getCheck();
+				}else {
+					alert(data.info);
+				}
+			});
+		}
+		return false;
+	});
+    $('#q_data_box .q_data').click(function() {
+        var _this = $(this);
+        if (_this.attr('checked')) {
+            var _question_html = '<div class="left" style="padding:3px 5px;margin:2px;"><span class="q_num">'+($('#q_box .question').length+1)+'</span>、'+_this.attr('data-title')+'（'+_this.attr('data-type')+'）</div>';
+            $('<div class="question clearfix" data-id="'+_this.val()+'"></div>').html(_question_html).appendTo($('#q_box'));
+            _this.parents('.checkboxer').next().find('.answer').clone().appendTo($('.question:last'));
+        }else {
+            $('#q_box .question').each(function() {
+                if ($(this).attr('data-id') == _this.val()) {
+                    $(this).remove();
+                    return false;
+                }
+            });
+            $('#q_box .question').each(function() {
+                $(this).find('.q_num').html($(this).index()+1);
+            });
+        }
+    });
+</script>

@@ -1,0 +1,183 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/export.jquery.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>优惠码列表</h5></div>
+        <div class="widget-content">
+            {$search_box}
+            <div class="help-block" style="float: left;">
+                提示：任何修改内容，审核通过后，必须在优惠码列表中才有效
+            </div>
+            <div style="float: right;">
+                <a href="javascript:;" class="btn btn-mini coupon_edit"><i class=" icon-edit"></i> 修改</a>
+                <a href="javascript:;" class="btn btn-mini coupon_enable"><i class=" icon-circle-arrow-up"></i> 启用</a>
+                <a href="javascript:;" class="btn btn-mini coupon_stop"><i class=" icon-circle-arrow-down"></i> 停用</a>
+                <a href="javascript:;" class="btn btn-mini coupon_view"><i class="icon-eye-open" style="margin-right: 0px;"></i> 查看详情</a>
+            </div>
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="checkedAll"/></th>
+                        <th>优惠码名称</th>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>面值金额(元)</th>
+                        <th>推广渠道</th>
+                        <th>审核时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="10">还没有任何优惠码信息，请先创建~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                    <tr>
+                        <td><input type="checkbox" name="coupon_code_id" value="{$info.coupon_code_id}"/></td>
+                        <td>{$info.coupon_code_name}</td>
+                        <td>{$info.coupon_use_type|id2name='coupon_use_type',###}</td>
+                        <td>{$info.coupon_status|id2name='coupon_status',###}</td>
+                        <td>{$info.coupon_value}</td>
+                        <td>{$info.brand_channel|id2name='brand_channel',###}</td>
+                        <td>{$info.check_time|default='暂未审核'}</td>
+                        <td>
+                            <a href="javascript:;" class="btn btn-mini create_coupon_code" data-coupon_code_id="{$info.coupon_code_id}" data-title="{$info.coupon_code_name}"><i class="icon-edit"></i> 生成优惠码</a>&nbsp;
+                            <a href="javascript:;" class="btn btn-mini explode_code" data-coupon_code_id="{$info.coupon_code_id}" data-url="{:U('CouponCode/export_code')}"><i class="icon-share"></i> 导出优惠码</a>&nbsp;
+                        </td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    
+    $('input[type=checkbox]').uniform(); //美化checkbox，radio按钮
+    $("#checkedAll").toggle(function () {
+        $("input[name=coupon_code_id]").each(function () {
+            $(this).parents('span').addClass('checked');
+            $(this).attr('checked', 'checked');
+        });
+    }, function () {
+        $(this).parents('span').removeClass('checked');
+        $("input[name=coupon_code_id]").each(function () {
+            $(this).parents('span').removeClass('checked');
+            $(this).removeAttr('checked');
+        });
+    });
+    $("input[name=coupon_code_id]").click(function () {
+        var _this = $(this);
+        _all_checked = true;
+        var _checked = _this.attr('checked');
+        if (!_checked) {
+            $("#checkedAll").parents('span').removeClass('checked');
+        } else {
+            $("input[name=coupon_code_id]").each(function () {
+                if (!$(this).parents('span').hasClass('checked') && _this.val() != $(this).val()) {
+                    _all_checked = false;
+                }
+            });
+            if (_all_checked && !$("#checkedAll").parents('span').hasClass('checked')) {
+                $("#checkedAll").parents('span').addClass('checked');
+            }
+        }
+    });
+    /*-----------------------------------------------查看优惠码-------------------------------------------*/
+    $(".coupon_view").click(function(){
+        var _checked_count = $("input[name=coupon_code_id]:checked").length;
+        if(_checked_count == 0){
+            alert("请选择一个优惠码");
+            return false;
+        }
+        if(_checked_count > 1){
+            alert("一次只能查看一个优惠码，请取消其它的选择");
+            return false;
+        }
+        var _coupon_code_id = $("input[name=coupon_code_id]:checked").first().val();
+        window.location.href = "{:U('CouponCode/info')}?coupon_code_id=" + _coupon_code_id;
+    });
+    /*-----------------------------------------------启用优惠码-------------------------------------------*/
+    $(".coupon_enable").click(function(){
+        var _checked_count = $("input[name=coupon_code_id]:checked").length;
+        if(_checked_count == 0){
+            alert("请选择一个优惠码");
+            return false;
+        }
+        var _coupon_code_id = '';
+        $("input[name=coupon_code_id]:checked").each(function(){
+            _coupon_code_id += $(this).val() + ',';
+        });
+        $.post("{:U('CouponCode/coupon_enable')}",{coupon_code_id:_coupon_code_id},function(data){
+            if(data.status){
+                alert(data.info);
+                window.location.reload();
+            }else{
+                alert(data.info);
+            }
+        });
+    });
+    /*-----------------------------------------------停用优惠码-------------------------------------------*/
+    $(".coupon_stop").click(function(){
+        var _checked_count = $("input[name=coupon_code_id]:checked").length;
+        if(_checked_count == 0){
+            alert("请选择一个优惠码");
+            return false;
+        }
+        var _coupon_code_id = '';
+        $("input[name=coupon_code_id]:checked").each(function(){
+            _coupon_code_id += $(this).val() + ',';
+        });
+        $.post("{:U('CouponCode/coupon_stop')}",{coupon_code_id:_coupon_code_id},function(data){
+            if(data.status){
+                alert(data.info);
+                window.location.reload();
+            }else{
+                alert(data.info);
+            }
+        });
+    });
+    /*-----------------------------------------------编辑优惠码-------------------------------------------*/
+    $(".coupon_edit").click(function(){
+        var _checked_count = $("input[name=coupon_code_id]:checked").length;
+        if(_checked_count == 0){
+            alert("请选择一个优惠码");
+            return false;
+        }
+        if(_checked_count > 1){
+            alert("一次只能修改一个优惠码，请取消其它的选择");
+            return false;
+        }
+        var _coupon_code_id = $("input[name=coupon_code_id]:checked").first().val();
+        $.post("{:U('CouponCode/edit')}",{coupon_code_id:_coupon_code_id},function(data){
+            if(data.status){
+               window.location.href = "{:U('CouponCodeEdit/update')}?coupon_code_id=" + _coupon_code_id;
+            }else{
+                alert(data.info);
+            }
+        });
+    });
+    /*-----------------------------------------------生成优惠码-------------------------------------------*/
+    $(".create_coupon_code").click(function(){
+        var _this = $(this);
+        var _coupon_code_id = _this.data("coupon_code_id");
+        tipwindows('生成优惠码-' + _this.data('title'),getCreateCouponCodeBox(_coupon_code_id));
+    });
+    function getCreateCouponCodeBox(_id) {
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post("{:U('CouponCode/get_code_info')}",{coupon_code_id:_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+ /*--------------------------------------------------------------------------导出订单-----------------------------------------------------------------*/
+    $(".explode_code").each(function(){
+        var _this = $(this);
+        _this.export({
+           'coupon_code_id':_this.data('coupon_code_id'),
+        }); 
+    });
+</script>

@@ -1,0 +1,101 @@
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<script src="__PUBLIC__/js/select2.min.js"></script>
+<script src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.sortable.js"></script>
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<style>
+    .controls label{display:inline-block; height:20px; padding:4px 10px 4px 0;margin-bottom:0;}
+</style>
+<div class="container-fluid">
+	<div class="widget-box">
+		<div class="widget-title add_box"><h5>修改活动问题</h5><a class="btn btn-success btn-mini" href="{:back_list_url()}"><i class="icon-share-alt icon-white"></i> 返回列表</a></div>
+		<div class="widget-content">
+			<div class="dataTables_wrapper">
+               <form id="theform" class="form-horizontal" ajax="true" action="{:U('ActivityQuestion/update')}" autocomplete="off" method="post">
+                        <if condition="$_GET['show_msg'] eq 1">
+                        <div class="control-group" id="success_box" style="width:800px;height:auto;">
+                            <label class="control-label"></label>
+                            <div class="controls">
+                                    <div class="alert alert-success" style="margin-bottom:0;">
+                                            <button class="close" data-dismiss="alert">×</button>问题修改成功。
+                                    </div>
+                            </div>
+                        </div>
+                        </if>			   
+                        <div class="control-group">
+                            <label class="control-label"><span style="color:#FF0000;">*</span> 问题标题：</label>
+                            <div class="controls">
+			    <input type="text" name="title" id="title" placeholder="请输入标题" empty="请输入标题" value="{$info.title}"/>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">状态：</label>
+                            <div class="controls">
+                                <div class="btn-group add_change_status">
+                                    <a data-status="1" class="btn btn-mini {:set_class(1,$info['status'],'btn-success active')}">ON</a>
+                                    <a data-status="2" class="btn btn-mini {:set_class(2,$info['status'],'active')}">OFF</a>
+                                </div>
+                            </div>
+                            <input type="hidden" id="status" name="status" value="{$info.status}" />
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">是否必填项：</label>
+                            <div class="controls">
+                                <label><input type="radio" name="vereist" value="1" {:set_class('1',$info['vereist'],'checked')}/>必填</label>
+                                <label><input type="radio" name="vereist" value="2" {:set_class('2',$info['vereist'],'checked')}/>非必填</label>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label"></label>
+                            <div class="controls">
+                                <input type='hidden' value="{$info.id}" id='id' name='id'/>
+                                <input type="submit" class="btn btn-primary" value="提 交" />
+				<span id="form_error" style="color:green;"></span>
+                            </div>
+                        </div>
+
+                </form>				
+		</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+    $('input[type=radio]').uniform();
+     //更改状态
+    $('.add_change_status a').click(function() {
+        var _this = $(this);
+        if (_this.hasClass('active')) return false;
+        _this.parent().find('a').removeClass('active');
+        _this.addClass('active');
+        if (_this.index() == 1) _this.prev().removeClass('btn-success');
+        else _this.addClass('btn-success');
+        $('#status').val($(this).data('status'));
+    });
+    $('#theform').form({
+            start:function() {
+            },
+            error:function(data,_this) {
+                    if (_this) {
+                            error(data,_this);
+                            $('.error').removeClass('error');
+                            _this.parents('.control-group').addClass('error');
+                    }else alert(data);
+            },		
+            ajaxcallback:function(data) {
+                    if (data.status) {
+                            location.href = "{:U('ActivityQuestion/update',array('show_msg'=>1,'id'=>$info['id']))}";
+                    }else {
+                            if (data.data) {
+                                    var _obj = $('#'+data.data);
+                                    $('.error').removeClass('error');
+                                    _obj.parents('.control-group').addClass('error');
+                                    _obj.focus();
+                                    error(data.info,_obj);
+                            }else {
+                                    alert(data.info);
+                            }
+                    }
+            }
+    });	
+</script>

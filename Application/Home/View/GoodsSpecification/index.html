@@ -1,0 +1,97 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>商品规格列表</h5><a class="btn btn-success btn-mini" href="javascript:;" id="addGoodsSpecification"><i class="icon-plus icon-white"></i> 添加规格</a></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>规格名称</th>
+                        <th>规格类型</th>
+                        <th>状态</th>
+                        <th>规格排序</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="6">还没有任何类型信息，请先创建~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                    <tr>
+                        <td>{$info.specification_name}</td>
+                        <td>{$info.type_name}</td>
+                        <td>
+                            <div class="btn-group list_change_status">
+                                <a data-specification_id="{$info.specification_id}" data-status="1" class="btn btn-mini {:set_class('1',$info['specification_status'],'btn-success active')}">上架</a>
+                                <a data-specification_id="{$info.specification_id}" data-status="2" class="btn btn-mini {:set_class('2',$info['specification_status'],'active')}">下架</a>
+                            </div>
+                        </td>
+                        <td>{$info.specification_sort}</td>
+                        <td>{$info.create_time}</td>
+                        <td>
+                            <a href="javascript:;" class="btn btn-mini edit_specification" data-id="{$info.specification_id}" data-title="{$info.specification_name}"><i class="icon-edit"></i> 编辑</a>&nbsp;
+                            <a href="javascript:;" data-id="{$info.specification_id}" data-title="{$info.specification_name}" class="btn btn-mini specification_del"><i class="icon-trash"></i> 删除</a>
+                        </td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('.list_change_status a').click(function() {
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (_this.hasClass('active')) return false;
+        _this.data('send','off');
+        $.post("{:U('GoodsSpecification/change_status')}",{specification_id:_this.data('specification_id'),specification_status:_this.data('status')},function(data) {
+            _this.data('send','on');
+            if(!data.status) alert(data.info);
+            else {
+                _this.parent().find('a').removeClass('active');
+                _this.addClass('active');
+                if (_this.index() == 1) _this.prev().removeClass('btn-success');
+                else _this.addClass('btn-success');
+            }
+        },'json');
+    });
+    $('.specification_del').click(function() {
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (confirm('确认删除 '+$(this).data('title')+' 吗？')) {
+            _this.data('send','off');
+            $.post("{:U('GoodsSpecification/delete')}",{specification_id:$(this).data('id')},function(data) {
+                _this.data('send','on');
+                if (data.status) location.reload();
+                else alert(data.info);
+            });
+        }
+    });
+    
+    $("#addGoodsSpecification").click(function() {
+        tipwindows('添加商品规格',getAddGoodsSpecification());
+    });
+    function getAddGoodsSpecification(_id) {
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post("{:U('GoodsSpecification/get_add_page')}",{},function(data){_return = data.info;},'json');
+        return _return;
+    }
+    
+    $(".edit_specification").click(function() {
+        tipwindows($(this).data('title')+' - 编辑',getEditGoodsSpecificationBox($(this).data('id')));
+    });
+    function getEditGoodsSpecificationBox(_id) {
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post("{:U('GoodsSpecification/get_update_page')}",{specification_id:_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+</script>

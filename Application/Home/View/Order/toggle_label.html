@@ -1,0 +1,280 @@
+{__NOLAYOUT__}
+<div style="margin-bottom: 10px;">
+    <a href="javascript:;" class="btn btn-mini add_comment" data-order_id="{$info.order_id}"><i class="icon-edit"></i> 添加备注</a>
+    <if condition="$info['child_order']">
+        <if condition="($info['pay_status'] eq 12) AND ($info['order_status'] lt 4) and ($type eq 2)">
+            <a href="javascript:;" class="btn btn-mini send_goods" data-order_id="{$info.order_id}"><i class="icon-globe"></i> 发货</a>
+        </if>
+        <if condition="($info['pay_status'] neq 12) AND ($info['order_status'] lt 4)">
+            <a href="javascript:;" class="btn btn-mini update_order" data-order_id="{$info.order_id}" data-type="1"><i class="icon-repeat"></i> 取消订单</a>
+        </if>
+        <if condition="($info['pay_status'] eq 12)">
+            <a href="javascript:;" class="btn btn-mini makesure_invoice" data-order_id="{$info.order_id}"><i class="icon-barcode"></i> 确认开票</a>
+        </if>
+
+        <if condition="$info['order_status'] eq 4">
+            <!--<a href="javascript:;" class="btn btn-mini receive_order" data-order_id="{$info.order_id}"><i class="icon-ok"></i> 确认收货</a>-->
+        </if>
+        <if condition="($info['is_reverse'] gt 0) and ($type eq 2)">
+            <a href="javascript:;" class="btn btn-mini reverse_order" data-order_id="{$info.order_id}"><i class="icon-repeat"></i> 退换货</a>
+        </if>
+         <if condition="($info['delivery_type'] eq 1)">
+             <a href="{:U('Order/print_order',array('order_id'=>$info['order_id']))}" class="btn btn-mini" onclick="ajax_loading(false);" target="_blank"><i class="icon-print"></i> 打印订单</a>
+        </if>
+    </if>
+    <a href="javascript:;" class="btn btn-mini update_order" data-order_id="{$info.order_id}" data-type="2"><i class="icon-trash"></i> 删除订单</a>
+    <input type="hidden" name="opt_type" id="opt_type" value="{$type}"/>
+</div>
+<if condition="$type eq 1">
+    <div>
+        <table class="table table-bordered">
+            <tr>
+                <td>订单编号：</td>
+                <td>{$info.order_cur_id}</td>
+                <td>下单时间:</td>
+                <td>{$info.create_time}</td>
+            </tr>
+            <tr>
+                <td>支付方式：</td>
+                <td>{$info.pay_type|id2name='pay_type',###}</td>
+                <td>是否开票：</td>
+                <td>{$info.is_invoice|id2name='is_invoice',###}</td>
+            </tr>
+            <tr>
+                <td>订单总金额：</td>
+                <td colspan="3">{$info.total_value|price_format}</td>
+            </tr>
+            <tr>
+                <td>储值卡金额：</td>
+                <td>{$info.total_storage_money|price_format}</td>
+                <td>积分总额：</td>
+                <td>{$info.total_point|intval}</td>
+            </tr>
+            <tr>
+                <td>优惠码金额：</td>
+                <td>{$info.coupon_code_value|price_format}</td>
+                <td>优惠券金额：</td>
+                <td>{$info.coupon_value|price_format}</td>
+            </tr>
+            <tr>
+                <td>应收总金额：</td>
+                <td>{$info['pay_total_cash']}</td>
+                <td>订单状态：</td>
+                <td>{$info.order_status|id2name='order_status',###}</td>
+            </tr>
+            <tr>
+                <td>商家名称：</td>
+                <td>{$info.shops_name|default='暂无卖家信息'}</td>
+                <td>收货人：</td>
+                <td>{$info.name|default='无'}</td>
+            </tr>
+            <tr>
+                <td>收货人电话：</td>
+                <td>{$info.mobile|default='无'}</td>
+                <td>省/直辖市：</td>
+                <td>{$info.province|default='无'}</td>
+            </tr>
+            <tr>
+                <td>市/直辖市：</td>
+                <td>{$info.city|default='无'}</td>
+                <td>区/县：</td>
+                <td>{$info.county|default='无'}</td>
+            </tr>
+            <tr>
+                <td>详细地址：</td>
+                <td>{$info.address|default='无'}</td>
+                <td>收货人邮箱：</td>
+                <td>{$info.email|default='无'}</td>
+            </tr>
+            <tr>
+                <td>用户备注信息</td>
+                <td colspan="3">{$info.user_remark|default='无'}</td>
+            </tr>
+        </table>
+    </div>
+    <elseif condition="$type eq 2"/>
+    <div>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="checkedOrderGoodsAll"/></th>
+                    <th>商品编码</th>
+                    <th>商品名称</th>
+                    <th>状态</th>
+                    <th>销售价</th>
+                    <th>数量</th>
+                    <th>使用积分数</th>
+                    <th>商品类型</th>
+                    <th>优惠券</th>
+                    <th>优惠码</th>
+                    <th>储值卡</th>
+                    <th>商家</th>
+                </tr>
+            </thead>
+            <tbody>
+            <volist name='order_goods_list' id='order_goods'>
+                <tr>
+                    <td><input type="checkbox" name="order_goods_id" value="{$order_goods.order_goods_id}"/></td>
+                    <td>{$order_goods.goods_code}</td>
+                    <td>{$order_goods.goods_name}</td>
+                    <td>{$order_goods.order_goods_status|id2name='order_goods_status',###}</td>
+                    <td>{$order_goods.show_price}</td>
+                    <td>{$order_goods.goods_number}</td>
+                    <td>{$order_goods.use_integral|default='0'}</td>
+                    <td>{$order_goods.order_goods_type|id2name='order_goods_type',###}</td>
+                    <td>{$order_goods.coupon_txt|default='未使用'}</td>
+                    <td>{$order_goods.coupon_code_txt|default='未使用'}</td>
+                    <td>{$order_goods.storage_money|default='未使用'}</td>
+                    <td>{$order_goods.shops_name}</td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+    <script type="text/javascript">
+        $('#checkedOrderGoodsAll').uniform();
+        $('input[name=order_goods_id]').uniform(); //美化checkbox，radio按钮
+        $("#checkedOrderGoodsAll").toggle(function () {
+            $("input[name=order_goods_id]").each(function () {
+                $(this).parents('span').addClass('checked');
+                $(this).attr('checked', 'checked');
+            });
+        }, function () {
+            $(this).parents('span').removeClass('checked');
+            $("input[name=order_goods_id]").each(function () {
+                $(this).parents('span').removeClass('checked');
+                $(this).removeAttr('checked');
+            });
+        });
+        $("input[name=order_goods_id]").click(function () {
+            var _this = $(this);
+            _all_checked = true;
+            var _checked = _this.attr('checked');
+            if (!_checked) {
+                $("#checkedOrderGoodsAll").parents('span').removeClass('checked');
+            } else {
+                $("input[name=order_goods_id]").each(function () {
+                    if (!$(this).parents('span').hasClass('checked') && _this.val() != $(this).val()) {
+                        _all_checked = false;
+                    }
+                });
+                if (_all_checked && !$("#checkedOrderGoodsAll").parents('span').hasClass('checked')) {
+                    $("#checkedOrderGoodsAll").parents('span').addClass('checked');
+                }
+            }
+        });
+    </script>
+    <elseif condition="$type eq 3"/>
+    <div>
+        <div style='margin: 10px 0 10px 0;'><span><strong>开票信息</strong></span></div>
+        <if condition="$info['is_invoice'] eq 0">
+            <div>不需要发票</div>
+        <else />
+            <div>
+                <table class="table table-bordered" >
+                        <tr>
+                            <td>开票状态：</td>
+                            <td>{$invoice_info.invoice_status|id2name='invoice_status',###}</td>
+                            <td>开票时间：</td>
+                            <td>{$invoice_info.open_time|default='未开票'}</td>
+                            <td>操作人：</td>
+                            <td>{$invoice_info.user_name|default='暂无'}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style='margin: 10px 0 10px 0;'><span><strong>发票基本信息</strong></span></div>
+            <div>
+                <table class="table table-bordered" >
+                        <tr>
+                            <td>开票方式：</td>
+                            <td>{$invoice_info.type|id2name='invoice_type',###}</td>
+                            <td>发票类型：</td>
+                            <td>{$invoice_info.open_way|id2name='invoice_open_way',###}</td>
+                            <td>发票抬头：</td>
+                            <td>{$invoice_info.invoice_title}</td>
+                            <td>发票内容：</td>
+                            <td>{$invoice_info.content_way|id2name='invoice_content_way',###}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </if>
+    </div>
+    <elseif condition="$type eq 4"/>
+    <div>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>支付方式</th>
+                    <th>支付流水号</th>
+                    <th>交易流水号</th>
+                    <th>支付金额</th>
+                    <th>支付时间</th>
+                </tr>
+            </thead>
+            <tbody>
+            <empty name="pay_list">
+                <tr><td colspan="5">没有支付信息</td></tr>
+            </empty>
+            <volist name='pay_list' id='pay_info'>
+                <tr>
+                    <td>{$pay_info.payment_type|id2name='payment_type',###}</td>
+                    <td>{$pay_info.payment_serial_number}</td>
+                    <td>{$pay_info.payment_trade_no}</td>
+                    <td>{$pay_info.payment_fee}</td>
+                    <td>{$pay_info.create_time}</td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+    </div>
+     <elseif condition="$type eq 5"/>
+        <div>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>备注内容</th>
+                        <th>备注时间</th>
+                        <th>备注人</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <empty name="comment_list">
+                    <tr><td colspan="3">没有备注信息</td></tr>
+                </empty>
+                <volist name='comment_list' id='comment_info'>
+                    <tr>
+                        <td>{$comment_info.comment}</td>
+                        <td>{$comment_info.create_time}</td>
+                        <td>{$comment_info.user_name}</td>
+                    </tr>
+                </volist>
+                </tbody>
+            </table>
+        </div>
+     <elseif condition="$type eq 6"/>
+        <div>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>快递公司</th>
+                        <th>快递单号</th>
+                        <th>寄件时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <empty name="express_list">
+                    <tr><td colspan="3">没有快递信息</td></tr>
+                </empty>
+                <volist name='express_list' id='express_info'>
+                    <tr>
+                        <td>{$express_info.shipper_name}</td>
+                        <td>{$express_info.express_order}</td>
+                        <td>{$express_info.create_time}</td>
+                    </tr>
+                </volist>
+                </tbody>
+            </table>
+        </div>
+</if>

@@ -1,0 +1,147 @@
+<link rel="stylesheet" href="__PUBLIC__/css/jquery.gritter.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script src="__PUBLIC__/js/jquery.gritter.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.sortable.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>修改商品分类</h5><a class="btn btn-success btn-mini" href="{:back_list_url()}"><i class="icon-share-alt icon-white"></i> 返回列表</a></div>
+        <div class="widget-content nopadding">
+            <form class="form-horizontal" method="post" ajax="true" action="{:U('GoodsCategory/update')}" id="add_form" autocomplete="off">
+                <div class="control-group">
+                    <label class="control-label">父级分类：</label>
+                    <div class="controls" id="choose_category_box">
+                        <foreach name='parent_serial_list' item='parent_detail_list' key='level'>
+                           <div class="btn-group">
+                                <a class="btn btn-small" data-id="0"><if condition='$level == 1'>顶级分类<else/>选择分类</if></a>
+                                <a data-toggle="dropdown" class="btn btn-small dropdown-toggle"><span class="caret"></span></a>
+                                <ul class="dropdown-menu parent_id">
+                                    <li><a href="javascript:;" data-id="0"><if condition='$level == 1'>顶级分类<else/>选择分类</if></a></li>
+                                    <li class="divider"></li>
+                                    <volist name="parent_detail_list" id="root_serial">
+                                        <li><a href="javascript:;" data-id="{$root_serial.goods_category_id}" <if condition='$root_serial.selected eq true'>class='parent_selected'</if>>{$root_serial.goods_category_name}</a></li>
+                                    </volist>
+                                </ul>
+                            </div> 
+                        </foreach>
+                        <input type="hidden" id="parent_id" name="parent_id" value="{$info.goods_category_parent_id}" />
+                        <input type="hidden" id="path" name="path" value="{$info.goods_category_path}" />
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">分类名称：</label>
+                    <div class="controls">
+                        <input type="text" name="goods_category_name" empty="请输入分类名称" id="goods_category_name" placeholder="请输入分类名称" value='{$info.goods_category_name}'/>
+                        <div class="help-block">提示:名称不能超过64个汉字</div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">分类编码：</label>
+                    <div class="controls">
+                        <input type="text" name="goods_category_code" empty="请输入分类编码" id="goods_category_code" placeholder="请输入分类编码" value="{$info.goods_category_code}"/>
+                        <div class="help-block">提示:分类编码不能重复</div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">分类简短语：</label>
+                    <div class="controls">
+                        <input type="text" name="goods_category_summary" id="goods_category_summary" placeholder="分类简短语" value="{$info.goods_category_summary}"/>
+                        <div class="help-block">提示:分类简短语不能超过32个汉字</div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">分类简介：</label>
+                    <div class="controls">
+                        <textarea name="goods_category_desc" id="goods_category_desc" placeholder="请输入分类简介">{$info.goods_category_desc}</textarea>
+                        <div class="help-block">提示:分类简介不能超过128个汉字</div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">分类SEO信息：</label>
+                    <div class="controls">
+                        <textarea name="goods_category_seo_info" id="goods_category_seo_info" placeholder="请输入分类SEO信息">{$info.goods_category_seo_info}</textarea>
+                        <div class="help-block">提示:分类简介不能超过256个汉字，多个用英文分号隔开</div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <input type="hidden" name="goods_category_id" id="goods_category_id" value="{$info.goods_category_id}"/>
+                    <input type="submit" value="提交" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    /*-------------------------------------------初始化-----------------------------------------------------*/
+    //把父类选中
+    if ($('.parent_selected').length > 0) {
+        $('.parent_selected').each(function () {
+            $(this).parents('.btn-group').find('a:first').html($(this).html()).attr('data-id', $(this).attr('data-id'));
+        });
+    }
+    $('.dropdown-menu a').live('click',function() {
+        var _this = $(this);
+        $(this).parents('.btn-group').find('a:first').html(_this.html()).attr('data-id',_this.attr('data-id'));
+        
+        if (_this.attr('data-id') != '0') {
+            $.post("{:U('GoodsCategory/getChildCategory')}",{id:_this.attr('data-id'),child_id:$("#goods_category_id").val()},function(data) {
+                if (data.status) {
+                    $('#choose_category_box').find('.btn-group:gt('+_this.parents('.btn-group').index()+')').remove();
+                    $('#parent_id').before($(data.data));                    
+                }
+                var _path = '0';
+                var _data_id = 0;
+                $('#choose_category_box .btn-group').each(function() {
+                    var _id = $(this).find('a:first').attr('data-id');
+                    if(_id != '0') {_path += '_'+_id;_data_id = _id;}
+                });
+                $('#parent_id').val(_data_id);
+                $('#path').val(_path);
+            });
+        }else {
+            $('#choose_category_box').find('.btn-group:gt('+_this.parents('.btn-group').index()+')').remove();
+            var _path = '0';
+            var _data_id = 0;
+            $('#choose_category_box .btn-group').each(function() {
+                var _id = $(this).find('a:first').attr('data-id');
+                if(_id != '0') {_path += '_'+_id;_data_id = _id;}
+            });
+            $('#parent_id').val(_data_id);
+            $('#path').val(_path);
+        }        
+    });
+    
+    $("#add_form").form({
+        start:function() {
+            $('.error').removeClass('error');
+            remove_error();
+        },
+        error:function(data,_this) {
+            if (_this) {
+                error(data,_this);
+                $('.error').removeClass('error');
+                _this.parents('.control-group').addClass('error');
+            }else alert(data);
+        },
+        ajaxcallback:function(data) {
+            if (data.status) {
+                $.gritter.add({
+                    title:	'修改成功',
+                    text:	'商品分类 '+data.data+' 修改成功。',
+                    sticky: false
+                });	
+            }else {
+                if (data.data) {
+                    var _obj = $('#'+data.data);
+                    $('.error').removeClass('error');
+                    _obj.parents('.control-group').addClass('error');
+                    _obj.focus();
+                    error(data.info,_obj);
+                }else {
+                    alert(data.info);
+                }
+            }
+        }
+    });
+</script>

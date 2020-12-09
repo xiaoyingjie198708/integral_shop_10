@@ -1,0 +1,128 @@
+<link rel="stylesheet" href="__PUBLIC__/css/jquery.gritter.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/upload.jquery.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.sortable.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.gritter.min.js"></script>
+<style>
+    .img_box{margin:15px 0; overflow:hidden;}
+    .img_box ul{list-style:none; margin:0;}
+    .img_box ul li{float:left; width:140px; height:140px;cursor:pointer;margin-right:15px;margin-bottom:10px;}
+    .img_box ul li:hover{border-color:#08c; box-shadow:0 1px 4px rgba(0,105, 214,0.25);}
+    .img_box ul li.active{border-color:red; box-shadow:0 1px 4px rgba(0,105, 214,0.25);}
+    .controls label{display:inline-block; height:20px; padding:4px 10px 4px 0;margin-bottom:0;}
+</style>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>修改商品标签</h5><a class="btn btn-success btn-mini" href="{:back_list_url()}"><i class="icon-share-alt icon-white"></i> 返回列表</a></div>
+        <div class="widget-content nopadding">
+            <form class="form-horizontal" method="post" ajax="true" action="{:U('GoodsLabel/update')}" id="add_form" autocomplete="off">
+                <div class="control-group">
+                    <label class="control-label">标签名称：</label>
+                    <div class="controls">
+                        <input type="text" name="label_name" placeholder="请输入标签名称" empty="请输入标签名称" id="label_name" value="{$info.label_name}"/>
+                        <div class="help-block">提示：名称不能超过64个汉字</div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">标签描述：</label>
+                    <div class="controls">
+                        <textarea name="label_desc" id="label_desc" placeholder="请输入标签别名">{$info.label_desc}</textarea>
+                        <div class="help-block">提示：名称不能超过128个汉字</div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">标签图标：</label>
+                    <div class="controls">
+                        <button class="btn btn-success" type="button" id="upload_img"><i class="icon-picture icon-white"></i> 选择图片</button>
+                        <div class="img_box" id="img_box">
+                            <ul class="img_ul">
+                                <if condition="$info.label_icon neq ''">
+                                    <li class="thumbnail" data-path="{$info.label_icon}"><img src="" /></li>
+                                </if>
+                            </ul>
+                        </div>
+                        <input type="hidden" name="label_icon" id="label_icon" value="{$info.label_icon}"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">商品类型：</label>
+                    <div class="controls">
+                        <foreach name="type_list" item="type">
+                            <label><input type="checkbox" value="{$type.type_id}" name="type_id[]" {$type['checked'] ? 'checked' : ''}/>{$type.type_name}</label>
+                        </foreach>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">标签排序：</label>
+                    <div class="controls">
+                        <input type="text" name="label_sort" id="label_sort" placeholder="请输入标签排序" value="{$info.label_sort}"/>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <input type="hidden" name="label_id" id="label_id" value="{$info.label_id}"/>
+                    <input type="submit" value="提交" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('input[type=checkbox],input[type=radio]').uniform(); //美化checkbox，radio按钮
+    $("#add_form").form({
+        start:function() {
+            $('.error').removeClass('error');
+            remove_error();
+        },
+        error:function(data,_this) {
+            if (_this) {
+                error(data,_this);
+                $('.error').removeClass('error');
+                _this.parents('.control-group').addClass('error');
+            }else alert(data);
+        },
+        ajaxcallback:function(data) {
+            if (data.status) {
+                $.gritter.add({
+                    title:	'修改标签成功',
+                    text:	'标签 ['+data.data+'] 修改成功。',
+                    sticky: false
+                });	
+            }else {
+                if (data.data) {
+                    var _obj = $('#'+data.data);
+                    $('.error').removeClass('error');
+                    _obj.parents('.control-group').addClass('error');
+                    _obj.focus();
+                    error(data.info,_obj);
+                }else {
+                    alert(data.info);
+                }
+            }
+        }
+    });
+    /*-------------------------------------------图片--------------------------------------------*/
+    $('.img_ul li').each(function() { 
+        $(this).find('img').attr('src',createImageUrl($(this).data('path'),'0_0'));
+        image_center($(this));
+    });
+    $("#upload_img").upload({
+            multiple:false,
+            params:'size:106_32',
+            success:function(data) {
+                var _img_url = $("#img_box").find('.img_ul');
+                var _hide = $("#label_icon");
+                //清空图片
+                _img_url.children('li').remove();
+                _hide.val('');
+                if (data.savename) {
+                    var _path = data.savepath + data.savename;
+                    $('<li class="thumbnail" data-path="'+_path+'"></li>').html('<img src="'+createImageUrl(_path,'0_0')+'" />').appendTo(_img_url);
+                    _hide.val(_path);
+                }
+                _img_url.find('li').each(function() { image_center($(this));});
+                if(_img_url.children().length) _img_url.sortable();
+            }
+        });
+</script>

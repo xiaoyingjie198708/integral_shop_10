@@ -1,0 +1,54 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-zh-CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/export.jquery.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>商品预约列表</h5></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>商品编码</th>
+                        <th>商品名称</th>
+                        <th>会员账号</th>
+                        <th>终端</th>
+                        <th>商家</th>
+                        <th>预约时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="8">还没有任何会员预约商品信息~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                    <tr>
+                        <td>{$info.goods_code}</td>
+                        <td>{$info.goods_name}</td>
+                        <td>{$info.member_account}</td>
+                        <td>{$info.platform|id2name='platform',###}</td>
+                        <td>{$info.shops_name}</td>
+                        <td>{$info.create_time}</td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    /*--------------------------------------------------------------------------导出-----------------------------------------------------------------*/
+    $("#explode_order").export({
+       seatch:$("input[name='seatch']").val(),
+       create_start:$("input[name='create_start']").val(),
+       create_end:$("input[name='create_end']").val(),
+    });
+</script>

@@ -1,0 +1,53 @@
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-zh-CN.js"></script>
+<style>
+    .controls label{display:inline-block; height:20px; padding:4px 10px 4px 0;margin-bottom:0;}
+</style>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>修改消费码有效期</h5><a class="btn btn-success btn-mini" href="{:back_list_url()}"><i class="icon-share-alt icon-white"></i> 返回列表</a></div>
+        <div class="widget-content nopadding">
+            <form class="form-horizontal" method="post" ajax="true" action="{:U('TestUpdateVaild/update')}" id="add_form" autocomplete="off">
+                <div class="control-group">
+                    <label class="control-label">消费码：</label>
+                    <div class="controls">
+                        <input type="text" name="use_code" placeholder="请输入消费码" empty="请输入消费码" id="use_code" />
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">有效期：</label>
+                    <div class="controls">
+                        <input type="text" class="input_date" name="valid_time" placeholder="请输入有效期" empty="请输入有效期" id="valid_time" />
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <input type="submit" value="提交" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(".input_date").datetimepicker({showSecond: true,timeFormat: 'hh:mm:ss', stepHour: 1,stepMinute: 1,stepSecond: 1}); //时间插件
+    $("#add_form").form({
+        start:function() {
+            $('.error').removeClass('error');
+            remove_error();
+        },
+        error:function(data,_this) {
+            if (_this) {
+                error(data,_this);
+                $('.error').removeClass('error');
+            }else alert(data);
+        },
+        ajaxcallback:function(data) {
+            alert(data.info);
+        }
+    });
+</script>

@@ -1,0 +1,62 @@
+{__NOLAYOUT__}
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<div class="widget-box" style="margin:0;">
+    <div class="widget-content nopadding">
+        <form class="form-horizontal" ajax="true" action="{:U('CouponCode/add_code')}" autocomplete="off" id="add_code_form">   
+            <div class="control-group">
+                <label class="control-label">最大发放数：</label>
+                <div class="controls">
+                    <input type="text" value="{$max_count}" disabled/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">已经发放数：</label>
+                <div class="controls">
+                    <input type="text" value="{$send_count}" disabled/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">本次发放：</label>
+                <div class="controls">
+                    <input type="text" name="send_number" id="send_number" value="1"/>
+                </div>
+            </div>
+            <div class="form-actions">
+                <input type="hidden" id="coupon_code_id" name="coupon_code_id" value="{$coupon_code_id}"/>
+                <input type="submit" value="生成" class="btn btn-success"/>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    $('#add_code_form').form({
+     start:function() {
+        $('.error').removeClass('error');
+        remove_error();
+    },
+    error:function(data,_this) {
+        if (_this) {
+            error(data,_this);
+            $('.error').removeClass('error');
+            _this.parents('.control-group').addClass('error');
+        }else alert(data);
+    },
+    ajaxcallback:function(data) {
+        if (data.status) {
+            alert(data.info);
+            tip_close();
+        }else {
+            if (data.data) {
+                var _obj = $('#'+data.data);
+                $('.error').removeClass('error');
+                _obj.parents('.control-group').addClass('error');
+                _obj.focus();
+                error(data.info,_obj);
+            }else {
+                alert(data.info);
+                tip_close();
+            }
+        }
+    }
+});
+</script>

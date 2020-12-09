@@ -1,0 +1,76 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-zh-CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/export.jquery.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>奔驰用车卡列表</h5></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>订单编号</th>
+                        <th>会员账号</th>
+                        <th>商家</th>
+                        <th>商品名称</th>
+                        <th>商品价格</th>
+                        <th>卡类型</th>
+                        <th>卡账号</th>
+                        <th>卡密码</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <empty name="list">
+                    <tr><td colspan="12">还没有任何奔驰用车卡信息~~~</td></tr>
+                </empty>
+                <volist name="list" id="info">
+                    <tr>
+                        <td><a href="javascript:;" class="quick_view" data-code_id="{$info.id}">{$info.order_cur_id}</a></td>
+                        <td>{$info.user_name}</td>
+                        <td>{$info.shops_name}</td>
+                        <td>{$info.goods_name}</td>
+                        <td>{$info.goods_price}</td>
+                        <td>{$info.code_type|id2name='benz_code_type',###}</td>
+                        <td>{$info.use_code}</td>
+                        <td>{$info.code_pwd}</td>
+                        <td>{$info.status|id2name='benz_status',###}</td>
+                    </tr>
+                </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(".quick_view").toggle(function () {
+        var _this = $(this);
+        if ($(".quick_tr").length > 0)
+            $(".quick_tr").remove();
+        $.post("{:U('BenzCode/quick_view')}", {code_id: _this.data('code_id')}, function (data) {
+            if (data.status) {
+                var _current_tr = _this.parents('tr');
+                var _td_count = _current_tr.find('td').length;
+                _current_tr.after($('<tr class="quick_tr"><td colspan="' + _td_count + '">' + data.info + '</td></tr>'));
+            }
+        });
+    }, function () {
+        $(".quick_tr").remove();
+    });
+    /*--------------------------------------------------------------------------导出-----------------------------------------------------------------*/
+    $("#explode_order").export({
+       member_account:$("input[name='member_account']").val(),
+       code_type:$("select[name='code_type']").val(),
+       benz_status:$("select[name='benz_status']").val(),
+       create_start:$("input[name='create_start']").val(),
+       create_end:$("input[name='create_end']").val(),
+       use_start:$("input[name='use_start']").val(),
+       use_end:$("input[name='use_end']").val(),
+    });
+</script>

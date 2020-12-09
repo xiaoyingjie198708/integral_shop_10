@@ -1,0 +1,43 @@
+{__NOLAYOUT__}
+<div class="widget-box  tab-left" style="margin-top:0;">
+    <div id="order_quick_box" class="widget-content tab-content">
+        <div>
+        <table class="table table-bordered">
+            <tr>
+                <td>回款状态：</td>
+                <td>已回款</td>
+                <td>回款时间：</td>
+                <td>{$order_goods_info.pay_time}</td>
+            </tr>
+            <tr>
+                <td>是否需要发票：</td>
+                <td>{$order_goods_info.is_invoice|id2name='is_invoice',###}</td>
+                <td>开票状态：</td>
+                <td>{$order_goods_info.invoice_status|id2name='invoice_status',###}</td>
+            </tr>
+            <tr>
+                <td>优惠券总金额：</td>
+                <td>{$order_goods_info.coupon_value|price_format}</td>
+                <td>优惠券编号：</td>
+                <td>{$order_goods_info.coupon_code|default='未使用优惠券'}</td>
+            </tr>
+            <tr>
+                <td>优惠码总金额：</td>
+                <td>{$order_goods_info.coupon_code_value|price_format}</td>
+                <td>优惠码编号：</td>
+                <td>{$order_goods_info.couponcode_code|default='未使用优惠码'}</td>
+            </tr>
+            <tr>
+                <td>使用积分：</td>
+                <td>{$order_goods_info.use_point|intval}</td>
+                <td>折扣总金额：</td>
+                <td>{$order_goods_info.discount_value|price_format}</td>
+            </tr>
+            <tr>
+                <td>使用储值卡：</td>
+                <td colspan="3">{$order_goods_info.storage_money|price_format}</td>
+            </tr>
+        </table>
+    </div>
+    </div>
+</div>

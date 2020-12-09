@@ -1,0 +1,67 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-zh-CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/export.jquery.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title"><h5>收款方式汇总报表</h5></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>标签名称</th>
+                        <th>银联</th>
+                        <th>支付宝</th>
+                        <th>微信</th>
+                        <th>文惠券</th>
+                        <th>储值卡</th>
+                        <th>合计</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="7">没有任何数据~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                        <tr class="tree_list_child list_child_{$info.label_parent_id}" style="{:set_class($info['label_parent_id'],'0','display:none;','>')}" data-path="{$info.label_path}">
+                            <td class="tree_list" data-tree="{$info.label_level}" style="text-align:left;">
+                                <a href="javascript:;" data-id="{$info.label_id}" class="list_colse">{$info.label_name}</a>
+                            </td>
+                            <td><a href="{:U('LabelDetailReport/index',array('label_id'=>$info['label_id']))}?payment_type[]=2&pay_start={$pay_start}&pay_end={$pay_end}" target="_blank" onclick="ajax_loading(false);">{$info.yinlian|price_format}</a></td>
+                            <td><a href="{:U('LabelDetailReport/index',array('label_id'=>$info['label_id']))}?payment_type[]=1&pay_start={$pay_start}&pay_end={$pay_end}" target="_blank" onclick="ajax_loading(false);">{$info.zhifubao|price_format}</a></td>
+                            <td><a href="{:U('LabelDetailReport/index',array('label_id'=>$info['label_id']))}?payment_type[]=3&pay_start={$pay_start}&pay_end={$pay_end}" target="_blank" onclick="ajax_loading(false);">{$info.weixin|price_format}</a></td>
+                            <td><a href="{:U('LabelDetailReport/index',array('label_id'=>$info['label_id']))}?payment_type[]=4&pay_start={$pay_start}&pay_end={$pay_end}" target="_blank" onclick="ajax_loading(false);">{$info.wenhuiquan|price_format}</a></td>
+                            <td><a href="{:U('LabelDetailReport/index',array('label_id'=>$info['label_id']))}?payment_type[]=5&pay_start={$pay_start}&pay_end={$pay_end}" target="_blank" onclick="ajax_loading(false);">{$info.chuzhika|price_format}</a></td>
+                            <td><a href="{:U('LabelDetailReport/index',array('label_id'=>$info['label_id']))}?pay_start={$pay_start}&pay_end={$pay_end}" target="_blank" onclick="ajax_loading(false);">{$info.heji|price_format}</a></td>
+                        </tr>
+                    </volist>
+                    <tr>
+                            <td>
+                                合计
+                            </td>
+                            <td><a href="{:U('LabelDetailReport/index')}?payment_type[]=2&pay_start={$pay_start}&pay_end={$pay_end}" target="_blank" onclick="ajax_loading(false);">{$total_data.yinlian|price_format}</a></td>
+                            <td><a href="{:U('LabelDetailReport/index')}?payment_type[]=1&pay_start={$pay_start}&pay_end={$pay_end}" target="_blank" onclick="ajax_loading(false);">{$total_data.zhifubao|price_format}</a></td>
+                            <td><a href="{:U('LabelDetailReport/index')}?payment_type[]=3&pay_start={$pay_start}&pay_end={$pay_end}" target="_blank" onclick="ajax_loading(false);">{$total_data.weixin|price_format}</a></td>
+                            <td><a href="{:U('LabelDetailReport/index')}?payment_type[]=4&pay_start={$pay_start}&pay_end={$pay_end}" target="_blank" onclick="ajax_loading(false);">{$total_data.wenhuiquan|price_format}</a></td>
+                            <td><a href="{:U('LabelDetailReport/index')}?payment_type[]=5&pay_start={$pay_start}&pay_end={$pay_end}" target="_blank" onclick="ajax_loading(false);">{$total_data.chuzhika|price_format}</a></td>
+                            <td><a href="{:U('LabelDetailReport/index')}?pay_start={$pay_start}&pay_end={$pay_end}" target="_blank" onclick="ajax_loading(false);">{$total_data.heji|price_format}</a></td>
+                        </tr>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+ /*--------------------------------------------------------------------------导出订单-----------------------------------------------------------------*/
+    $("#explode_order").export({
+       'label_id':$("input[name='label_id']").val(),
+       'pay_start':$("input[name='pay_start']").val(),
+       'pay_end':$("input[name='pay_end']").val(),
+    });  
+</script>

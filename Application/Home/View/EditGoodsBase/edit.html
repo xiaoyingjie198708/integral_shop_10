@@ -1,0 +1,917 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/jquery.gritter.css" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-zh-CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/upload.jquery.js"></script>
+<script charset="utf-8" src="__PUBLIC__/editor/kindeditor.js"></script>
+<script charset="utf-8" src="__PUBLIC__/editor/lang/zh_CN.js"></script>
+<script charset="utf-8" src="__PUBLIC__/js/jquery.sortable.js"></script>
+<script charset="utf-8" src="__PUBLIC__/js/jquery.gritter.min.js"></script>
+<style>
+    #category_list .select2-search{*width:auto;}
+    #category_list .select2-drop{position:relative;top:0;min-width:200px;*width:200px;border-top:1px solid #aaa; padding-top:5px;border-radius:4px;}
+    #category_list .select2-result:hover{background-color:#ccc;color:#fff;}
+    #category_list .select2-highlighted:hover{background-color:#3875d7;color:#fff;}
+    .select2-results{max-height:430px;}
+    .serial_box{float:left;}
+    .form-horizontal .controls{*display:block-inline;}
+    .controls > .radio:first-child, .controls > .checkbox:first-child{padding-top:0;}
+    .radio input[type="radio"], .checkbox input[type="checkbox"]{margin-top:0;margin-left:0;}
+    .controls label{display:inline-block; height:20px; padding:4px 10px 4px 0;margin-bottom:0;}
+    textarea{resize:none;}
+    .step_box{position:absolute;top:0;margin-top:5px;}
+    .step_child{width: 20px; height:20px; border:4px solid #e6e6e6;border-radius:50%;background-color:#fdfdfd;position:absolute;cursor:pointer;}
+    .step_box .active{border:4px solid #5eb95e;}
+    .step_name{font-size:16px;position:absolute; white-space:nowrap;cursor:pointer;}
+    
+    .special_box{ width:80%; margin-top:10px;overflow:hidden;border:1px solid #cdcdcd;}
+    .special_box .control-label{width:150px;}
+    .special_box .control-group{overflow:hidden;}
+    .special_box .controls{margin-left:150px;}
+    .special_box .form-actions{padding-left:160px;}
+    .special_box .special_info{padding:10px 20px;float:left;}
+    .special_box .del{padding:10px 0 10px 30px;float:left;}
+    .special_box .update{padding:10px;float:left;}
+    #special_list .control-group:hover,#special_list div.active{background-color:#eaeaea;}
+    
+    .img_box{margin:15px 0; overflow:hidden;}
+    .img_box ul{list-style:none; margin:0;}
+    .img_box ul li{float:left; width:140px; height:140px;cursor:pointer;margin-right:15px;margin-bottom:10px;}
+    .img_box ul li:hover{border-color:#08c; box-shadow:0 1px 4px rgba(0,105, 214,0.25);}
+    .img_box ul li.active{border-color:red; box-shadow:0 1px 4px rgba(0,105, 214,0.25);}
+    
+    .tp_menu_box{ border:1px solid #d4d4d4; position:absolute;text-align:center;}
+    .tp_menu_box ul{list-style:none;margin:0;}
+    .tp_menu_box li{padding:5px 20px; border-bottom:1px solid #d4d4d4;cursor:pointer;background-color:#fff; }
+    .tp_menu_box li:hover{background-color:#eee;}
+    .tp_menu_box li.last{border:none;}
+</style>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box">
+            <ul class="nav nav-tabs">
+                <volist name="goods_label" id="label" key="label_i">
+                <li class="{:set_class(1,$label_i,'active')}"><a data-toggle="tab" href="#tab_{$label_i}">{$label}</a></li>
+                </volist>
+            </ul>
+            <a class="btn btn-success btn-mini" href="{:back_list_url()}"><i class="icon-share-alt icon-white"></i> 返回列表</a>
+        </div>
+        <div class="widget-content" style="padding:0;margin-top:12px;border-top:1px solid #eee;">
+            <form id="edit_goods_form" action="{:U('EditGoodsBase/update')}" class="form-horizontal tab-content" ajax="true" method="post" autocomplete="off" />
+                <div class="tab-pane active" id="tab_1" data-step="1">
+                    <div class="control-group">
+                        <label class="control-label">商品分类：</label>
+                        <div class="controls" style="overflow:hidden;">
+                            <div id="category_list">
+                                {$content}
+                            </div>
+                            <input type="hidden" id="goods_category_id" value="{$info.goods_category_id}" name="goods_category_id" empty="请选择商品分类" />
+                            <input type="hidden" id="serial_path" value="{$info.serial_path}" name="serial_path" />
+                        </div>                        
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_2" data-step="2">
+                    <div class="control-group">
+                        <label class="control-label">商铺：</label>
+                        <div class="controls">
+                            <select id="shops_code" name="shops_code" empty="请选择商铺" style="min-width:300px;">
+                                <option value=" ">选择商铺</option>
+                                <volist name="shops_list" id="shops">
+                                <option value="{$shops.shops_code}" {$shops['shops_code'] == $info['shops_code'] ? 'selected' : ''}>{$shops.shops_name}</option>
+                                </volist>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">商品名称：</label>
+                        <div class="controls">
+                            <input id="goods_name" type="text" name="goods_name" placeholder="请输入商品名称" empty="请输入商品名称" value="{$info.goods_name}"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">物料编码：</label>
+                        <div class="controls">
+                            <input id="goods_materiel_code" type="text" name="goods_materiel_code" placeholder="请输入物料编码" value="{$info.goods_materiel_code}" disabled/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">商品品牌：</label>
+                        <div class="controls">
+                            <select name="brand_id" id="brand_id" style="min-width: 300px;">
+                                <option value=" ">请选择商品品牌</option>
+                                <volist name="brand_list" id="brand_info">
+                                    <option value="{$brand_info.brand_id}" {$brand_info['brand_id'] == $info['brand_id'] ? 'selected' : ''}>{$brand_info.brand_name}</option>
+                                </volist>
+                            </select>
+                            <!--<div class="help-block">提示:请先选择商品类型才能选择品牌</div>-->
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">单位：</label>
+                        <div class="controls">
+                            <select name="goods_unit" id="goods_unit" style="min-width: 200px;">
+                                <option value=" ">请选择单位</option>
+                                <foreach name="Think.config.goods_unit" item="unit" key="unit_i">
+                                    <option value="{$unit_i}" {$info['goods_unit'] == $unit_i ? 'selected' : ''}>{$unit}</option>
+                                </foreach>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">商品简介：</label>
+                        <div class="controls">
+                            <textarea id="goods_brief" name="goods_brief" placeholder="请输入商品简介">{$info.goods_brief}</textarea>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">搜索关键字：</label>
+                        <div class="controls">
+                            <textarea id="search_key_word" name="search_key_word" placeholder="请输入搜索关键字">{$info.search_key_word}</textarea>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">商品排序：</label>
+                        <div class="controls">
+                            <input id="goods_sort" type="text" name="goods_sort" placeholder="请输入排序序号" value="{$info.goods_sort}" regex="/^(0|[1-9][0-9]{0,9})?$/" regexMsg="格式有误，请重新输入"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">支持邮寄：</label>
+                        <div class="controls">
+                            <label><input type="radio" name="is_object" value="1" {$info['is_object'] == 1 ? 'checked' : ''} />支持 </label>
+                            <label><input type="radio" name="is_object" value="0" {$info['is_object'] == 0 ? 'checked' : ''}/>不支持 </label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">前台搜索：</label>
+                        <div class="controls">
+                            <label><input type="radio" name="is_search" value="1" {$info['is_search'] == 1 ? 'checked' : ''} />可搜索 </label>
+                            <label><input type="radio" name="is_search" value="0" {$info['is_search'] == 0 ? 'checked' : ''}/>不可搜索 </label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">验证库存：</label>
+                        <div class="controls">
+                            <label><input type="radio" name="is_check_store" value="1" {$info['is_check_store'] == 1 ? 'checked' : ''}/>支持 </label>
+                            <label><input type="radio" name="is_check_store" value="0" {$info['is_check_store'] == 0 ? 'checked' : ''} />不支持 </label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">退货：</label>
+                        <div class="controls">
+                            <label><input type="radio" name="is_promotion" value="1" {$info['is_promotion'] == 1 ? 'checked' : ''}/>支持 </label>
+                            <label><input type="radio" name="is_promotion" value="0" {$info['is_promotion'] == 0 ? 'checked' : ''} />不支持 </label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">换货：</label>
+                        <div class="controls">
+                            <label><input type="radio" name="is_change" value="1" {$info['is_change'] == 1 ? 'checked' : ''}/>支持 </label>
+                            <label><input type="radio" name="is_change" value="0" {$info['is_change'] == 0 ? 'checked' : ''} />不支持 </label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">预约服务：</label>
+                        <div class="controls">
+                            <label><input type="radio" name="service_type" value="0" {$info['service_type'] == 0 ? 'checked' : ''}/>非预约产品 </label>
+                            <label><input type="radio" name="service_type" value="1" {$info['service_type'] == 1 ? 'checked' : ''}/>预约产品 </label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">黑名单能否购买：</label>
+                        <div class="controls">
+                            <label><input type="radio" name="is_black" value="0" {$info['is_black'] == 0 ? 'checked' : ''}/>不能 </label>
+                            <label><input type="radio" name="is_black" value="1" {$info['is_black'] == 1 ? 'checked' : ''}/>能 </label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">商品类型：</label>
+                        <div class="controls">
+                            <select id="goods_type" name="goods_type" empty="请选择商品类型" style="min-width: 200px;">
+                                <option value=" ">请选择商品类型</option>
+                                <foreach name="Think.config.goods_type" item="type" key="type_i">
+                                    <option value="{$type_i}" {$info['goods_type'] == $type_i ? 'selected' : ''}>{$type}</option>
+                                </foreach>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control-group {$info['goods_type'] == 2 ? '' : 'hide'}" id="lp_box">
+                        <label class="control-label">添加礼包商品：</label>
+                        <div class="controls">
+                            <button class="btn btn-success" id="add_lp_goods" type="button"><i class=" icon-plus icon-white"></i> 选择商品</button>
+                             <table class="table table-bordered table-center" style="margin-top: 10px;">
+                                <thead>
+                                    <tr>
+                                        <th>商品编码</th>
+                                        <th>物料编码</th>
+                                        <th>商品名称</th>
+                                        <th>商家名称</th>
+                                        <th>销售价</th>
+                                        <th>积分</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="main_goods_box">
+                                    <volist name="goods_list" id="goods_info">
+                                        <tr>
+                                            <td>{$goods_info.goods_code}<input type="hidden" name="relation_good_ids[]" value="{$goods_info.goods_id}"/></td>
+                                            <td>{$goods_info.goods_materiel_code}</td>
+                                            <td>{$goods_info.goods_name}</td>
+                                            <td>{$goods_info.shops_name}</td>
+                                            <td><input type="text" name="goods_price_{$goods_info.goods_id}" value="{$goods_info.goods_price}"/></td>
+                                            <td><input type="text" name="goods_point_{$goods_info.goods_id}" value="{$goods_info.max_integral}"/></td>
+                                            <td><a href='javascript:;' class='btn btn-mini goods_del'><i class='icon-trash'></i> 删除</a></td>
+                                        </tr>
+                                    </volist>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">商品图片：</label>
+                        <div class="controls">
+                            <button class="btn btn-success" id="upload_img" type="button"><i class="icon-picture icon-white"></i> 选择图片</button>
+                            <div class="img_box" data-id="product_default_pic_arr[]">
+                                <ul class="img_ul">
+                                    <volist name="goods_img_list" id="img">
+                                        <li data-path="{$img}" class="thumbnail">
+                                            <img src="">
+                                        </li>
+                                    </volist>
+                                </ul>
+                            </div>
+                            <span class="help-block">图片尺寸：400*400</span>
+                            <span class="help-block">图片大小不能超过60k，在列表页展示，只能上传一张</span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">橱窗图片：</label>
+                        <div class="controls">
+                            <button class="btn btn-success" id="window_upload_img" type="button"><i class="icon-picture icon-white"></i> 选择图片</button>
+                            <div class="img_box" data-id="product_pic_arr[]">
+                                <ul class="img_ul">
+                                     <volist name="win_img_list" id="img">
+                                        <li data-path="{$img}" class="thumbnail">
+                                            <img src="">
+                                        </li>
+                                    </volist>
+                                </ul>
+                            </div>
+                            <span class="help-block">图片尺寸：800*800</span>
+                            <span class="help-block">上传图片后：点击图片设置为封面（不选择，默认第一张），拖动图片设置显示顺序</span>
+                        </div>
+                    </div>
+                    <div class="control-group hide">
+                        <label class="control-label">商品规格：</label>
+                        <div class="controls">
+                            <div id="specofocationBox">
+                                <empty name='spec_list'>
+                                    选择的商品类型没有关联任何规格
+                                </empty>
+                                <volist name="spec_list" id="spec">
+                                    <div style='margin:10px 0px;'>
+                                        <label><input type='checkbox' name='specofocation_id[]' value='{$spec.specification_id}' {$spec['checked'] ? 'checked' : ''}>{$spec.specification_name}</label>
+                                        <span class='value_box'>值：<input type='text' name='spec_value_{$spec.specification_id}' id='spec_value_{$spec.specification_id}' style='width:300px;' value='{$spec.value}'/></span>
+                                    </div>
+                                </volist>
+                            </div>
+                            <div class="help-block">提示:请先选择商品类型才能选择规格</div>
+                        </div>
+                    </div>
+                     <div class="control-group hide">
+                        <label class="control-label">商品配置：</label>
+                        <div class="controls">
+                            <div id="goodsConfBox">{$goods_conf_content}</div>
+                            <div class="help-block">提示:请先选择商品类型才能选择配置</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_3"  data-step="3">
+                    <div class="control-group">
+                        <label class="control-label">商品特性：</label>
+                        <div class="controls">
+                            <button class="btn btn-success" type="button" id="add_special_btn"><i class="icon-plus icon-white"></i> 添加特性</button>
+                            <div class="special_box {:set_class(null,$special_list,'hide')}" id="special_list">
+                                <volist name="special_list" id="special">
+                                <div class="control-group" data-data="{$special|json_encode|base64_encode}">
+                                    <div class="special_info">{$special.special_name}</div>
+                                    <a href="javascript:;" class="del">删除</a>
+                                    <a href="javascript:;" class="update">修改</a>
+                                </div>
+                                </volist>
+                            </div>
+                            <div class="special_box hide" id="add_special_box">
+                                <div class="control-group">
+                                    <label class="control-label">特性名称：</label>
+                                    <div class="controls">
+                                        <input id="special_name" type="text" placeholder="请输入特性名称" />
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">特性平台：</label>
+                                    <div class="controls">
+                                        <foreach name="Think.config.special_platform" item="platform" key="platform_i">
+                                        <label><input type="radio" name="special_platform" value="{$platform_i}" {:set_class(1,$platform_i,'checked')} />{$platform} </label>
+                                        </foreach>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">特性排序：</label>
+                                    <div class="controls">
+                                        <input id="special_sort" type="text" placeholder="请输入特性排序值" />
+                                        <span class="help-block">特性排序为升序，不设置或者和其他特性排序值一样为自然排序</span>
+                                    </div>
+                                </div>
+                                <div class="control-group" id="special_content_box">
+                                    <label class="control-label">特性内容：</label>
+                                    <div class="controls">
+                                        <textarea id="special_content" style="width:80%;height:300px;" placeholder="请输入特性内容"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <input id="special_submit" class="btn btn-success" type="button" value="保存特性" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <div class="tab-pane" id="tab_4"  data-step="4">
+                    <div class="control-group">
+                        <label class="control-label">预约上架时间：</label>
+                        <div class="controls">
+                            <input class="input_date" style="width: 150px" type="text" name="pre_up_time" id="pre_up_time" placeholder="请选择预约上架时间" value="{$info.pre_up_time}"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">预约下架时间：</label>
+                        <div class="controls">
+                            <input class="input_date" style="width: 150px" type="text" name="expect_down_time" id="expect_down_time" placeholder="请选择预约下架时间" value="{$info.expect_down_time}"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">（消费码）过期时间：</label>
+                        <div class="controls">
+                            <input class="input_date" style="width: 150px" type="text" name="timeout_time" id="timeout_time" placeholder="请选择过期时间" value="{$info.timeout_time}"/>
+                            <span class="help-block">如果填写过期时间，则生成的消费码过期时间为此时间。</span>
+                        </div>
+                    </div>
+                    <if condition="$stock_info['stock_id']">
+                        <div class="control-group">
+                            <label class="control-label">当前库存：</label>
+                            <div class="controls">
+                                {$stock_info.total_stocks}
+                            </div>
+                        </div>        
+                    <else />
+                        <div class="control-group">
+                            <label class="control-label">初始化库存：</label>
+                            <div class="controls">
+                                <input id="goods_stock" type="text" name="goods_stock" placeholder="请输入初始化库存数" regex="/^(0|[1-9][0-9]{0,9})?$/" regexMsg="格式有误，请重新输入"/>
+                            </div>
+                        </div>
+                    </if>
+                    <div class="control-group">
+                        <label class="control-label">限制兑换次数：</label>
+                        <div class="controls">
+                            <input id="year_count" type="text" name="year_count" placeholder="请输入年兑换次数" regex="/^(-1|0|[1-9][0-9]{0,9})?$/" regexMsg="格式有误，请重新输入" value="{$info['year_count']}"/>
+                            <span class="help-block">商品一个人限制时间内购买的数量，-1表示不限制，大于-1表示只能购买的数量</span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">限制时间：</label>
+                        <div class="controls">
+                            <input class="date input_date" style="width: 150px" type="text" name="limit_start_time" id="limit_start_time" placeholder="请输入开始时间" value="{$info['limit_start_time']}"/>
+                            &nbsp;~&nbsp;
+                            <input class="date input_date" style="width: 150px" type="text" name="limit_end_time" id="limit_end_time" placeholder="请输入结束时间" value="{$info['limit_end_time']}"/>
+                            <span class="help-block">当限制次数大于-1时，必须选择有效的时间</span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">总兑换次数：</label>
+                        <div class="controls">
+                            <input id="total_count" type="text" name="total_count" placeholder="请输入总兑换次数" regex="/^(-1|0|[1-9][0-9]{0,9})?$/" regexMsg="格式有误，请重新输入"  value="{$info['total_count']}"/>
+                            <span class="help-block">商品一个人总购买的数量，-1表示不限制，大于-1表示只能购买的数量</span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">市场价：</label>
+                        <div class="controls">
+                            <input id="goods_media_price" type="text" name="goods_media_price" placeholder="请输入市场价" value="{$info.goods_media_price}" regex="/^(0|[1-9][0-9]{0,9})(\.[0-9]{1,2})?$/" regexMsg="格式有误，请重新输入"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">结算价：</label>
+                        <div class="controls">
+                            <input id="goods_cost_price" type="text" name="goods_cost_price" placeholder="请输入结算价" value="{$info.goods_cost_price}" regex="/^(0|[1-9][0-9]{0,9})(\.[0-9]{1,2})?$/" regexMsg="格式有误，请重新输入"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">是否固定积分：</label>
+                        <div class="controls">
+                            <label><input type="radio" name="integral" value="0" {$info['integral'] == '0' ? 'checked' : ''}/>否</label>
+                            <label><input type="radio" name="integral" value="1" {$info['integral'] == '1' ? 'checked' : ''}/>是</label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" id="salePrice">{$info['integral'] == '1' ? '销售价' : '总销售价'}：</label>
+                        <div class="controls">
+                            <input id="goods_price_pc" type="text" name="goods_price_pc" value="{$info.goods_price_pc}" placeholder="请输入销售价" regex="/^(0|[1-9][0-9]{0,9})(\.[0-9]{1,2})?$/" regexMsg="格式有误，请重新输入"/>
+                        </div>
+                    </div>
+                   <div class="control-group">
+                        <label class="control-label" id="pointValue">{$info['integral'] == '1' ? '固定积分数' : '最大积分抵扣金额'}（元）：</label>
+                        <div class="controls">
+                            <input id="max_integral" type="text" name="max_integral" placeholder="请输入积分抵扣金额" value="{$info['max_integral']}" regex="/^(0|[1-9][0-9]{0,9})?$/" regexMsg="格式有误，请重新输入"/>
+                            <div class="help-block">0标识只能用钱购买，不能使用积分，积分兑换比例{$Think.config.INTEGRAL_RATE.point}:{$Think.config.INTEGRAL_RATE.rmb}</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">可使用储值卡：</label>
+                        <div class="controls">
+                            <label><input type="radio" name="use_storage_money" value="0" {$info['use_storage_money'] == '0' ? 'checked' : ''}/>否</label>
+                            <label><input type="radio" name="use_storage_money" value="1" {$info['use_storage_money'] == '1' ? 'checked' : ''}/>是</label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">促销语：</label>
+                        <div class="controls">
+                            <textarea id="promotion_content_pc" name="promotion_content_pc" placeholder="请输入商品促销语">{$info.promotion_content_pc}</textarea>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">销售类型：</label>
+                        <div class="controls">
+                            <select id="sale_type" name="sale_type" empty="请选择销售类型" style="min-width:300px;">
+                                <option value=" ">选择销售类型</option>
+                                <foreach name="Think.config.sale_type" item="type" key="type_i">
+                                    <option value="{$type_i}" {$info['sale_type'] == $type_i ? 'selected' : ''}>{$type}</option>
+                                </foreach>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control-group {:set_class(2,$info['sale_type'],'hide','!=')}" id="expect_up_time_box">
+                        <label class="control-label">上市时间：</label>
+                        <div class="controls">
+                            <input class="input_date" style="width: 150px" type="text" name="expect_up_time" id="expect_up_time" placeholder="请选择预计上市时间" value="{$info.expect_up_time}"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_5"  data-step="5">
+                    <div class="control-group">
+                        <label class="control-label">标签信息：</label>
+                        <div class="controls">
+                            {$goods_label_content}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <input type="hidden" id="goods_id" name="goods_id" value="{$info.goods_id}" />
+                    <input type="hidden" id="goods_code" name="goods_code" value="{$info.goods_code}" />
+                    <input id="submit" class="btn btn-primary" type="submit" value=" 保 存 " />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script type="text/javascript">
+    if('{$Think.get.step|intval}') setStep({$Think.get.step|intval});
+    $('input[type=checkbox],input[type=radio]').uniform(); //美化checkbox，radio按钮
+    $("select").select2();
+    $(".input_date").datetimepicker({showSecond: true,timeFormat: 'hh:mm:ss', stepHour: 1,stepMinute: 1,stepSecond: 1}); //时间插件
+    function setStep(_step) {
+        $('.nav-tabs').find('li').eq(_step-1).find('a').trigger('click');
+    }
+    //搜索绑定事件
+    $('#category_list').find('.select2-input').live('keyup',function() {
+        var _this = $(this);
+        var _list = _this.parents('.select2-drop').find('.select2-results');
+        var _val = $.trim(_this.val());
+        _list.find('.select2-result-label').each(function() {
+            var _text = $(this).data('title');
+            _text = _text.replace(_val,'<span class="red">'+_val+'</span>');
+            $(this).html(_text);
+        });
+    });
+    //绑定商品分类点击事件
+    $('#category_list').find('.select2-result').live('click',function() {
+        $(this).parent().find('.select2-highlighted').removeClass('select2-highlighted');
+        $(this).addClass('select2-highlighted');
+        _id = $(this).data('id');
+        _ids = '';_p_ids = '';
+        var _index = $(this).parents('.serial_box').index();
+        $('.select2-highlighted').each(function() {
+            if ($(this).parents('.serial_box').index() <= _index) {
+                _ids += $(this).data('id')+'_';
+                _p_ids += $(this).data('pid')+'_';
+            }
+        });
+        $('#goods_category_id').val(_id);
+        $('#serial_path').val(_ids);
+        $.post("{:U('EditGoodsBase/category_list')}",{id:_id,ids:_ids,p_ids:_p_ids},function(data) { $('#category_list').html(data);});
+    });
+    /*---------------------------------------------------------------提交商品表单-------------------------------------------------*/
+    //处理图片、特性数据提交
+    function set_data_for_img_special() {
+        $('.other_data_param').remove();
+        $('.img_box').find('li').each(function() {
+            var _pic_id = $(this).parents('.img_box').data('id');
+            $('<input type="hidden" class="other_data_param" name="'+_pic_id+'" value="'+$(this).data('path')+'" />').appendTo($('#edit_goods_form'));
+        });
+        $('#special_list .control-group').each(function() {
+            $('<input type="hidden" class="other_data_param" name="goods_specials[]" value="'+$.param($(this).data('data'))+'" />').appendTo($('#edit_goods_form'));
+        });
+        if($.trim($("#year_count").val()) == ''){
+            $("#year_count").val('-1')
+        }
+        if($.trim($("#total_count").val()) == ''){
+            $("#total_count").val('-1')
+        }
+    }
+    //绑定表单提交事件
+    $('#edit_goods_form').form({
+        start:function() {
+            $('.error').removeClass('error');
+            remove_error();
+            set_data_for_img_special();
+        },
+        error:function(data,_this) {
+            if (_this) {
+                error(data,_this);
+                $('.error').removeClass('error');
+                _this.parents('.control-group').addClass('error');
+                setStep((_this.data('step') ? _this.data('step') : _this.parents('.tab-pane').data('step')));
+            }else alert(data);
+        },
+        ajaxcallback:function(data) {
+            if (data.status) {
+                $('.show_goods_name').html($.trim($('#goods_name').val()));
+                $.gritter.add({
+                    title:	'商品修改成功',
+                    text:	'商品 “'+$.trim($('#goods_name').val())+'” 修改成功。',
+                    sticky: false
+                });	
+            }else {
+                if (data.data) {
+                    var _obj = $('#'+data.data);
+                    console.log(_obj);
+                    $('.error').removeClass('error');
+                    _obj.parents('.control-group').addClass('error');
+//                    _obj.focus();
+                    error(data.info,_obj);
+                    setStep(_obj.parents('.tab-pane').data('step'));
+                }else {
+                    alert(data.info);
+                }
+            }
+        }
+    });
+    /*---------------------------------------------------------------图片信息-------------------------------------------------*/
+    var _show_img = true;
+    $('.nav-tabs li:eq(1)').click(function() {
+        if(_show_img){
+            $('.img_ul li').each(function() { 
+                var _img_path = $(this).data('path');
+                if(_img_path) $(this).find('img').attr('src',createImageUrl(_img_path,'140_140'));
+                image_center($(this));
+            });
+            _show_img = false;
+        }
+    });
+    $('.img_ul li').each(function() { image_center($(this));});
+    if($('.img_ul').children().length) $('.img_ul').sortable();
+    $('#upload_img').upload({
+        multiple:false,
+//        params:'size:400_400',
+        success:function(data) {
+            var _this = $('#upload_img');
+             var _img_url = _this.next('div').find('.img_ul');
+             _img_url.find('li').remove();
+            if (data.savename) {
+                var _path = data.savepath + data.savename;
+                $('<li class="thumbnail" data-path="'+_path+'"></li>').html('<img src="'+createImageUrl(_path,'140_140')+'" />').appendTo(_img_url);
+            }else {
+                for (var i=0; i<data.length; i++) {
+                    var _path = data[i].savepath + data[i].savename;
+                    $('<li class="thumbnail" data-path="'+_path+'"></li>').html('<img src="'+createImageUrl(_path,'140_140')+'" />').appendTo(_img_url);
+                }
+            }
+            _img_url.find('li').each(function() { image_center($(this));});
+            if(_img_url.children().length) _img_url.sortable();
+        }
+    });
+    $('#window_upload_img').upload({
+        multiple:true,
+//        params:'size:800_800',
+        success:function(data) {
+            var _this = $('#window_upload_img');
+             var _img_url = _this.next('div').find('.img_ul');
+            if (data.savename) {
+                var _path = data.savepath + data.savename;
+                $('<li class="thumbnail" data-path="'+_path+'"></li>').html('<img src="'+createImageUrl(_path,'140_140')+'" />').appendTo(_img_url);
+            }else {
+                for (var i=0; i<data.length; i++) {
+                    var _path = data[i].savepath + data[i].savename;
+                    $('<li class="thumbnail" data-path="'+_path+'"></li>').html('<img src="'+createImageUrl(_path,'140_140')+'" />').appendTo(_img_url);
+                }
+            }
+            _img_url.find('li').each(function() { image_center($(this));});
+            if(_img_url.children().length) _img_url.sortable();
+        }
+    });
+     //图片点击事件
+    $('.img_ul li').live('click',function() {
+        $('.img_ul li').removeClass('active').data('default',0);
+        $(this).addClass('active').data('default',1);
+    }).live('contextmenu',function(e) {
+        menu_box_close();
+        var _html = '<ul><li class="del_img last">删除图片</li></ul>';
+        $('<div class="tp_menu_box"></div>').html(_html).data('obj',$(this)).appendTo($('body'));
+        $('.tp_menu_box').css({top:e.pageY,left:e.pageX});
+        return false;
+    });
+    //删除图片
+    $('.del_img').live('click',function(event) {
+        $(this).parents('.tp_menu_box').data('obj').remove();
+    });
+    function menu_box_close() {
+        $('.tp_menu_box').remove();
+    }
+    $(document).bind('click',function() { menu_box_close();});
+    /*---------------------------------------------------------------特性信息-------------------------------------------------*/
+    $('#special_list .control-group').each(function() {
+        $(this).data('data',$.parseJSON(base64_decode($(this).data('data'))));
+    });
+    //初始化文本编辑器
+    KindEditor.ready(function(K) {
+        window.editor = K.create('#special_content');
+    });
+    //编辑器显示、隐藏
+    function is_editor() {
+        $('#special_content_type_box').show();
+        $('#special_content_box').show();
+    }
+    //切换编辑器
+    $("input[name=special_platform]").change(function(){
+        var _this = $(this);
+        var _other = $("input[name=special_platform]:not(:checked)");
+        _other.data('content',editor.html());
+        var _content = _this.data('content');
+        if(!_content) _content = '';
+        editor.html(_content);
+    });
+    //添加特性
+    $('#add_special_btn').click(function() {
+        $('#special_submit').data('action','add').val('保存特性');
+        if ($('#special_list').find('.active').length) {
+            $('#add_special_box').slideUp(600,function() {
+                $('#special_list').find('.active').removeClass('active');
+                reset_special();
+                $('#add_special_box').slideDown(600,function() {to_special_box();});
+            });
+        }else {
+            $('#add_special_box').slideDown(600,function() {to_special_box();});
+        }        
+    });
+    //保存特性
+    $('#special_submit').click(function() {
+        var _data = {};
+        _data.special_name = $('#special_name').val();
+        _data.special_platform = $('input[name=special_platform]:checked').val();
+        _data.special_sort = $('#special_sort').val();
+        var _pc_content = '';
+        var _mobile_content = '';
+        //当前是PC
+        if(_data.special_platform == 1){
+            _pc_content = editor.html();
+            _mobile_content = $("input[name=special_platform]:not(:checked)").data('content');
+        }else{
+            _mobile_content = editor.html();
+            _pc_content = $("input[name=special_platform]:not(:checked)").data('content');
+        }
+        _data.special_content_pc = _pc_content;
+        _data.special_content_mobile = _mobile_content;
+        remove_error();
+        if (!_data.special_name) {
+            error('请输入特性名称',$('#special_name'));
+            $('#special_name').focus();
+            return false;
+        }
+        if (_data.special_sort && !/^\d+$/.test(_data.special_sort)) {
+            error('特性排序值只能是数字',$('#special_sort'));
+            $('#special_sort').focus();
+            return false;
+        }
+        if (!_data.special_content_pc && !_data.special_content_mobile) {
+            error('请输入特性内容',$('#special_content'));
+            $('#special_content').focus();
+            return false;
+        }
+        if ($(this).data('action') == 'update') {
+            var _parent = $('#special_list').find('.active');
+            $(this).data('action','add').val('保存特性');
+            _parent.find('.special_info').html($('#special_name').val());
+            _parent.data('data',_data);
+            _parent.removeClass('active');
+            $('#add_special_box').slideUp(600,function() {reset_special();});
+        }else {
+            $('#add_special_box').slideUp(600,function() {
+                var _special_info = $('<div class="control-group"></div>').html('<div class="special_info">'+$('#special_name').val() +'</div><a class="del" href="javascript:;">删除</a><a class="update" href="javascript:;">修改</a>').appendTo($('#special_list'));
+                _special_info.data('data',_data);
+                $('#special_list').slideDown(600);
+                reset_special();
+            });
+        }
+    });
+    //删除
+    $('#special_list').find('.del').live('click',function() {
+        $(this).parent().fadeOut(300,function() {
+            $(this).remove();
+            if (!$('#special_list .control-group').length) $('#special_list').slideUp(600);
+        });
+        $('#add_special_box').slideUp(600,function() {reset_special();});
+        $('#special_list').slideDown(600);
+    });
+    //修改
+    $('#special_list').find('.update').live('click',function() {
+        remove_error();
+        var _this = $(this);
+        $('#add_special_box').slideUp(600,function() {
+            $('#special_list .control-group').removeClass('active');
+            _this.parent().addClass('active');
+            $('#special_submit').val('更新特性').data('action','update');
+            var _data = _this.parent().data('data');
+            if(!_data.special_platform) _data.special_platform = 1;
+            $('#special_name').val(_data.special_name);
+            $('input[name=special_platform]').attr('checked',false);
+            $('input[name=special_platform]').eq(Number(_data.special_platform)-1).attr('checked',true);
+            $('#special_sort').val(_data.special_sort);
+            $.uniform.update();
+            if(_data.special_platform == 1){
+                editor.html(_data.special_content_pc);
+            }else{
+                editor.html(_data.special_content_mobile);
+            }
+            is_editor();
+            $('#add_special_box').slideDown(600,function() {to_special_box();});
+        });        
+    });
+    //定位到编辑特性盒子位置
+    function to_special_box() {
+        editor.focus();
+    }
+    //重置添加特性数据
+    function reset_special() {
+        remove_error();
+        $('#special_name').val('');
+        $('input[name=special_platform]').attr('checked',false);
+        $('input[name=special_platform]').eq(0).attr('checked',true);
+        $('#special_content').val('');
+        $.uniform.update();
+        editor.html('');
+        is_editor();
+    }
+    /*---------------------------------------------------------------商品类型更改-------------------------------------------------*/
+    $("#goods_type_id").change(function(){
+        var _type_id = $(this).val();
+        //更改品牌
+        var _brand = $("#brand_id");
+        _brand.find("option:gt(0)").remove();
+        $.post("{:U('EditGoodsBase/brand_list')}",{type_id:_type_id},function(data){
+            $.each(data.data,function(i,item){
+                $("<option value='"+item.brand_id+"'>"+item.brand_name+"</option>").appendTo(_brand);
+            });
+            _brand.select2();
+        });
+        //更改标签
+        change_goods_label(_type_id);
+        //更改规格
+        change_goods_specofocation(_type_id);
+        //更改配置
+        change_goods_conf(_type_id);
+    });
+    
+    function change_goods_label(_type_id){
+        var _label_box = $("#labelBox");
+        _label_box.html('');
+        $.post("{:U('EditGoodsBase/goods_label_list')}",{type_id:_type_id},function(data){
+            $.each(data.data,function(i,item){
+                $("<label><input type='checkbox' name='label_id[]' value='"+item.label_id+"'/>"+item.label_name+"</label>").appendTo(_label_box);
+            });
+            if(!_label_box.find('label').length) _label_box.html('选择的商品类型没有关联任何标签');
+            else $("input[name='label_id[]']").uniform();
+        });
+    }
+    
+    function  change_goods_specofocation(_type_id){
+        var _specofocation_box = $("#specofocationBox");
+        _specofocation_box.html('');
+        $.post("{:U('EditGoodsBase/goods_specification_list')}",{type_id:_type_id},function(data){
+            $.each(data.data,function(i,item){
+                var _specification_label = "<div style='margin:10px 0px;'>";
+                _specification_label += "<label><input type='checkbox' name='specofocation_id[]' value='"+item.specification_id+"'/>"+item.specification_name+"</label>";
+                _specification_label += "<span class='value_box'>值：<input type='text' name='spec_value_"+item.specification_id+"' id='spec_value_"+item.specification_id+"' style='width:300px;'/></span>";
+                _specification_label += "</div>";
+                $(_specification_label).appendTo(_specofocation_box);
+            });
+            if(!_specofocation_box.find('label').length) _specofocation_box.html('选择的商品类型没有关联任何规格');
+            else $("input[name='specofocation_id[]']").uniform();
+        });
+    }
+    
+    function change_goods_conf(_type_id){
+        var _conf_box = $("#goodsConfBox");
+        _conf_box.html('');
+        $.post("{:U('EditGoodsBase/get_conf_page')}",{type_id:_type_id},function(data){
+            _conf_box.html(data.data);
+            $('.goods_conf').select2();
+        });
+    }
+     /*---------------------------------------------------------------销售信息------------------------------------------------------------*/
+    $("input[name=is_sale_pc]").click(function(){
+        var _sale_pc = $(this).val();
+        if(_sale_pc == 0){
+            $("#goods_price_pc").attr('disabled',true);
+            $("#promotion_content_pc").attr('disabled',true);
+        }else{
+            $("#goods_price_pc").removeAttr('disabled');
+            $("#promotion_content_pc").removeAttr('disabled');
+        }
+    });
+    $("input[name=is_sale_wap]").click(function(){
+        var _sale_wap = $(this).val();
+        if(_sale_wap == 0){
+            $("#goods_price_wap").attr('disabled',true);
+            $("#promotion_content_wap").attr('disabled',true);
+        }else{
+            $("#goods_price_wap").removeAttr('disabled');
+            $("#promotion_content_wap").removeAttr('disabled');
+        }
+    });
+    $("input[name=is_sale_app]").click(function(){
+        var _sale_app = $(this).val();
+        if(_sale_app == 0){
+            $("#goods_price_app").attr('disabled',true);
+            $("#promotion_content_app").attr('disabled',true);
+        }else{
+            $("#goods_price_app").removeAttr('disabled');
+            $("#promotion_content_app").removeAttr('disabled');
+        }
+    });
+    /*-----------------------------------------------添加礼品包-------------------------------------------*/
+    $("#goods_type").change(function(){
+        var _goods_type = $(this).val();
+        if(_goods_type == 2) $("#lp_box").show();
+        else $("#lp_box").hide();
+    });
+    $("#add_lp_goods").click(function(){
+        choose_goods('','choose_goods_success');
+    });
+    function choose_goods_success(_data){
+        $.post("{:U('Base/get_goods_names')}",{goods_id:_data},function(data){
+            if(data.data){
+                $("#main_empty_tr").remove();
+               $.each(data.data,function(i,item){
+                   var _tr = "<tr>" + 
+                       "<td>"+item.goods_code+"<input type='hidden' name='relation_good_ids[]' value='"+item.goods_id+"'/></td>" +
+                       "<td>"+item.goods_materiel_code+"</td>" +
+                       "<td>"+item.goods_name+"</td>" +
+                       "<td>"+item.shops_name+"</td>" +
+                       "<td><a href='javascript:;' class='btn btn-mini goods_del'><i class='icon-trash'></i> 删除</a></td>" +
+                       "</tr>";
+                    $(_tr).appendTo($("#main_goods_box"));
+                }); 
+            }
+        });
+    }
+    $(".goods_del").live("click",function(){
+        $(this).parents('tr').remove();
+    });
+    /*-----------------------------------------------预计上市时间-------------------------------------------*/
+    $("#sale_type").change(function(){
+        var _sale_type = $(this).val();
+        if(_sale_type == 2){
+            $("#expect_up_time_box").show();
+        }else{
+            $("#expect_up_time_box").hide();
+            $("#expect_up_time").val('');
+        }
+    });
+    /*-----------------------------------------------积分改变-------------------------------------------*/
+    $("input[name=integral]").change(function(){
+        var _this = $(this);
+        if(_this.val() == 0){
+            $("#salePrice").html('总销售价：');
+            $("#pointValue").html('固定积分抵扣金额：');$("#max_integral").attr('placeholder','请输入积分抵扣金额');;
+        }else{
+            $("#salePrice").html('销售价：');
+            $("#pointValue").html('固定积分数：');$("#max_integral").attr('placeholder','请输入固定积分');
+        }
+    });
+</script>

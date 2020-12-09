@@ -1,0 +1,55 @@
+{__NOLAYOUT__}
+<style>
+.form-horizontal .control-label{width:100px;}
+.form-horizontal .controls{margin-left:120px;}
+.form-horizontal .form-actions{padding-left:120px;}
+.select2-results{max-height:300px;}
+</style>
+<div class="widget-box" style="margin:0;">
+    <div class="widget-content nopadding">
+        <form class="form-horizontal add_form" ajax="true" action="{:U('CouponCheck/check_fail')}" autocomplete="off">   
+            <div class="control-group">
+                <label class="control-label">拒绝原因：</label>
+                <div class="controls">
+                    <textarea id="refuse_reason" name="refuse_reason" placeholder="请输入拒绝原因" empty="请输入拒绝原因"></textarea>
+                </div>
+            </div>
+            <div class="form-actions">
+                <input type="hidden" id="coupon_ids" name="coupon_ids" value="{$coupon_ids}"/>
+                <input type="submit" value="提交" class="btn" />
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+$('.add_form').form({
+     start:function() {
+        $('.error').removeClass('error');
+        remove_error();
+    },
+    error:function(data,_this) {
+        if (_this) {
+            error(data,_this);
+            $('.error').removeClass('error');
+            _this.parents('.control-group').addClass('error');
+        }else alert(data);
+    },
+    ajaxcallback:function(data) {
+        if (data.status) {
+            tip_close();
+            location.reload();
+        }else {
+            if (data.data) {
+                var _obj = $('#'+data.data);
+                $('.error').removeClass('error');
+                _obj.parents('.control-group').addClass('error');
+                _obj.focus();
+                error(data.info,_obj);
+            }else {
+                alert(data.info);
+                tip_close();
+            }
+        }
+    }
+});
+</script>

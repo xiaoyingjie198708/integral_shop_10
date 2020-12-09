@@ -1,0 +1,52 @@
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>商品标签列表</h5><a class="btn btn-success btn-mini" href="{:U('GoodsLabel/add')}"><i class="icon-plus icon-white"></i> 添加商品标签</a></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>标签名称</th>
+                        <!--<th>排序</th>-->
+                        <th>标签描述</th>
+                        <th>修改时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="5">还没有任何标签信息，请先创建~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                    <tr class="tree_list_child list_child_{$info.label_parent_id}" style="{:set_class($info['label_parent_id'],'0','display:none;','>')}" data-path="{$info.label_path}">
+                        <td class="tree_list" data-tree="{$info.label_level}" style="text-align:left;">
+                            <a href="javascript:;" data-id="{$info.label_id}" class="list_colse">{$info.label_name}</a>
+                        </td>
+                        <td>{$info.label_desc}</td>
+                        <td>{$info.update_time}</td>
+                        <td>
+                            <a href="{:U('GoodsLabel/update',array('label_id'=>$info['label_id']))}" class="btn btn-mini"><i class="icon-edit"></i> 编辑</a>&nbsp;
+                            <a href="javascript:;" data-id="{$info.label_id}" data-title="{$info.label_name}" class="btn btn-mini label_del"><i class="icon-trash"></i> 删除</a>
+                        </td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('.label_del').click(function() {
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (confirm('确认删除 '+$(this).data('title')+' 吗？')) {
+            _this.data('send','off');
+            $.post("{:U('GoodsLabel/delete')}",{label_id:$(this).data('id')},function(data) {
+                _this.data('send','on');
+                if (data.status) location.reload();
+                else alert(data.info);
+            });
+        }
+    });
+</script>

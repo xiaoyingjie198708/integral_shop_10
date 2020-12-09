@@ -1,0 +1,93 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/tip.jquery.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/form.jquery.min.js"></script>
+<style>
+.radio input[type="radio"], .checkbox input[type="checkbox"]{margin-top:0;margin-left:0;}
+.warging{border-radius:50%;padding:2px 3px;cursor:pointer;position:absolute;margin-left:4px;}
+.sku-stock{min-width:60px;*width:60px;display:inline-block;}
+.status{cursor:pointer;}
+</style>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>商品分类列表</h5><a class="btn btn-success btn-mini" href="{:U('GoodsCategory/add')}"><i class="icon-plus icon-white"></i> 添加商品分类</a></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>分类名称</th>
+                        <th>分类编码</th>
+                        <th>状态</th>
+                        <th>子节点</th>
+                        <th>分类级别</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <empty name="list">
+                    <td colspan="7">还没有商品分类，请先创建~~~</td>
+                </empty>
+                    <volist name="list" id="info">
+                    <tr class="tree_list_child list_child_{$info.goods_category_parent_id}" style="{:set_class($info['goods_category_parent_id'],'0','display:none;','>')}" data-path="{$info.goods_category_path}">
+                        <td class="tree_list" data-tree="{$info.goods_category_level}" style="text-align:left;">
+                            <a href="javascript:;" data-id="{$info.goods_category_id}" class="list_colse">{$info.goods_category_name}</a>
+                        </td>
+                        <td>{$info.goods_category_code}</td>
+                        <td>
+                            <div class="btn-group change_status">
+                                <a data-id="{$info.goods_category_id}" data-status="1" class="btn btn-mini {:set_class('1',$info['goods_category_status'],'btn-success active')}">ON</a>
+                                <a data-id="{$info.goods_category_id}" data-status="2" class="btn btn-mini {:set_class('2',$info['goods_category_status'],'active')}">OFF</a>
+                            </div>
+                        </td>
+                        <td>{$info.child_node|id2name='child_node',###}</td>
+                        <td>{$info.goods_category_level}</td>
+                        <td>{$info.create_time}</td>
+                        <td>
+                            <a class="btn btn-mini" href="{:U('GoodsCategory/update',array('category_code'=>$info['goods_category_code']))}"><i class="icon-edit"></i> 编辑</a>
+                            <a class="btn btn-mini del_category" href="javascript:;" data-id="{$info['goods_category_id']}"><i class="icon-trash"></i> 删除</a>
+                        </td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+var _status_obj = $.parseJSON('{$Think.config.goods_category_status|json_encode}');
+$('select').select2();
+var _badge_class = ['default','badge-success'];
+$('.badge').each(function() {
+    var _status = $(this).data('status');
+    if(_status > 0) $(this).addClass(_badge_class[_status]);
+});
+$('.del_category').click(function() {
+    var _this = $(this);
+    if(!confirm('确定要删除吗？')) return false;
+    $.post("{:U('GoodsCategory/delete')}",{goods_category_id:$(this).data('id')},function(data) {
+        if (data.status) _this.parents('tr').remove();
+        else alert(data.info);
+    },'json');
+});
+
+$(".change_status a").click(function(){
+     var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (_this.hasClass('active')) return false;
+        _this.data('send','off');
+        $.post("{:U('GoodsCategory/change_status')}",{status:_this.data('status'),goods_category_id:_this.data('id')},function(data) {
+            _this.data('send','on');
+            if(!data.status) alert(data.info);
+            else {
+                _this.parent().find('a').removeClass('active');
+                _this.addClass('active');
+                if (_this.index() == 1) _this.prev().removeClass('btn-success');
+                else _this.addClass('btn-success');
+            }
+        },'json');
+});
+</script>

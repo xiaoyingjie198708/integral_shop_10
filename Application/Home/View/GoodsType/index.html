@@ -1,0 +1,97 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>商品类型列表</h5><a class="btn btn-success btn-mini" href="javascript:;" id="addGoodsType"><i class="icon-plus icon-white"></i> 添加类型</a></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>类型名称</th>
+                        <!--<th>物理类别</th>-->
+                        <th>类型编码</th>
+                        <th>状态</th>
+                        <th>修改时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="6">还没有任何类型信息，请先创建~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                    <tr>
+                        <td>{$info.type_name}</td>
+                        <!--<td>{$info.physics_type_id|id2name='physics_type',###}</td>-->
+                        <td>{$info.type_code}</td>
+                        <td>
+                            <div class="btn-group change_status">
+                                <a data-type_id="{$info.type_id}" data-status="1" class="btn btn-mini {:set_class('1',$info['type_status'],'btn-success active')}">上架</a>
+                                <a data-type_id="{$info.type_id}" data-status="2" class="btn btn-mini {:set_class('2',$info['type_status'],'active')}">下架</a>
+                            </div>
+                        </td>
+                        <td>{$info.update_time}</td>
+                        <td>
+                            <a href="javascript:;" class="btn btn-mini edit_goods_type" data-id="{$info.type_id}" data-title="{$info.type_name}"><i class="icon-edit"></i> 编辑</a>&nbsp;
+                            <a href="javascript:;" data-id="{$info.type_id}" data-title="{$info.type_name}" class="btn btn-mini goods_type_del"><i class="icon-trash"></i> 删除</a>
+                        </td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('.change_status a').click(function() {
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (_this.hasClass('active')) return false;
+        _this.data('send','off');
+        $.post("{:U('GoodsType/change_status')}",{type_id:_this.data('type_id'),type_status:_this.data('status')},function(data) {
+            _this.data('send','on');
+            if(!data.status) alert(data.info);
+            else {
+                _this.parent().find('a').removeClass('active');
+                _this.addClass('active');
+                if (_this.index() == 1) _this.prev().removeClass('btn-success');
+                else _this.addClass('btn-success');
+            }
+        },'json');
+    });
+    $('.goods_type_del').click(function() {
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (confirm('确认删除 '+$(this).data('title')+' 吗？')) {
+            _this.data('send','off');
+            $.post("{:U('GoodsType/delete')}",{type_id:$(this).data('id')},function(data) {
+                _this.data('send','on');
+                if (data.status) location.reload();
+                else alert(data.info);
+            });
+        }
+    });
+    
+    $("#addGoodsType").click(function() {
+        tipwindows('添加商品类型',getAddGoodsTypeBox());
+    });
+    function getAddGoodsTypeBox(_id) {
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post("{:U('GoodsType/get_add_page')}",{},function(data){_return = data.info;},'json');
+        return _return;
+    }
+    
+    $(".edit_goods_type").click(function() {
+        tipwindows($(this).data('title')+' - 编辑',getEditGoodsTypeBox($(this).data('id')));
+    });
+    function getEditGoodsTypeBox(_id) {
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post("{:U('GoodsType/get_update_page')}",{type_id:_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+</script>

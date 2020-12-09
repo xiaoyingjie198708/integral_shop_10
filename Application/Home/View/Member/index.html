@@ -1,0 +1,77 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>会员列表</h5></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>会员编码</th>
+                        <th>会员账号</th>
+                        <th>会员等级</th>
+                        <th>会员卡号</th>
+                        <th>当前积分</th>
+                        <th>储值卡金额</th>
+                        <th>会员状态</th>
+                        <th>注册时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="9">还没有任何会员信息~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                    <tr>
+                        <td>{$info.member_code}</td>
+                        <td>{$info.member_account}</td>
+                        <td>{$info.tier_name}</td>
+                        <td>{$info.card_number}</td>
+                        <td>{$info.current_point}</td>
+                        <td>{$info.storage_money}</td>
+                        <td>{$info.state_code|id2name='member_status',###}</td>
+                        <td>{$info.create_time}</td>
+                        <td>
+                            <a href="{:U('Member/info',array('member_id'=>$info['member_id']))}" class="btn btn-mini"><i class="icon-eye-open"></i> 查看详情</a>
+                        </td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('.change_status a').click(function() {
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (_this.hasClass('active')) return false;
+        _this.data('send','off');
+        $.post("{:U('GoodsStock/change_stock_status')}",{stock_id:_this.data('stock_id'),stock_status:_this.data('status')},function(data) {
+            _this.data('send','on');
+            if(!data.status) alert(data.info);
+            else {
+                _this.parent().find('a').removeClass('active');
+                _this.addClass('active');
+                if (_this.index() == 1) _this.prev().removeClass('btn-success');
+                else _this.addClass('btn-success');
+            }
+        },'json');
+    });
+    /*-------------------------------------------------修改库存----------------------------------------*/
+    $(".update_stock").click(function() {
+        var _id = $(this).data('id');
+        tipwindows('更新库存',getUpdateStockBox(_id));
+    });
+    function getUpdateStockBox(_id) {
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post("{:U('GoodsStock/get_update_stock')}",{stock_id:_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+</script>

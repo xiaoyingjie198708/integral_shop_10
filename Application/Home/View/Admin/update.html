@@ -1,0 +1,99 @@
+{__NOLAYOUT__}
+<style>
+.form-horizontal .control-label{width:100px;}
+.form-horizontal .controls{margin-left:120px;}
+.form-horizontal .form-actions{padding-left:120px;}
+.select2-results{max-height:300px;}
+</style>
+<div class="widget-box" style="margin:0;">
+    <div class="widget-content nopadding">
+        <form class="form-horizontal update_user_form" ajax="true" action="{:U('Admin/update')}" autocomplete="off">   
+            <div class="control-group">
+                <label class="control-label">用户名：</label>
+                <div class="controls">{$info.username}</div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">真实姓名：</label>
+                <div class="controls">
+                    <input type="text" name="realname" empty="请输入真实名称" id="realname" value="{$info.realname}" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">所属分组：</label>
+                <div class="controls" style="padding-right:20px;">
+                    <select id="group" name="group[]" multiple="" empty="请选择所属分组">
+                        <volist name="groups" id="group">
+                        <option value="{$group.id}" {$group.select}>{$group.name}</option>
+                        </volist>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">所属商家：</label>
+                <div class="controls" style="padding-right:20px;">
+                    <select id="relation" name="relation[]" multiple="">
+                        <volist name="relations" id="relation">
+                        <option value="{$relation.shops_id}" {$relation.select}>{$relation.shops_name}</option>
+                        </volist>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">帐号状态：</label>
+                <div class="controls">
+                    <div class="btn-group update_change_status">
+                        <a data-status="1" class="btn btn-mini {:set_class('1',$info['status'],'btn-success active')}">ON</a>
+                        <a data-status="0" class="btn btn-mini {:set_class('0',$info['status'],'active')}">OFF</a>
+                    </div>
+                </div>
+                <input type="hidden" id="status" name="status" value="{$info.status}" />
+            </div>
+            <div class="form-actions">
+                <input type="hidden" id="id" name="id" value="{$info.id}" />
+                <input type="submit" value="提交" class="btn" />
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+$('select').select2();
+$('.update_change_status a').click(function() {
+    var _this = $(this);
+    if (_this.hasClass('active')) return false;
+    _this.parent().find('a').removeClass('active');
+    _this.addClass('active');
+    if (_this.index() == 1) _this.prev().removeClass('btn-success');
+    else _this.addClass('btn-success');
+    $('#status').val($(this).data('status'));
+});
+$('.update_user_form').form({
+     start:function() {
+        $('.error').removeClass('error');
+        remove_error();
+    },
+    error:function(data,_this) {
+        if (_this) {
+            error(data,_this);
+            $('.error').removeClass('error');
+            _this.parents('.control-group').addClass('error');
+        }else alert(data);
+    },
+    ajaxcallback:function(data) {
+        if (data.status) {
+            tip_close();
+            location.reload();
+        }else {
+            if (data.data) {
+                var _obj = $('#'+data.data);
+                $('.error').removeClass('error');
+                _obj.parents('.control-group').addClass('error');
+                _obj.focus();
+                error(data.info,_obj);
+            }else {
+                alert(data.info);
+                tip_close();
+            }
+        }
+    }
+});
+</script>

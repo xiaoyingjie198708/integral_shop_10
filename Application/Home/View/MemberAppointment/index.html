@@ -1,0 +1,91 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-zh-CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/export.jquery.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>客户预约列表</h5><a class="btn btn-success btn-mini" href="javascript:;" id="addMemberApp"><i class="icon-plus icon-white"></i> 添加预约</a></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>联系电话</th>
+                        <th>联系人</th>
+                        <th>商品名称</th>
+                        <th>数量</th>
+                        <th>商家</th>
+                        <th>预约时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="7">还没有任何类型信息，请先创建~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                    <tr>
+                        <td>{$info.member_mobile}</td>
+                        <td>{$info.member_name}</td>
+                        <td>{$info.goods_desc}</td>
+                        <td>{$info.goods_num}</td>
+                        <td>{$info.shops_name}</td>
+                        <td>{$info.app_time}</td>
+                        <td>
+                            <a href="javascript:;" class="btn btn-mini edit_member_app" data-id="{$info.id}"><i class="icon-edit"></i> 编辑</a>&nbsp;
+                            <a href="javascript:;" data-id="{$info.id}" class="btn btn-mini member_app_del"><i class="icon-trash"></i> 删除</a>
+                        </td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('.member_app_del').click(function() {
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (confirm('确认删除吗？')) {
+            _this.data('send','off');
+            $.post("{:U('MemberAppointment/delete')}",{id:$(this).data('id')},function(data) {
+                _this.data('send','on');
+                if (data.status) location.reload();
+                else alert(data.info);
+            });
+        }
+    });
+    
+    $("#addMemberApp").click(function() {
+        tipwindows('添加预约',getAddMemberAppBox());
+    });
+    function getAddMemberAppBox() {
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post("{:U('MemberAppointment/get_add_page')}",{},function(data){_return = data.info;},'json');
+        return _return;
+    }
+    
+    $(".edit_member_app").click(function() {
+        tipwindows('更新预约',getUpdateMemberAppBox($(this).data('id')));
+    });
+    function getUpdateMemberAppBox(_id) {
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post("{:U('MemberAppointment/get_update_page')}",{id:_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+     /*--------------------------------------------------------------------------导出-----------------------------------------------------------------*/
+    $("#explode_order").export({
+       seatch:$("input[name='seatch']").val(),
+       goods_name:$("input[name='goods_name']").val(),
+       app_start:$("input[name='app_start']").val(),
+       app_end:$("input[name='app_end']").val(),
+    });  
+</script>

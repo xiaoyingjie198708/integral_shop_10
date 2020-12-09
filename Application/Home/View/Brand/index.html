@@ -1,0 +1,84 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>品牌列表</h5><a class="btn btn-success btn-mini" href="{:U('Brand/add')}"><i class="icon-plus icon-white"></i> 添加品牌</a></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>品牌名称</th>
+                        <th>品牌别名</th>
+                        <th>品牌图标</th>
+                        <th>状态</th>
+                        <th>排序</th>
+                        <th>品牌官网</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="8">还没有任何品牌信息，请先创建~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                    <tr>
+                        <td>{$info.brand_name}</td>
+                        <td>{$info.brand_alias}</td>
+                        <td>
+                            <if condition="$info.brand_pic neq ''">
+                                <img src="{$info.brand_pic|createImageUrl=###}"/>
+                            </if>
+                        </td>
+                        <td>
+                            <div class="btn-group change_status">
+                                <a data-user="{$info.brand_id}" data-status="1" class="btn btn-mini {:set_class('1',$info['brand_status'],'btn-success active')}">上架</a>
+                                <a data-user="{$info.brand_id}" data-status="2" class="btn btn-mini {:set_class('2',$info['brand_status'],'active')}">下架</a>
+                            </div>
+                        </td>
+                        <td>{$info.brand_sort}</td>
+                        <td>{$info.brand_url}</td>
+                        <td>{$info.create_time}</td>
+                        <td>
+                            <a href="{:U('Brand/update',array('brand_id'=>$info['brand_id']))}" class="btn btn-mini"><i class="icon-edit"></i> 编辑</a>&nbsp;
+                            <a href="javascript:;" data-id="{$info.brand_id}" data-title="{$info.brand_name}" class="btn btn-mini brand_del"><i class="icon-trash"></i> 删除</a>
+                        </td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('.change_status a').click(function() {
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (_this.hasClass('active')) return false;
+        _this.data('send','off');
+        $.post("{:U('Brand/change_barnd_status')}",{brand_id:_this.data('user'),brand_status:_this.data('status')},function(data) {
+            _this.data('send','on');
+            if(!data.status) alert(data.info);
+            else {
+                _this.parent().find('a').removeClass('active');
+                _this.addClass('active');
+                if (_this.index() == 1) _this.prev().removeClass('btn-success');
+                else _this.addClass('btn-success');
+            }
+        },'json');
+    });
+    $('.brand_del').click(function() {
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (confirm('确认删除 '+$(this).data('title')+' 吗？')) {
+            _this.data('send','off');
+            $.post("{:U('Brand/delete')}",{brand_id:$(this).data('id')},function(data) {
+                _this.data('send','on');
+                if (data.status) location.reload();
+                else alert(data.info);
+            });
+        }
+    });
+</script>

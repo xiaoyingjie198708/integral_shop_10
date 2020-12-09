@@ -1,0 +1,74 @@
+{__NOLAYOUT__}
+<style>
+.form-horizontal .control-label{width:100px;}
+.form-horizontal .controls{margin-left:120px;}
+.form-horizontal .form-actions{padding-left:120px;}
+.select2-results{max-height:300px;}
+</style>
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script src="__PUBLIC__/js/select2.min.js"></script>
+<div class="widget-box" style="margin:0;">
+    <div class="widget-content nopadding">
+        <form class="form-horizontal" ajax="true" action="" autocomplete="off">   
+            <div class="control-group">
+                <label class="control-label">商品名称：</label>
+                <div class="controls">
+                    <input type="text" name="goods_name" id="goods_name" value="{$info.goods_name}" disabled/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">商家：</label>
+                <div class="controls">
+                    <input type="text" name="shops_name" id="shops_name" value="{$info.shops_name}" disabled/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">当前库存：</label>
+                <div class="controls">
+                    <input type="text" name="cur_sale_stocks" id="cur_sale_stocks" value="{$info.cur_sale_stocks}" disabled/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">操作库存：</label>
+                <div class="controls">
+                    <input type="text" name="stock_number" id="stock_number" value="{$info.stock_number}"/>
+                </div>
+            </div>
+            <div class="form-actions">
+                <input type="hidden" id="stock_id" name="stock_id" value="{$info.stock_id}"/>
+                <input type="button" value="确认增加库存" class="btn btn-success update_stock_btn" data-type="1"/>
+                <input type="button" value="确认减少库存" class="btn btn-danger update_stock_btn" data-type="2"/>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+$(".update_stock_btn").click(function(){
+    var _this = $(this);
+    var _stock_number = $('#stock_number').val();
+    if (!/^\d+$/.test(_stock_number)) {
+        error('操作库存只能是数字',$('#stock_number'));
+        $('#stock_number').focus();
+        return false;
+    }
+    var _stock_id = $("#stock_id").val();
+    $.post("{:U('GoodsStock/update_stock')}",{stock_id:_stock_id,stock_type:_this.data('type'),stock_number:_stock_number},function(data){
+        if (data.status) {
+            tip_close();
+            location.reload();
+        }else {
+            if (data.data) {
+                var _obj = $('#'+data.data);
+                $('.error').removeClass('error');
+                _obj.parents('.control-group').addClass('error');
+                _obj.focus();
+                error(data.info,_obj);
+            }else {
+                alert(data.info);
+                tip_close();
+            }
+        }
+    });
+});
+</script>

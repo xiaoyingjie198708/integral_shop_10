@@ -1,0 +1,26 @@
+        </div>
+        <div class="check_browser_version hide">
+            <div class="alert">
+                <button data-dismiss="alert" class="close">×</button>
+                <strong>友情提示：</strong> 为了更好的体验，请升级您的浏览器。（IE8以上）
+            </div>
+        </div>        
+	</body>
+    <volist name="other_js" id="o_js">
+        <script src="__PUBLIC__/js/{$o_js}.js"></script>    
+    </volist>
+</html>
+<script type="text/javascript">
+if ($('.tree_list').length) {
+    $('.tree_list').each(function() {
+        var _lv = Number($(this).data('tree'));
+        if (_lv > 1) $(this).css({'padding-left':(_lv*10+(_lv-1)*10)+'px','background-position':(_lv*10+(_lv-1)*10-15)+'px center'});
+        else $(this).removeClass('tree_list');
+    });
+}
+if($.browser.msie){
+    if ($.browser.version == '6.0' || $.browser.version == '7.0' || $.browser.version == '8.0') {
+        $('.check_browser_version').removeClass('hide');
+    }
+}
+</script>

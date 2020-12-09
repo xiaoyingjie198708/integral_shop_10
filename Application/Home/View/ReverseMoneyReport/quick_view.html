@@ -1,0 +1,43 @@
+{__NOLAYOUT__}
+<div class="widget-box  tab-left" style="margin-top:0;">
+    <div id="order_quick_box" class="widget-content tab-content">
+        <div>
+        <table class="table table-bordered">
+            <tr>
+                <td>应退金额：</td>
+                <td>{$info.forward_value|price_format}</td>
+                <td>实退金额：</td>
+                <td>{$info.reverse_value|price_format}</td>
+            </tr>
+            <tr>
+                <td>退款流水号：</td>
+                <td>{$info.reverse_serial_number|default='无'}</td>
+                <td>退款手续费：</td>
+                <td>{$info.poundage|price_format}</td>
+            </tr>
+            <tr>
+                <td>应退积分：</td>
+                <td>{$info.forward_point|intval}</td>
+                <td>实退积分：</td>
+                <td>{$info.reverse_point|intval}</td>
+            </tr>
+            <tr>
+                <td>应退储值卡金额：</td>
+                <td>{$info.forward_storage_money|price_format}</td>
+                <td>实退储值卡金额：</td>
+                <td>{$info.reverse_storage_money|price_format}</td>
+            </tr>
+            <tr>
+                <td>退款状态：</td>
+                <td>{$info.reverse_status|id2name='reverse_money_status',###}</td>
+                <td>更新时间：</td>
+                <td>{$info.update_time|default='无'}</td>
+            </tr>
+            <tr>
+                <td>退款备注</td>
+                <td colspan="3">{$info.comment|default='无'}</td>
+            </tr>
+        </table>
+    </div>
+    </div>
+</div>

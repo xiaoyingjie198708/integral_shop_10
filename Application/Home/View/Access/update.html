@@ -1,0 +1,64 @@
+{__NOLAYOUT__}
+<style>
+.form-horizontal .control-label{width:100px;}
+.form-horizontal .controls{margin-left:120px;}
+.form-horizontal .form-actions{padding-left:120px;}
+</style>
+<div class="widget-box" style="margin:0;">
+    <div class="widget-content nopadding">
+        <form class="form-horizontal update_rule_form" ajax="true" action="{:U('Access/update')}" autocomplete="off">   
+            <div class="control-group">
+                <label class="control-label">权限标识：</label>
+                <div class="controls">
+                    <input type="text" name="name" empty="请输入权限标识" id="name" value="{$info.name}" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">权限名称：</label>
+                <div class="controls">
+                    <input type="text" name="title" empty="请输入权限名称" id="title" value="{$info.title}" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">权限条件：</label>
+                <div class="controls">
+                    <input type="text" name="condition" id="condition" value="{$info.condition}" />
+                </div>
+            </div>
+            <div class="form-actions">
+                <input type="hidden" id="id" name="id" value="{$info.id}" />
+                <input type="hidden" id="p_id" name="p_id" value="{$info.p_id}" />
+                <input type="submit" value="提交" class="btn" />
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+$('.update_rule_form').form({
+     start:function() {
+        $('.error').removeClass('error');
+        remove_error();
+    },
+    error:function(data,_this) {
+        if (_this) {
+            error(data,_this);
+            $('.error').removeClass('error');
+            _this.parents('.control-group').addClass('error');
+        }else alert(data);
+    },
+    ajaxcallback:function(data) {
+        if (data.status) {
+            $('#name_'+data.info).html(data.data);
+            tip_close();
+        }else {
+            if (data.data) {
+                var _obj = $('#'+data.data);
+                $('.error').removeClass('error');
+                _obj.parents('.control-group').addClass('error');
+                _obj.focus();
+                error(data.info,_obj);
+            }else tip_close();
+        }
+    }
+});
+</script>

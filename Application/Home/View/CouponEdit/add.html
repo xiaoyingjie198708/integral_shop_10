@@ -1,0 +1,146 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/jquery.gritter.css" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-zh-CN.js"></script>
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.gritter.min.js"></script>
+<style>
+    .controls label{display:inline-block; height:20px; padding:4px 10px 4px 0;margin-bottom:0;}
+</style>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>添加优惠券</h5><a class="btn btn-success btn-mini" href="{:back_list_url()}"><i class="icon-share-alt icon-white"></i> 返回列表</a></div>
+        <div class="widget-content nopadding">
+        <form class="form-horizontal" method="post" ajax="true" action="{:U('CouponEdit/add')}" id="add_form" autocomplete="off">
+<!--            <div class="control-group">
+                <label class="control-label">优惠券分类：</label>
+                <div class="controls">
+                    <select name="coupon_category_type" id="coupon_category_type" empty="请选择优惠券分类" style="min-width: 200px;">
+                        <option value=" ">请选择优惠券分类</option>
+                        <foreach name="Think.config.coupon_category_type" item="category" key="type_i">
+                            <option value="{$type_i}">{$category}</option>
+                        </foreach>
+                    </select>
+                </div>
+            </div>-->
+            <div class="control-group">
+                <label class="control-label">优惠券分类：</label>
+                <div class="controls">
+                    <foreach name="Think.config.coupon_category_type" item="type" key="type_i">
+                        <label><input type="radio" name="coupon_category_type" value="{$type_i}" {$type_i == 1 ? 'checked' : ''}/>{$type}</label>
+                    </foreach>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">优惠券名称：</label>
+                <div class="controls"><input type="text" name="coupon_name" id="coupon_name" empty="请输入优惠券名称" placeholder="请输入优惠券名称"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">优惠券类型：</label>
+                <div class="controls">
+                    <foreach name="Think.config.coupon_use_type" item="type" key="type_i">
+                        <label><input type="radio" name="coupon_use_type" value="{$type_i}" {$type_i == 1 ? 'checked' : ''}/>{$type}</label>
+                    </foreach>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">优惠券金额：</label>
+                <div class="controls"><input type="text" name="coupon_value" id="coupon_value" empty="请输入优惠券金额" placeholder="请输入优惠券金额" regex="/^(0|[1-9][0-9]{0,9})(\.[0-9]{1,2})?$/" regexMsg="格式有误，请重新输入"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">最大发放张数：</label>
+                <div class="controls"><input type="text" name="max_count" id="max_count" empty="请输入最大领取数" placeholder="请输入最大领取数" regex="/^(0|[1-9][0-9]{0,9})?$/" regexMsg="格式有误，请重新输入"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">使用有效期：</label>
+                <div class="controls">
+                    <input class="date" style="width: 150px" type="text" name="valid_start_time" id="valid_start_time" placeholder="请输入开始时间"  empty="请输入开始时间"/>
+                    &nbsp;~&nbsp;
+                    <input class="date" style="width: 150px" type="text" name="valid_end_time" id="valid_end_time" placeholder="请输入结束时间" empty="请输入结束时间"/>
+                </div>
+            </div>
+<!--            <div class="control-group">
+                <label class="control-label">是否推广领取：</label>
+                <div class="controls">
+                    <label><input type="radio" name="is_generalize" value="1" checked/>是</label>
+                    <label><input type="radio" name="is_generalize" value="0"/>否</label>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">推广有效期：</label>
+                <div class="controls">
+                    <input class="date" style="width: 150px" type="text" name="generalize_start_time" id="generalize_start_time" placeholder="请输入开始时间"/>
+                    &nbsp;~&nbsp;
+                    <input class="date" style="width: 150px" type="text" name="generalize_end_time" id="generalize_end_time" placeholder="请输入结束时间"/>
+                </div>
+            </div>-->
+            <div class="control-group">
+                <label class="control-label">可使用平台：</label>
+                <div class="controls">
+                    <label><input type="checkbox" name="is_pc" value="1" checked/>PC端</label>
+                    <label><input type="checkbox" name="is_wap" value="1"/>WAP端</label>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">优惠券规则：</label>
+                <div class="controls"><textarea id="coupon_desc" name="coupon_desc" placeholder="请输入优惠券规则描述"></textarea></div>
+            </div>
+            <div class="form-actions">
+                <input type="submit" value="提交" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+<script type="text/javascript">
+    $('select').select2();
+    $('input[type=checkbox],input[type=radio]').uniform(); //美化checkbox，radio按钮
+    $(".date").datetimepicker({
+        showSecond: true,
+        timeFormat: 'hh:mm:ss',
+        stepHour: 1,
+        stepMinute: 1,
+        stepSecond: 1
+    });
+    $("#add_form").form({
+        start:function() {
+            $('.error').removeClass('error');
+            remove_error();
+        },
+        error:function(data,_this) {
+            if (_this) {
+                error(data,_this);
+                $('.error').removeClass('error');
+                _this.parents('.control-group').addClass('error');
+            }else alert(data);
+        },
+        ajaxcallback:function(data) {
+            if (data.status) {
+                    $("#add_form")[0].reset();
+                    $('select').select2();
+                    $.uniform.update();
+                    $.gritter.add({
+                        title:	'添加优惠券成功',
+                        text:	'优惠券'+data.data+'添加成功。',
+                        sticky: false
+                    });	
+            }else {
+                if (data.data) {
+                    var _obj = $('#'+data.data);
+                    $('.error').removeClass('error');
+                    _obj.parents('.control-group').addClass('error');
+                    _obj.focus();
+                    error(data.info,_obj);
+                }else {
+                    alert(data.info);
+                }
+            }
+        }
+    });
+</script>

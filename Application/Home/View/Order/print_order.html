@@ -1,0 +1,58 @@
+{__NOLAYOUT__}
+<html>
+    <head>
+        <title>打印订单</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            table .tr_center{text-align: center;}
+            table tr{margin-top: 5px;}
+        </style>
+    </head>
+    <body>
+        <table style="width:100%;margin:auto 0;">
+            <tr class="tr_center"><td colspan="2">国家大剧院配送订单</td></tr>
+            <tr>
+                <td>订单编号：{$info.order_cur_id}</td>
+                <td>下单时间：{$info.create_time}</td>
+            </tr>
+            <tr>
+                <td>订单金额：{$info.total_value}</td>
+                <td>实付金额：{$info.pay_value}</td>
+            </tr>
+            <tr>
+                <td>收货人：{$info.name}/{$info.mobile}</td>
+                <td>收货地址：{$info.province} {$info.city} {$info.county} {$info.address}</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <table style="width:100%;">
+                            <tr>
+                                <td>商品编码</td>
+                                <td>商品名称</td>
+                                <td>销售价</td>
+                                <td>数量</td>
+                                <td>使用积分数</td>
+                                <td>优惠券</td>
+                                <td>优惠码</td>
+                                <td>储值卡</td>
+                            </tr>
+                            <volist name='order_goods_list' id='order_goods'>
+                                <tr>
+                                    <td>{$order_goods.goods_code}</td>
+                                    <td>{$order_goods.goods_name}</td>
+                                    <td>{$order_goods.show_price}</td>
+                                    <td>{$order_goods.goods_number}</td>
+                                    <td>{$order_goods.use_integral|default='0'}</td>
+                                    <td>{$order_goods.coupon_txt|default='未使用'}</td>
+                                    <td>{$order_goods.coupon_code_txt|default='未使用'}</td>
+                                    <td>{$order_goods.storage_money|default='未使用'}</td>
+                                </tr>
+                            </volist>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>

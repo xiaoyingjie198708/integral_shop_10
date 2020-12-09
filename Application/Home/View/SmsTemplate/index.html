@@ -1,0 +1,57 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>短信模板列表</h5><a class="btn btn-success btn-mini" href="{:U('SmsTemplate/add')}"><i class="icon-plus icon-white"></i> 添加模板</a></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>模板名称</th>
+                        <th>操作的表</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <tr><td colspan="4">还没有短信模板记录~~~</td></tr>
+                    </empty>
+                    <volist name="list" id="info">
+                        <tr>
+                            <td>{$info.template_name}</td>
+                            <td>{$info.table_name}</td>
+                            <td>
+                                <div class="btn-group change_status">
+                                    <a data-id="{$info.id}" data-status="1" class="btn btn-mini {:set_class('1',$info['status'],'btn-success active')}">有效</a>
+                                    <a data-id="{$info.id}" data-status="0" class="btn btn-mini {:set_class('0',$info['status'],'active')}">无效</a>
+                                </div>
+                            <td>
+                                <a href="{:U('SmsTemplate/update',array('id'=>$info['id']))}" class="btn btn-mini"><i class="icon-edit"></i> 修改</a>
+                            </td>
+                        </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+$('.change_status a').click(function() {
+    var _this = $(this);
+    if(_this.data('send') == 'off') return false;
+    if (_this.hasClass('active')) return false;
+    _this.data('send','off');
+    $.post("{:U('SmsTemplate/change_status')}",{id:_this.data('id'),status:_this.data('status')},function(data) {
+        _this.data('send','on');
+        if(!data.status) alert(data.info);
+        else {
+            _this.parent().find('a').removeClass('active');
+            _this.addClass('active');
+            if (_this.index() == 1) _this.prev().removeClass('btn-success');
+            else _this.addClass('btn-success');
+        }
+    },'json');
+});
+</script>

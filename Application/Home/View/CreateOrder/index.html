@@ -1,0 +1,125 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/jquery.gritter.css" />
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.gritter.min.js"></script>
+<style>
+    .controls label{display:inline-block; height:20px; padding:4px 10px 4px 0;margin-bottom:0;}
+</style>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>临时测试订单</h5><a class="btn btn-success btn-mini" href="{:back_list_url()}"><i class="icon-share-alt icon-white"></i> 返回列表</a></div>
+        <div class="widget-content nopadding">
+        <form class="form-horizontal" method="post" ajax="true" action="{:U('CreateOrder/add')}" id="add_form" autocomplete="off">
+            <div class="control-group">
+                <label class="control-label">会员ID：</label>
+                <div class="controls"><input type="text" name="member_id" id="member_id" empty="请输入会员ID" placeholder="请输入会员ID"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">商品编码：</label>
+                <div class="controls"><input type="text" name="goods_code" id="goods_code" empty="请输入商品编码" placeholder="请输入商品编码"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">商品数量：</label>
+                <div class="controls"><input type="text" name="goods_number" id="goods_number" empty="请输入商品数量" placeholder="请输入商品数量"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">使用优惠券：</label>
+                <div class="controls"><input type="text" name="coupon_code" id="coupon_code" placeholder="请输入优惠券编码"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">使用积分：</label>
+                <div class="controls"><input type="text" name="integral" id="integral" placeholder="请输入积分数量"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">是否付款：</label>
+                <div class="controls">
+                    <label><input type="radio" name="pay_status" value="12" checked/>支付成功</label>
+                    <label><input type="radio" name="pay_status" value="10"/>未支付</label>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">是否开发票：</label>
+                <div class="controls">
+                    <label><input type="radio" name="is_invoice" value="1" checked/>需要</label>
+                    <label><input type="radio" name="is_invoice" value="0"/>不需要</label>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">发票抬头：</label>
+                <div class="controls"><input type="text" name="invoice_title" id="invoice_title" placeholder="请输入发票抬头"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">收货人姓名：</label>
+                <div class="controls"><input type="text" name="name" id="name" placeholder="请输入收货人姓名"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">收货人电话：</label>
+                <div class="controls"><input type="text" name="mobile" id="mobile" placeholder="请输入收货人电话"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">收货人邮箱：</label>
+                <div class="controls"><input type="text" name="email" id="email" placeholder="请输入收货人邮箱"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">省份：</label>
+                <div class="controls"><input type="text" name="province" id="province" placeholder="请输入省份"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">市：</label>
+                <div class="controls"><input type="text" name="city" id="city" placeholder="请输入市"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">县区：</label>
+                <div class="controls"><input type="text" name="county" id="county" placeholder="请输入县区"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">详细地址：</label>
+                <div class="controls"><input type="text" name="address" id="address" placeholder="请输入详细地址"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">用户备注：</label>
+                <div class="controls"><input type="text" name="user_remark" id="user_remark" placeholder="请输入用户备注"/></div>
+            </div>
+            <div class="form-actions">
+                <input type="submit" value="提交" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+<script type="text/javascript">
+    $('input[type=checkbox],input[type=radio]').uniform(); //美化checkbox，radio按钮
+    $("#add_form").form({
+        start:function() {
+            $('.error').removeClass('error');
+            remove_error();
+        },
+        error:function(data,_this) {
+            if (_this) {
+                error(data,_this);
+                $('.error').removeClass('error');
+                _this.parents('.control-group').addClass('error');
+            }else alert(data);
+        },
+        ajaxcallback:function(data) {
+            if (data.status) {
+                    $("#add_form")[0].reset();
+                    $.uniform.update();
+                    alert("下单成功");
+            }else {
+                if (data.data) {
+                    var _obj = $('#'+data.data);
+                    $('.error').removeClass('error');
+                    _obj.parents('.control-group').addClass('error');
+                    _obj.focus();
+                    error(data.info,_obj);
+                }else {
+                    alert(data.info);
+                }
+            }
+        }
+    });
+</script>

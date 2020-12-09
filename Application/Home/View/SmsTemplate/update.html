@@ -1,0 +1,94 @@
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/jquery.gritter.css" />
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.gritter.min.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>修改短信模板</h5><a class="btn btn-success btn-mini" href="{:back_list_url()}"><i class="icon-share-alt icon-white"></i> 返回列表</a></div>
+        <div class="widget-content nopadding">
+            <form class="form-horizontal" method="post" ajax="true" action="{:U('SmsTemplate/update')}" id="add_form" autocomplete="off">
+                <div class="control-group">
+                    <label class="control-label">模板名称：</label>
+                    <div class="controls"><input type="text" name="template_name" id="template_name" empty="请输入模板名称" placeholder="请输入模板名称" value="{$info.template_name}"/></div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">操作表：</label>
+                    <div class="controls"><input type="text" name="table_name" id="table_name" empty="请输入操作表" placeholder="请输入操作表" value="{$info.table_name}"/></div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">触发条件：</label>
+                    <div class="controls"><input type="text" name="params" id="params" placeholder="请输入触发条件" value="{$info.params}"/></div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">占位符字段：</label>
+                    <div class="controls">
+                        <input type="text" name="placeholder" id="placeholder" placeholder="请输入占位符" value="{$info.placeholder}"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">条件字段：</label>
+                    <div class="controls">
+                        <input type="text" name="last_mark" id="last_mark" placeholder="请输入条件字段" value="{$info.last_mark}"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">条件字段默认值：</label>
+                    <div class="controls">
+                        <input type="text" name="last_mark_value" id="last_mark_value" placeholder="请输入条件字段默认值" value="{$info.last_mark_value}"/>
+                    </div>
+                </div>
+<!--                <div class="control-group">
+                    <label class="control-label">手机号码字段：</label>
+                    <div class="controls">
+                        <input type="text" name="phone_field" id="phone_field" placeholder="请输入手机号码字段" empty="请输入手机号码字段" value="{$info.phone_field}"/>
+                    </div>
+                </div>-->
+                <div class="control-group">
+                    <label class="control-label">短信模板：</label>
+                    <div class="controls">
+                        <textarea name="sms_template" id="sms_template" placeholder="请输入短信模板" empty="请输入短信模板">{$info.sms_template}</textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <input type="hidden" id="id" name="id" value="{$info.id}"/>
+                    <input type="submit" value="提交" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $("#add_form").form({
+        start:function() {
+            $('.error').removeClass('error');
+            remove_error();
+        },
+        error:function(data,_this) {
+            if (_this) {
+                error(data,_this);
+                $('.error').removeClass('error');
+                _this.parents('.control-group').addClass('error');
+            }else alert(data);
+        },
+        ajaxcallback:function(data) {
+            if (data.status) {
+                $.gritter.add({
+                    title:	'修改短信模板成功',
+                    text:	'修改短信模板，短信定时任务已启动。',
+                    sticky: false
+                });	
+            }else {
+                if (data.data) {
+                    var _obj = $('#'+data.data);
+                    $('.error').removeClass('error');
+                    _obj.parents('.control-group').addClass('error');
+                    _obj.focus();
+                    error(data.info,_obj);
+                }else {
+                    alert(data.info);
+                }
+            }
+        }
+    });
+</script>

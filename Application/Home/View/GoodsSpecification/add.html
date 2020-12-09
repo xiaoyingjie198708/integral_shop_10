@@ -1,0 +1,91 @@
+{__NOLAYOUT__}
+<style>
+.form-horizontal .control-label{width:100px;}
+.form-horizontal .controls{margin-left:120px;}
+.form-horizontal .form-actions{padding-left:120px;}
+.select2-results{max-height:300px;}
+</style>
+<div class="widget-box" style="margin:0;">
+    <div class="widget-content nopadding">
+        <form class="form-horizontal add_form" ajax="true" action="{:U('GoodsSpecification/add')}" autocomplete="off">   
+            <div class="control-group">
+                <label class="control-label">规格名称：</label>
+                <div class="controls">
+                    <input type="text" name="specification_name" id="specification_name" placeholder="请输入规格名称" empty="请输入规格名称"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">商品类型：</label>
+                <div class="controls">
+                    <select name="type_id" id="type_id" empty="请选择商品类型" style="min-width: 200px;">
+                        <option value=" ">请选择商品类型</option>
+                        <foreach name="goods_type_list" item="goods_type" key="type_i">
+                            <option value="{$type_i}">{$goods_type}</option>
+                        </foreach>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">排序：</label>
+                <div class="controls">
+                    <input type="text" name="specification_sort" id="specification_sort" placeholder="请输入排序"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">类型状态：</label>
+                <div class="controls">
+                    <div class="btn-group change_status">
+                        <a data-status="1" class="btn btn-mini btn-success active">上架</a>
+                        <a data-status="2" class="btn btn-mini">下架</a>
+                    </div>
+                </div>
+                <input type="hidden" id="specification_status" name="specification_status" value="1" />
+            </div>
+            <div class="form-actions">
+                <input type="submit" value="提交" class="btn" />
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+$('select').select2();
+$('.change_status a').click(function() {
+    var _this = $(this);
+    if (_this.hasClass('active')) return false;
+    _this.parent().find('a').removeClass('active');
+    _this.addClass('active');
+    if (_this.index() == 1) _this.prev().removeClass('btn-success');
+    else _this.addClass('btn-success');
+    $('#specification_status').val($(this).data('status'));
+});
+$('.add_form').form({
+     start:function() {
+        $('.error').removeClass('error');
+        remove_error();
+    },
+    error:function(data,_this) {
+        if (_this) {
+            error(data,_this);
+            $('.error').removeClass('error');
+            _this.parents('.control-group').addClass('error');
+        }else alert(data);
+    },
+    ajaxcallback:function(data) {
+        if (data.status) {
+            tip_close();
+            location.reload();
+        }else {
+            if (data.data) {
+                var _obj = $('#'+data.data);
+                $('.error').removeClass('error');
+                _obj.parents('.control-group').addClass('error');
+                _obj.focus();
+                error(data.info,_obj);
+            }else {
+                alert(data.info);
+                tip_close();
+            }
+        }
+    }
+});
+</script>

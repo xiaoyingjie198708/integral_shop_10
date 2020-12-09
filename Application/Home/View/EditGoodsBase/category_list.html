@@ -1,0 +1,17 @@
+{__NOLAYOUT__}
+<volist name="category_list" id="c_list" key="category_i">
+<div class="serial_box" style="{:set_class($category_i,1,'margin-left:20px;','>')}">
+    <div class="select2-drop select2-with-searchbox">   
+        <div class="select2-search">
+            <input type="text" style="width:100%;*width:86%;" class="select2-input" autocomplete="off" />
+        </div>
+        <ul class="select2-results">
+            <volist name="c_list" id="category">
+            <li class="select2-result {:set_class('checked',$category['checked'],'select2-highlighted')}" data-id="{$category.goods_category_id}" data-pid="{$category.goods_category_parent_id}">
+                <div class="select2-result-label" data-title="{$category.goods_category_name}">{$category.goods_category_name}</div>
+            </li>
+            </volist>
+        </ul>
+    </div>
+</div>
+</volist>

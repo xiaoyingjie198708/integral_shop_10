@@ -1,0 +1,91 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-zh-CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/tip.jquery.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>消费码列表</h5></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>订单编号</th>
+                        <th>会员账号</th>
+                        <th>商家</th>
+                        <th>商品名称</th>
+                        <th>商品价格</th>
+                        <th>消费码</th>
+                        <th>状态</th>
+                        <th>发放时间</th>
+                        <th>有效期</th>
+                        <th>是否回访</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <empty name="list">
+                    <tr><td colspan="8">还没有任何消费码信息</td></tr>
+                </empty>
+                <volist name="list" id="info">
+                    <tr>
+                        <td>{$info.order_cur_id}</td>
+                        <td>{$info.member_account}</td>
+                        <td>{$info.shops_name}</td>
+                        <td>{$info.goods_name}</td>
+                        <td>{$info.goods_price}</td>
+                        <td>{$info.use_code}</td>
+                        <td><div id="statusBox">{$info.status|id2name='code_status',###}</div></td>
+                        <td>{$info.create_time}</td>
+                        <td>
+                        <if condition="$info.valid_time eq 0 ">
+                            无限制
+                            <else />
+                            {$info.valid_time|date='Y-m-d',###}
+                        </if>
+                        </td>
+                        <td>{$info.is_visit|id2name='is_visit',###}</td>
+                        <td>
+                           <a href="javascript:;" class="btn btn-mini add_comment" data-use_id="{$info.use_id}"><i class="icon-edit"></i> 添加回访备注</a>
+                            <a href="javascript:;" class="btn btn-mini detail_comment" data-use_id="{$info.use_id}"><i class="icon-eye-open" style="margin-right: 0px;"></i> 查看回访详情</a> 
+                        </td>
+                    </tr>
+                </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script>
+/*--------------------------------------------------------------------------添加备注-----------------------------------------------------------------*/
+$(".add_comment").live('click',function(){
+   var _use_id = $(this).data('use_id');
+   tipwindows('添加回访',getaddCommentBox(_use_id));
+});
+function getaddCommentBox(_use_id){
+   var _return = '';
+   $.ajaxSetup({async:false});
+   $.post("{:U('UseCode/get_visit_comment')}",{use_id:_use_id},function(data){_return = data.info;},'json');
+   return _return;
+}
+
+/*--------------------------------------------------------------------------备注内容-----------------------------------------------------------------*/
+$(".detail_comment").live('click',function(){
+   var _use_id = $(this).data('use_id');
+   tipwindows('回访日志',getCommentBox(_use_id));
+});
+function getCommentBox(_use_id){
+   var _return = '';
+   $.ajaxSetup({async:false});
+   $.post("{:U('UseCode/get_comment_list')}",{use_id:_use_id},function(data){_return = data.info;},'json');
+   return _return;
+}
+</script>

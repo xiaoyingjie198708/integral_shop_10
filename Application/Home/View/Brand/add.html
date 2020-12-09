@@ -1,0 +1,143 @@
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/jquery.gritter.css" />
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/upload.jquery.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.sortable.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.gritter.min.js"></script>
+<style>
+    .select2-results{max-height:300px;}
+    .controls label{display:inline-block; height:20px; padding:4px 10px 4px 0;margin-bottom:0;}
+    
+    .img_box{margin:15px 0; overflow:hidden;}
+    .img_box ul{list-style:none; margin:0;}
+    .img_box ul li{float:left; width:140px; height:140px;cursor:pointer;margin-right:15px;margin-bottom:10px;}
+    .img_box ul li:hover{border-color:#08c; box-shadow:0 1px 4px rgba(0,105, 214,0.25);}
+    .img_box ul li.active{border-color:red; box-shadow:0 1px 4px rgba(0,105, 214,0.25);}
+</style>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>添加品牌</h5><a class="btn btn-success btn-mini" href="{:back_list_url()}"><i class="icon-share-alt icon-white"></i> 返回列表</a></div>
+        <div class="widget-content nopadding">
+            <form class="form-horizontal" method="post" ajax="true" action="{:U('Brand/add')}" id="add_form" autocomplete="off">
+                <div class="control-group">
+                    <label class="control-label">品牌名称：</label>
+                    <div class="controls">
+                        <input type="text" name="brand_name" placeholder="请输入品牌名称" empty="请输入品牌名称" id="brand_name" />
+                        <div class="help-block">提示：名称不能超过64个汉字</div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">品牌别名：</label>
+                    <div class="controls">
+                        <input type="text" name="brand_alias" id="brand_alias" placeholder="请输入品牌别名" />
+                        <div class="help-block">提示：多个别名以"|"分隔，以"|"开头与结尾</div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">品牌首字母：</label>
+                    <div class="controls">
+                        <input type="text" name="brand_initial" id="brand_initial" placeholder="请输入品牌首字母" regex="/^[a-zA-Z]{0,1}$/" regexMsg="格式有误，请重新输入" empty="请输入品牌首字母"/>
+                        <div class="help-block">提示：只能输入一个字母</div>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">品牌官网：</label>
+                    <div class="controls">
+                        <input type="text" name="brand_url" id="brand_url" placeholder="请输入品牌官网" />
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">品牌图标：</label>
+                    <div class="controls">
+                        <button class="btn btn-success" type="button" id="upload_img"><i class="icon-picture icon-white"></i> 选择图片</button>
+                        <div class="img_box" id="img_box">
+                            <ul class="img_ul"></ul>
+                        </div>
+                        <input type="hidden" name="brand_pic" id="brand_pic"/>
+                    </div>
+                </div>
+<!--                <div class="control-group">
+                    <label class="control-label">品牌排序：</label>
+                    <div class="controls">
+                        <input type="text" name="brand_sort" id="brand_sort" placeholder="请输入品牌排序" value="0"/>
+                    </div>
+                </div>-->
+                <div class="control-group">
+                    <label class="control-label">商品类型：</label>
+                    <div class="controls">
+                        <foreach name="type_list" item="type">
+                            <label><input type="checkbox" value="{$type.type_id}" name="type_id[]"/>{$type.type_name}</label>
+                        </foreach>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">推荐：</label>
+                    <div class="controls">
+                        <foreach name="Think.config.brand_recommend" item="type_i" key="key_i">
+                            <label><input type="radio" value="{$key_i}" {$key_i == 0 ? 'checked' : ''} name="brand_recommend"/>{$type_i}</label>
+                        </foreach>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <input type="submit" value="提交" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('input[type=checkbox],input[type=radio]').uniform(); //美化checkbox，radio按钮
+    $("#add_form").form({
+        start:function() {
+            $('.error').removeClass('error');
+            remove_error();
+        },
+        error:function(data,_this) {
+            if (_this) {
+                error(data,_this);
+                $('.error').removeClass('error');
+                _this.parents('.control-group').addClass('error');
+            }else alert(data);
+        },
+        ajaxcallback:function(data) {
+            if (data.status) {
+                $("#add_form")[0].reset();
+                $("#img_box").find('.img_ul').children('li').remove();
+                $.gritter.add({
+                    title:	'添加品牌成功',
+                    text:	'品牌 ['+data.data+'] 添加成功。',
+                    sticky: false
+                });	
+            }else {
+                if (data.data) {
+                    var _obj = $('#'+data.data);
+                    $('.error').removeClass('error');
+                    _obj.parents('.control-group').addClass('error');
+                    _obj.focus();
+                    error(data.info,_obj);
+                }else {
+                    alert(data.info);
+                }
+            }
+        }
+    });
+    $("#upload_img").upload({
+            multiple:false,
+            params:'size:106_32',
+            success:function(data) {
+                var _img_url = $("#img_box").find('.img_ul');
+                var _hide = $("#brand_pic");
+                //清空图片
+                _img_url.children('li').remove();
+                _hide.val('');
+                if (data.savename) {
+                    var _path = data.savepath + data.savename;
+                    $('<li class="thumbnail" data-path="'+_path+'"></li>').html('<img src="'+createImageUrl(_path,'0_0')+'" />').appendTo(_img_url);
+                    _hide.val(_path);
+                }
+                _img_url.find('li').each(function() { image_center($(this));});
+                if(_img_url.children().length) _img_url.sortable();
+            }
+        });
+</script>

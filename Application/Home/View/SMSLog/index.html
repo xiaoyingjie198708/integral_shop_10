@@ -1,0 +1,50 @@
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<link rel="stylesheet" href="__PUBLIC__/css/jquery.gritter.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>短信日志列表</h5><a class="btn btn-success btn-mini" href="javascript:;" id="sendBtn"><i class="icon-plus icon-white"></i> 发送短信</a></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>手机号码</th>
+                        <th>短信内容</th>
+                        <th>状态</th>
+                        <th>发送时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <empty name="list">
+                    <tr><td colspan="4">没有短信日志~~~</td></tr>
+                </empty>
+                    <volist name="list" id="info">
+                    <tr>
+                        <td>{$info.phone}</td>
+                        <td>{$info.content}</td>
+                        <td>{$info['send_status']|id2name='send_status',###}</td>
+                        <td>{$info.send_date}</td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $("#sendBtn").click(function () {
+        tipwindows('发送短信', getAddBox());
+    });
+    function getAddBox() {
+        var _return = '';
+        $.ajaxSetup({async: false});
+        $.post("{:U('SMSLog/get_send_info')}", {}, function (data) {
+            _return = data.info;
+        }, 'json');
+        return _return;
+    }
+</script>

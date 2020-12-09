@@ -1,0 +1,14 @@
+{__NOLAYOUT__}
+<notempty name="parent_category">
+<div class="btn-group">
+    <a class="btn btn-small" data-id="0">选择菜单</a>
+    <a data-toggle="dropdown" class="btn btn-small dropdown-toggle"><span class="caret" style="margin"></span></a>
+    <ul class="dropdown-menu">
+        <li><a href="javascript:;" data-id="0">选择菜单</a></li>
+        <li class="divider"></li>
+        <volist name="parent_category" id="parent_m">
+        <li><a href="javascript:;" data-id="{$parent_m.goods_category_id}">{$parent_m.goods_category_name}</a></li>
+        </volist>
+    </ul>
+</div>
+</notempty>

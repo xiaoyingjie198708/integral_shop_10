@@ -1,0 +1,53 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-zh-CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>退货订单明细报表</h5></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>商家名称</th>
+                        <th>订单编号</th>
+                        <th>商品名称</th>
+                        <th>商品数量</th>
+                        <th>回款状态</th>
+                        <th>回款日期</th>
+                        <th>退货状态</th>
+                        <th>退货金额</th>
+                        <th>退货时间</th>
+                        <th>退货原因</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="11">还没有任何商家信息~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                    <tr>
+                        <td>{$info.shops_name}</td>
+                        <td>{$info.order_cur_id}</td>
+                        <td>{$info.goods_name}</td>
+                        <td>{$info.goods_number}</td>
+                        <td>{$info.pay_status|default='已支付'}</td>
+                        <td>{$info.pay_time}</td>
+                        <td>{$info.reverse_status|id2name='reverse_money_status',###}</td>
+                        <td>{$info.reverse_value|price_format}</td>
+                        <td>{$info.create_time}</td>
+                        <td>{$info.comment}</td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>

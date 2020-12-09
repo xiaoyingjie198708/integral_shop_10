@@ -1,0 +1,71 @@
+{__NOLAYOUT__}
+<style>
+.form-horizontal .control-label{width:100px;}
+.form-horizontal .controls{margin-left:120px;}
+.form-horizontal .form-actions{padding-left:120px;}
+</style>
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<link rel="stylesheet" href="__PUBLIC__/css/jquery.gritter.css" />
+<div class="widget-box" style="margin:0;">
+    <div class="widget-content nopadding">
+        <form class="form-horizontal" method="post" ajax="true" action="{:U('Group/add')}" id="add_form" autocomplete="off">
+            <div class="control-group">
+                <label class="control-label">用户组名称：</label>
+                <div class="controls"><input type="text" name="name" empty="请输入用户组名称" id="name" /></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">帐号状态：</label>
+                <div class="controls">
+                    <div class="btn-group add_change_status">
+                        <a data-status="1" class="btn btn-mini btn-success active">ON</a>
+                        <a data-status="0" class="btn btn-mini">OFF</a>
+                    </div>
+                </div>
+                <input type="hidden" id="status" name="status" value="1" />
+            </div>
+            <div class="form-actions">
+                <input type="submit" value="提交" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    $('.add_change_status a').click(function() {
+        var _this = $(this);
+        if (_this.hasClass('active')) return false;
+        _this.parent().find('a').removeClass('active');
+        _this.addClass('active');
+        if (_this.index() == 1) _this.prev().removeClass('btn-success');
+        else _this.addClass('btn-success');
+        $('#status').val($(this).data('status'));
+    });
+    $("#add_form").form({
+        start:function() {
+            $('.error').removeClass('error');
+            remove_error();
+        },
+        error:function(data,_this) {
+            if (_this) {
+                error(data,_this);
+                $('.error').removeClass('error');
+                _this.parents('.control-group').addClass('error');
+            }else alert(data);
+        },
+        ajaxcallback:function(data) {
+            if (data.status) {
+                tip_close();
+                window.location.href = "{:U('Group/index')}";
+            }else {
+                if (data.data) {
+                    var _obj = $('#'+data.data);
+                    $('.error').removeClass('error');
+                    _obj.parents('.control-group').addClass('error');
+                    _obj.focus();
+                    error(data.info,_obj);
+                }else {
+                    alert(data.info);
+                }
+            }
+        }
+    });
+</script>

@@ -1,0 +1,38 @@
+{__NOLAYOUT__}
+<style>
+.tab-left{border:1px solid #ddd; overflow:hidden;background-color:#fff;width:80%;}
+.tab-left .nav{float:left;}
+.tab-left .nav li{float:none;border-bottom:1px solid #ddd;border-right:1px solid #ddd;height:40px;line-height:40px;padding:0 8px;text-align:center;font-weight:bold;background-color:#f9f9f9;}
+.tab-left .nav li.active{border-right:none;background-color:#fff;color:#444;}
+.tab-left .nav li a{background-color:#f9f9f9;color:#999;}
+.tab-left .nav li.active a{color:#444;background-color:#fff;}
+.tab-left .tab-content{border:none;}
+.zc_data_list{list-style:none;padding-left:20px;}
+.zc_data_list li{border-bottom:1px solid #ddd;margin-bottom:10px;padding-bottom:10px;}
+.zc_data_list li label{display:block;height:auto;}
+.zc_data_list li:last-child{border-bottom:none;}
+</style>
+<div class="widget-box tab-left tab_label_box" style="margin-top:0;">
+    <ul class="nav">
+        <volist name="label_list" id="conf1" key="conf1_i">
+        <li class="{:set_class(1,$conf1_i,'active')}">
+            <a data-toggle="tab" href="#tab_table{$conf1.label_id}">{$conf1.label_name}</a>
+        </li>
+        </volist>
+    </ul>
+    <div class="widget-content tab-content">
+        <volist name="label_list" id="conf1" key="conf1_i">
+        <div id="tab_table{$conf1.label_id}" class="tab-pane {:set_class(1,$conf1_i,'active')}">
+            <ul class="zc_data_list" style="margin:0;text-align:left;">
+                <li>
+                    <span>
+                        <volist name="conf1.child" id="conf3">
+                            <label><input type="checkbox" class="sku_label_input" name="goods_label_ids[]" value="{$conf3.label_id}" {$conf3.checked} />{$conf3.label_name} </label>
+                        </volist>
+                    </span>
+                </li>
+            </ul>
+        </div>
+        </volist>
+    </div>
+</div>

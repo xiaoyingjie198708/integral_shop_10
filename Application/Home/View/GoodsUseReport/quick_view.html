@@ -1,0 +1,41 @@
+{__NOLAYOUT__}
+<div class="widget-box  tab-left" style="margin-top:0;">
+    <div id="order_quick_box" class="widget-content tab-content">
+        <div>
+        <table class="table table-bordered">
+            <thead>
+                    <tr>
+                        <th>应付金额</th>
+                        <th>应付积分</th>
+                        <th>实付金额</th>
+                        <th>实付积分</th>
+                        <th>实付储值卡</th>
+                        <th>实付优惠券</th>
+                        <th>实付优惠码</th>
+                        <th>退款金额</th>
+                        <th>退款积分</th>
+                        <th>退款储值卡</th>
+                        <th>实收金额</th>
+                        <th>实收积分</th>
+                        <th>实收储值卡</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <td>{$info.yf_rmb|price_format}</td>
+                    <td>{$info.yf_point|intval}</td>
+                    <td>{$info.sf_rmb|price_format}</td>
+                    <td>{$info.sf_point|intval}</td>
+                    <td>{$info.sf_czk|price_format}</td>
+                    <td>{$info.sf_yhq|price_format}</td>
+                    <td>{$info.sf_yhm|price_format}</td>
+                    <td>{$info.tk_rmb|price_format}</td>
+                    <td>{$info.tk_point|intval}</td>
+                    <td>{$info.tk_czk|price_format}</td>
+                    <td>{$info.ss_rmb|price_format}</td>
+                    <td>{$info.ss_point|intval}</td>
+                    <td>{$info.ss_czk|price_format}</td>
+                </tbody>
+        </table>
+    </div>
+    </div>
+</div>

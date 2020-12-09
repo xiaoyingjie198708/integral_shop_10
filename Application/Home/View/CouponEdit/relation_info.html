@@ -1,0 +1,200 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/jquery.gritter.css" />
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.gritter.min.js"></script>
+<style>
+    .controls label{display:inline-block; height:20px; padding:4px 10px 4px 0;margin-bottom:0;}
+</style>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box">
+        <ul class="nav nav-tabs">
+            <li class="current_type"><a href="{:U('CouponEdit/info',array('coupon_code'=>$info['coupon_code']))}" >优惠券详情</a></li>
+            <li class="active "><a href="javascript:;">优惠券关联信息</a></li>
+        </ul>
+        <a class="btn btn-success btn-mini" href="{:back_list_url()}"><i class="icon-share-alt icon-white"></i> 返回列表</a></div>
+        <div class="widget-content">
+        <form class="form-horizontal" method="post" ajax="true" action="" id="add_form" autocomplete="off">
+            <input type="hidden" name="coupon_id" id="coupon_id" value="{$info.coupon_id}"/>
+            <div class="control-group">
+                <label class="control-label">优惠券名称：</label>
+                <div class="controls"><input type="text" name="coupon_name" id="coupon_name" empty="请输入优惠券名称" placeholder="请输入优惠券名称" value="{$info.coupon_name}" disabled/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">优惠券类型：</label>
+                <div class="controls">
+                    <foreach name="Think.config.coupon_use_type" item="type" key="type_i">
+                        <label><input type="radio" name="coupon_use_type" value="{$type_i}" {$type_i == $info['coupon_use_type'] ? 'checked' : ''} disabled/>{$type}</label>
+                    </foreach>
+                </div>
+            </div>
+            <if condition="$info['coupon_use_type'] eq 2 ">
+                <div class="control-group">
+                    <label class="control-label">参与商家：</label>
+                    <div class="controls">
+                        <button class="btn btn-success" type="button" id="add_shops" disabled><i class="icon-plus icon-white"></i> 选择商家</button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label"></label>
+                    <div class="controls">
+                        <table class="table table_list table-bordered table-center" style="width: 82%;">
+                             <thead>
+                                <tr>
+                                    <th>商家编码</th>
+                                    <th>商家名称</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <empty name="relation_list">
+                                <tr><td colspan="3">没有添加任何参与商家，请添加</td></tr>
+                            </empty>
+                            <volist name="relation_list" id="shops">
+                                <tr>
+                                    <td>{$shops.relation_code}</td>
+                                    <td>{$shops.shops_name}</td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                    </div>
+            </if>
+            <if condition="$info['coupon_use_type'] eq 3 ">
+                <div class="control-group">
+                    <label class="control-label">绑定分类</label>
+                    <div class="controls">
+                        <table class="table table_list table-bordered table-center" style="width: 82%;">
+                            <thead>
+                                <tr>
+                                    <th>分类名称</th>
+                                    <th>分类编码</th>
+                                    <th>状态</th>
+                                    <th>子节点</th>
+                                    <th>分类级别</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <empty name="list">
+                                <td colspan="7">还没有商品分类，请先创建~~~</td>
+                            </empty>
+                                <volist name="list" id="info">
+                                <tr class="tree_list_child list_child_{$info.goods_category_parent_id}" style="{:set_class($info['goods_category_parent_id'],'0','display:none;','>')}" data-path="{$info.goods_category_path}">
+                                    <td class="tree_list" data-tree="{$info.goods_category_level}" style="text-align:left;">
+                                        <a href="javascript:;" data-id="{$info.goods_category_id}" class="list_colse">{$info.goods_category_name}</a>
+                                    </td>
+                                    <td>{$info.goods_category_code}</td>
+                                    <td>
+                                        <span class="badge status" data-id="{$info.goods_category_id}" data-status="{$info.goods_category_status}">
+                                            {:id2name('goods_category_status',$info['goods_category_status'])}
+                                        </span>
+                                    </td>
+                                    <td>{$info.child_node|id2name='child_node',###}</td>
+                                    <td>{$info.goods_category_level}</td>
+                                    <td>
+                                        <if condition="($info['last_node'] gt 0) and ($info['select_node'] eq 0)">
+                                            未关联
+                                        <elseif condition="$info['select_node'] gt 0"/>
+                                            已关联
+                                        <else />
+                                           不可关联 
+                                        </if>
+
+                                    </td>
+                                </tr>
+                                </volist>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </if>
+            <if condition="$info['coupon_use_type'] eq 4">
+                <div class="control-group">
+                    <label class="control-label">绑定商品：</label>
+                    <div class="controls">
+                        <button class="btn btn-success" type="button" id="add_goods_btn"><i class="icon-plus icon-white" disabled></i> 添加商品</button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label"></label>
+                    <div class="controls">
+                        <table class="table table_list table-bordered table-center" style="width: 82%;">
+                             <thead>
+                                <tr>
+                                    <th>商品编码</th>
+                                    <th>物料编码</th>
+                                    <th>商品名称</th>
+                                    <th>商家</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <empty name="relation_list">
+                                <tr><td colspan="5">没有添加任何绑定商品</td></tr>
+                            </empty>
+                            <volist name="relation_list" id="goods_info">
+                                <tr>
+                                    <td>{$goods_info.goods_code}</td>
+                                    <td>{$goods_info.goods_materiel_code}</td>
+                                    <td>{$goods_info.goods_name}</td>
+                                    <td>{$goods_info.shops_name}</td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                        <notempty name="relation_page"><div class="pagination alternate page" style="margin-right: 18%;"><ul>{$relation_page}</ul></div></notempty>
+                    </div>
+                </div>
+            </if>
+            <if condition="$info['coupon_use_type'] lt 4 ">
+                <div class="control-group">
+                    <label class="control-label">排除商品：</label>
+                    <div class="controls">
+                        <button class="btn btn-success" type="button" id="exclude_goods_btn" disabled><i class="icon-plus icon-white"></i> 添加商品</button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label"></label>
+                    <div class="controls">
+                        <table class="table table_list table-bordered table-center" style="width: 82%;">
+                             <thead>
+                                <tr>
+                                    <th>商品编码</th>
+                                    <th>物料编码</th>
+                                    <th>商品名称</th>
+                                    <th>商家</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <empty name="exclude_goods_list">
+                                <tr><td colspan="5">没有添加任何排除商品，如果需要排除商品，请添加</td></tr>
+                            </empty>
+                            <volist name="exclude_goods_list" id="exclude_goods">
+                                <tr>
+                                    <td>{$exclude_goods.goods_code}</td>
+                                    <td>{$exclude_goods.goods_materiel_code}</td>
+                                    <td>{$exclude_goods.goods_name}</td>
+                                    <td>{$exclude_goods.shops_name}</td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                        <notempty name="page"><div class="pagination alternate page" style="margin-right: 18%;"><ul>{$page}</ul></div></notempty>
+                    </div>
+                </div>
+            </if>
+        </form>
+    </div>
+</div>
+</div>
+<script type="text/javascript">
+    $('input[type=checkbox],input[type=radio]').uniform(); //美化checkbox，radio按钮
+     var _status_obj = $.parseJSON('{$Think.config.goods_category_status|json_encode}');
+    var _badge_class = ['default','badge-success'];
+    $('.badge').each(function() {
+        var _status = $(this).data('status');
+        if(_status > 0) $(this).addClass(_badge_class[_status]);
+    });
+</script>

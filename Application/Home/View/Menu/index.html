@@ -1,0 +1,86 @@
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>菜单列表</h5><a class="btn btn-success btn-mini" href="javascript:;" id="add_menu"><i class="icon-plus icon-white"></i> 添加菜单</a></div>
+        <div class="widget-content">
+            <div class="dataTables_wrapper">
+                <div class="accordion" id="collapse-group" style="margin-bottom:0;">
+                    <volist name="root_menu_list" id="m_list">
+                        <div class="accordion-group widget-box" id="del_{$m_list.id}">
+                            <div class="accordion-heading">
+                                <div class="widget-title">
+                                    <a data-parent="#collapse-group" href="#collapseG{$m_list.id}" data-toggle="collapse" style="display:block;overflow:hidden;">
+                                        <span class="icon"><i class="{$m_list.icon}"></i></span>
+                                        <h5 id="name_{$m_list.id}">{$m_list.name}</h5>
+                                    </a>
+                                    <div style="position:absolute;right:8px;top:6px;">
+                                        <a href="javascript:;" class="btn btn-mini menu_edit" data-id="{$m_list.id}" data-title="{$m_list.name}"><i class="icon-edit"></i> 编辑</a>
+                                        <a href="javascript:;" data-id="{$m_list.id}" data-title="{$m_list.name}" class="btn btn-mini menu_del"><i class="icon-trash"></i> 删除</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="collapse accordion-body" id="collapseG{$m_list.id}">
+                                <div class="widget-content">
+                                    <table class="table table_list border-bottom">
+                                        <tbody>
+                                        <volist name="menu_son_arr[$m_list['id']]" id="menu_son_info">
+                                            <tr id="del_{$menu_son_info.id}">
+                                                <td class="tree_list" data-tree="{$menu_son_info['lv']-1}">
+                                                    <div id="name_{$menu_son_info.id}">{$menu_son_info.name}</div>
+                                                </td>
+                                                <td width="120" style="text-align:right;">
+                                                    <a href="javascript:;" class="btn btn-mini menu_edit" data-id="{$menu_son_info.id}" data-title="{$menu_son_info.name}"><i class="icon-edit"></i> 编辑</a>
+                                                    <a href="javascript:;" data-id="{$menu_son_info.id}" data-title="{$menu_son_info.name}" class="btn btn-mini menu_del"><i class="icon-trash"></i> 删除</a>
+                                                </td>
+                                            </tr>
+                                        </volist>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </volist>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ <script type="text/javascript">
+        $("#add_menu").click(function () {
+            tipwindows('添加菜单', getAddBox());
+        });
+        function getAddBox() {
+            var _return = '';
+            $.ajaxSetup({async: false});
+            $.post("{:U('Menu/get_add_info')}", {}, function (data) {
+                _return = data.info;
+            }, 'json');
+            return _return;
+        }
+        $('.menu_edit').click(function () {
+            tipwindows($(this).data('title') + ' - 编辑', getEditBox($(this).data('id')));
+        });
+        function getEditBox(_id) {
+            var _return = '';
+            $.ajaxSetup({async: false});
+            $.post('__URL__/get_menu_info', {id: _id}, function (data) {
+                _return = data.info;
+            }, 'json');
+            return _return;
+        }
+        $('.menu_del').click(function () {
+            var _this = $(this);
+            if (_this.data('send') == 'off')
+                return false;
+            if (confirm('确认删除 ' + $(this).data('title') + ' 吗？')) {
+                _this.data('send', 'off');
+                $.post('__URL__/delete', {id: $(this).data('id')}, function (data) {
+                    _this.data('send', 'on');
+                    if (data.status)
+                        $('#del_' + data.data).remove();
+                    else
+                        alert(data.info);
+                });
+            }
+        });
+    </script>

@@ -1,0 +1,184 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>商品列表</h5></div>
+        <div class="widget-content">
+            {$search_box}
+            <div style="float: right; margin-bottom: 5px;">
+                <a href="javascript:;" class="btn btn-mini goods_expect_up"><i class=" icon-circle-arrow-up"></i> 预上架</a>
+                <a href="javascript:;" class="btn btn-mini goods_up"><i class=" icon-circle-arrow-up"></i> 上架</a>
+                <a href="javascript:;" class="btn btn-mini goods_down"><i class=" icon-circle-arrow-down"></i> 下架</a>
+            </div>
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="checkedAll"/></th>
+                        <th>商品编码</th>
+                        <th>商品名称</th>
+                        <th>状态</th>
+                        <th>销售价</th>
+                        <th>可使用储值卡</th>
+                        <th>商家</th>
+                        <th>审核时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="9">还没有任何商品信息，请先提交审核~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                    <tr>
+                        <td><input type="checkbox" name="goods_id" value="{$info.goods_code}"/></td>
+                        <td>{$info.goods_code}</td>
+                        <td>{$info.goods_name}</td>
+                        <td>{$info.goods_status|id2name='goods_status',###}</td>
+                        <td>{$info.show_price}</td>
+                        <td>{$info.use_storage_money|id2name='use_storage_money',###}</td>
+                        <td>{$info.shops_name}</td>
+                        <td>{$info.check_time}</td>
+                        <td>
+                             <a href="javascript:;" class="btn btn-mini goods_edit" data-goods_code="{$info.goods_code}"><i class="icon-edit"></i> 修改</a>
+                           <a href="{:U('GoodsBase/info',array('goods_code'=>$info['goods_code']))}" class="btn btn-mini"><i class="icon-eye-open" style="margin-right: 0px;"></i> 查看详情</a> 
+                        </td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    
+    $('input[type=checkbox]').uniform(); //美化checkbox，radio按钮
+    $("#checkedAll").toggle(function () {
+        $("input[name=goods_id]").each(function () {
+            $(this).parents('span').addClass('checked');
+            $(this).attr('checked', 'checked');
+        });
+    }, function () {
+        $(this).parents('span').removeClass('checked');
+        $("input[name=goods_id]").each(function () {
+            $(this).parents('span').removeClass('checked');
+            $(this).removeAttr('checked');
+        });
+    });
+    $("input[name=goods_id]").click(function () {
+        var _this = $(this);
+        _all_checked = true;
+        var _checked = _this.attr('checked');
+        if (!_checked) {
+            $("#checkedAll").parents('span').removeClass('checked');
+        } else {
+            $("input[name=goods_id]").each(function () {
+                if (!$(this).parents('span').hasClass('checked') && _this.val() != $(this).val()) {
+                    _all_checked = false;
+                }
+            });
+            if (_all_checked && !$("#checkedAll").parents('span').hasClass('checked')) {
+                $("#checkedAll").parents('span').addClass('checked');
+            }
+        }
+    });
+    /*-----------------------------------------------修改-------------------------------------------*/
+    $(".goods_edit").click(function(){
+        var _goods_code = $(this).data('goods_code');
+        $.post("{:U('GoodsBase/edit')}",{goods_code:_goods_code},function(data){
+            if(data.status){
+               window.location.href = "{:U('EditGoodsBase/edit')}?goods_code=" + _goods_code; 
+            }else{
+                alert(data.info);
+            }
+        });
+    });
+    /*-----------------------------------------------下架-------------------------------------------*/
+    $(".goods_down").click(function(){
+        var _checked_count = $("input[name=goods_id]:checked").length;
+        if(_checked_count == 0){
+            alert("请选择一个商品");
+            return false;
+        }
+        var _goods_code = '';
+        $("input[name=goods_id]:checked").each(function(){
+            _goods_code += $(this).val() + ',';
+        });
+        $.post("{:U('GoodsBase/rack_goods')}",{goods_codes:_goods_code},function(data){
+            if(data.status){
+                alert(data.info);
+                window.location.reload();
+            }else{
+                alert(data.info);
+            }
+        });
+    });
+    /*-----------------------------------------------上架-------------------------------------------*/
+    $(".goods_up").click(function(){
+        var _checked_count = $("input[name=goods_id]:checked").length;
+        if(_checked_count == 0){
+            alert("请选择一个商品");
+            return false;
+        }
+        var _goods_code = '';
+        $("input[name=goods_id]:checked").each(function(){
+            _goods_code += $(this).val() + ',';
+        });
+        $.post("{:U('GoodsBase/goods_shelves')}",{goods_codes:_goods_code},function(data){
+            if(data.status){
+                var _data = data.info + "";
+                if(_data.indexOf(';') > 0){
+                    var _datas = _data.split(";");
+                    var _count = _datas.length;
+                    var _data = '';
+                    createBox();
+                    for(var i=0;i<_count;i++){
+                        createLog(_datas[i]);
+                    }
+                }else{
+                    alert(data.info);
+                    window.location.reload();
+                }
+            }else{
+                alert(data.info);
+            }
+        });
+    });
+    /*-----------------------------------------------预上架-------------------------------------------*/
+    $(".goods_expect_up").click(function(){
+        var _checked_count = $("input[name=goods_id]:checked").length;
+        if(_checked_count == 0){
+            alert("请选择一个商品");
+            return false;
+        }
+        var _goods_code = '';
+        $("input[name=goods_id]:checked").each(function(){
+            _goods_code += $(this).val() + ',';
+        });
+        $.post("{:U('GoodsBase/goods_expect_up')}",{goods_codes:_goods_code},function(data){
+            if(data.status){
+                var _data = data.info + "";
+                if(_data.indexOf(';') > 0){
+                    var _datas = _data.split(";");
+                    var _count = _datas.length;
+                    var _data = '';
+                    createBox();
+                    for(var i=0;i<_count;i++){
+                        createLog(_datas[i]);
+                    }
+                }else{
+                    alert(data.info);
+                    window.location.reload();
+                }
+            }else{
+                alert(data.info);
+            }
+        });
+    });
+    $(".export_close").live('click',function(){
+        $('.mask').remove(); $('.export_box').remove();
+        window.location.reload();
+    });
+</script>

@@ -1,0 +1,235 @@
+{__NOLAYOUT__}
+<div class="container-fluid" style="padding:0;padding-bottom:20px;" id="choose_coupon_common_box">
+    <div class="widget-box nomargin">
+        <div class="widget-title"><h5>优惠券列表</h5><span class="label label-info">共 {$count|default=0} 个</span></div>
+        <div class="widget-content">
+            <div style="margin-top:0;" class="widget-box collapsible widget_box_search">
+                <form autocomplete="off" action="{:U('Base/choose_coupon')}" id="choose_coupon_common_form" ajax="true" method="post">
+                    <input type="hidden" name="callback" value="{$Think.request.callback|htmlspecialchars}" />
+                    <input type="hidden" name="type" value="{$Think.request.type|htmlspecialchars}" />
+                    <div class="widget-title">
+                        <a href="javascript:;"><span class="icon"><i class="icon-search"></i></span><h5>条件筛选</h5></a>
+                    </div>
+                    <div class="collapse in" style="overflow:visible;">
+                        <div class="widget-content search_box1">
+                            <ul class="search_ul">
+<!--                                <li class="search_li">
+                                券分类：
+                                    <div class="btn-group">
+                                        <button data-toggle="dropdown" class="btn" style="min-width:120px;" type="button">{$category_type_info['name']|default="请选择券分类"}</button>
+                                        <button data-toggle="dropdown" class="btn dropdown-toggle" type="button"><span class="caret"></span></button>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="javascript:;" data-value="0">请选择券分类</a></li>
+                                            <li class="divider"></li>
+                                            <foreach name="Think.config.coupon_category_type" item="category_type" key="type_i">
+                                            <li><a href="javascript:;" data-value="{$type_i}">{$category_type}</a></li>
+                                            </foreach>
+                                        </ul>
+                                    </div>
+                                </li>-->
+                                <li class="search_li">
+                                券名称：<input type="text" value="{$Think.request.search|htmlspecialchars}" placeholder="请输入券名称" name="search">
+                                </li>
+                                <li class="search_li"><input type="hidden" id="coupon_category" name="coupon_category" value="{:I('coupon_category')}" /><button type="submit" class="btn btn-primary"><i class="icon-search icon-white"></i> 筛选</button></li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div style="margin-bottom:5px;overflow:hidden;">
+                <div id="choose_coupon_common_ex" style="width:86%;float:left;"></div>
+                <div style="float:right;">
+                    <a href="javascript:;" id="submit_choose_coupon" class="btn btn-success">确定</a>
+                    <a href="javascript:;" id="reset_choose_coupon" class="btn btn btn-danger">清空</a>
+                </div>
+            </div>            
+            <table class="table table_list table-bordered table-center with-check">
+                <thead>
+                    <tr>
+                        <th>
+                        <if condition="$Think.request.type eq 1">
+                            &nbsp;
+                        <else />
+                            <input type="checkbox" class="choose_coupon_common_checkbox_all" />
+                        </if>
+                        </th>
+                        <th>券编码</th>                        
+                        <th>券名称</th>
+                        <th>券分类</th>
+                        <th>券金额</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <volist name="coupon_list" id="info">
+                    <tr>
+                        <td>
+                        <if condition="$Think.request.type eq 1">
+                            <input type="radio" class="choose_coupon_common_checkbox" name="choose_goods_sku_radio" value="{$info.coupon_id}" data-name="{$info.coupon_name}" />
+                        <else />
+                            <input type="checkbox" class="choose_coupon_common_checkbox" value="{$info.coupon_id}" data-name="{$info.coupon_name}" />
+                        </if>
+                        </td>
+                        <td>{$info.coupon_code}</td>
+                        <td>{$info.coupon_name}</td>
+                        <td>{$info.coupon_category_type|id2name='coupon_category_type',###}</td>
+                        <td>{$info.coupon_value}</td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul id="choose_coupon_common_page_box">{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $("#choose_coupon_common_box").find('input[type=checkbox],input[type=radio]').uniform();
+    $('#choose_coupon_common_page_box').find('a').click(function() {
+        var _this = $(this);
+        var _href = _this.attr('href');
+        if (_href == 'javascript:;' || _href == '#') return false;
+        $.get(_href,{},function(data) {choose_callback_common(data);},'json');
+        return false;
+    });
+    $('#choose_coupon_common_form').submit(function() {
+        $(this).find('input,select').each(function() {
+            if (!$.trim($(this).val())) $(this).removeAttr('name');
+        });
+        $.post($(this).attr('action'),$(this).serialize(),function(data) {choose_callback_common(data);},'json');
+        return false;
+    });
+    function choose_callback_common(data) {
+        $('#choose_coupon_common_box').parents('.modal-body').html(data.info);
+    }
+    var _choose_goods_sku_type = '{$Think.request.type|htmlspecialchars}';
+    $('.choose_coupon_common_checkbox').each(function() {
+        if ($.inArray($(this).val(),_choose_coupon_common_coupon_ids) != -1) $(this).attr('checked',true);
+        else $(this).attr('checked',false);
+    });
+    if (_choose_coupon_common_coupon_ids.length > 0 && _choose_coupon_common_coupon_names.length == 0) {
+        $.ajaxSetup({async:false});
+        $.post("{:U('Base/get_coupon_names')}",{coupon_id:implode(',',_choose_coupon_common_coupon_ids)},function(data) {
+            if (data.status && data.data) {
+                for (var i=0; i<data.data.length; i++) {
+                    _choose_coupon_common_coupon_names.push({id:data.data[i].coupon_id,name:data.data[i].coupon_name});
+                }
+            }
+        },'json');
+    }
+    reset_checkbox_checked();
+    reset_choose_coupon_txt();
+    $('.choose_coupon_common_checkbox_all').click(function() {
+        var _checked = $(this).attr('checked') ? true : false;
+        $('.choose_coupon_common_checkbox').attr('checked',_checked);
+        $.uniform.update();
+        reset_choose_coupon();
+    });
+    $('.choose_coupon_common_checkbox').click(function() {
+        if (_choose_goods_sku_type == 1) {
+            _choose_coupon_common_coupon_ids = [];
+            _choose_coupon_common_coupon_names = [];
+            _choose_coupon_common_coupon_ids.push($(this).val());
+            _choose_coupon_common_coupon_names.push({id:$(this).val(),name:$(this).attr('data-name')});
+            reset_choose_coupon();
+        }else {
+            reset_checkbox_checked();
+            reset_choose_coupon();
+        }        
+    });
+    function reset_checkbox_checked() {
+        if ($('.choose_coupon_common_checkbox').length == $('.choose_coupon_common_checkbox:checked').length) {
+            $('.choose_coupon_common_checkbox_all').attr('checked',true);
+        }else {
+            $('.choose_coupon_common_checkbox_all').attr('checked',false);
+        }
+        $.uniform.update();
+    }
+    function reset_choose_coupon() {
+        $('.choose_coupon_common_checkbox').each(function() {
+            if ($(this).attr('checked') == 'checked') {
+                if ($.inArray($(this).val(),_choose_coupon_common_coupon_ids) == -1) {
+                    _choose_coupon_common_coupon_ids.push($(this).val());
+                    _choose_coupon_common_coupon_names.push({id:$(this).val(),name:$(this).attr('data-name')});
+                }
+            }else {
+                for (var i=0; i<_choose_coupon_common_coupon_ids.length; i++) {
+                    if (_choose_coupon_common_coupon_ids[i] == $(this).val()) {
+                        _choose_coupon_common_coupon_ids.splice(i,1);
+                    }
+                }
+                for (var i=0; i<_choose_coupon_common_coupon_names.length; i++) {
+                    if (_choose_coupon_common_coupon_names[i].id == $(this).val()) {
+                        _choose_coupon_common_coupon_names.splice(i,1);
+                    }
+                }
+            }            
+        });
+        reset_choose_coupon_txt();
+    }
+    function reset_choose_coupon_txt() {
+        var _box = $('#choose_coupon_common_ex');
+        _box.html('<div class="btn-group" style="font-size:14px;margin-bottom:10px;">已选择券（'+_choose_coupon_common_coupon_names.length+'）：</div>');
+        for (var i=0; i<_choose_coupon_common_coupon_names.length; i++) {
+            $('<div class="btn-group" style="margin-bottom:10px;"></div>').html('<a href="javascript:;" class="btn">'+_choose_coupon_common_coupon_names[i].name+'</a><a href="javascript:;" data-id="'+_choose_coupon_common_coupon_names[i].id+'" class="btn dropdown-toggle" title="取消选择"><span class="icon-remove" style="margin-top:4px;"></span></a>').appendTo(_box);
+        }
+    }
+    $('#choose_coupon_common_ex').find('.dropdown-toggle').live('click',function() {
+        var _this = $(this);
+        for (var i=0; i<_choose_coupon_common_coupon_ids.length; i++) {
+            if (_choose_coupon_common_coupon_ids[i] == _this.data('id')) {
+                _choose_coupon_common_coupon_ids.splice(i,1);
+            }
+        }
+        for (var i=0; i<_choose_coupon_common_coupon_names.length; i++) {
+            if (_choose_coupon_common_coupon_names[i].id == _this.data('id')) {
+                _choose_coupon_common_coupon_names.splice(i,1);
+            }
+        }
+        $('.choose_coupon_common_checkbox').each(function() {
+            if ($.inArray($(this).val(),_choose_coupon_common_coupon_ids) != -1) $(this).attr('checked',true);
+            else $(this).attr('checked',false);
+        });
+        reset_checkbox_checked();
+        reset_choose_coupon_txt();
+        _this.parent().remove();
+    });
+    $('#reset_choose_coupon').click(function() {
+        _choose_coupon_common_coupon_ids = [];
+        _choose_coupon_common_coupon_names = [];
+        $('.choose_coupon_common_checkbox').each(function() {
+            if ($.inArray($(this).val(),_choose_coupon_common_coupon_ids) != -1) $(this).attr('checked',true);
+            else $(this).attr('checked',false);
+        });
+        reset_checkbox_checked();
+        reset_choose_coupon_txt();
+    });
+    $('#submit_choose_coupon').click(function() {
+        tip_close(function() {
+            try {
+                {$Think.request.callback|htmlspecialchars}(implode(',',_choose_coupon_common_coupon_ids));
+                _choose_coupon_common_coupon_ids = [];
+                _choose_coupon_common_coupon_names = [];
+            }catch (e) {
+                _choose_coupon_common_coupon_ids = [];
+                _choose_coupon_common_coupon_names = [];
+            }            
+        });
+    });
+    
+    var _choose_box = $('#choose_coupon_common_box');
+    _choose_box.find('.search_li').find('li a').die('click').live('click',function() {
+        var _this = $(this);
+        var _parent = _this.parents('.btn-group');
+        _parent.find('button').eq(0).html(_this.html());
+        $('#coupon_category').val(_this.data('value'));
+    });
+    
+    //选中分类
+    var _coupon_category = $('#coupon_category').val();
+    if (_coupon_category) {
+        _choose_box.find('.search_li').find('li a').each(function () {
+            if(_coupon_category == $(this).data('value')){
+                $(this).parents('.btn-group').find('button:first').html($(this).html()).attr('data-value', $(this).attr('data-value'));
+            }
+        });
+    }
+</script>

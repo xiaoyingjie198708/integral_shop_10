@@ -1,0 +1,27 @@
+<div id="header">
+    <!--<h3><a href="{$Think.config.BASE_URL}" style="color: #fff;  height: 43px;left: 36px;overflow: hidden; position: relative;text-indent: -100em;top: 16px;width: 191px;">积分商城</a></h3>-->	
+    <h1><a href="{$Think.config.BASE_URL}">{$Think.config.APP_TITLE}</a></h1>	
+</div>
+<div class="navbar-inverse" style="position: absolute;top: 5px; left: 180px; z-index: 20px;margin: 0;">
+    <ul class="nav btn-group">
+        <volist name="root_menu_list" id="root_menu">
+            <if condition="$root_menu['id'] neq $root_memu_id">
+                <li class="btn btn-inverse">
+                    <a title="" href="{:U('Self/index',array('menu'=>$root_menu['id']))}"><span class="text">{$root_menu.name}</span></a>
+                </li>
+            <else />
+                <li class="btn btn-inverse active">
+                    <a title="" href="javascript:;"><span class="text">{$root_menu.name}</span></a>
+                </li>
+            </if>
+        </volist>
+    </ul>
+</div>
+<div id="user-nav" class="navbar navbar-inverse">
+    <ul class="nav btn-group">
+        <li class="btn btn-inverse"><a title="" href="javascript:;"><i class="icon icon-user"></i> <span class="text">{$Think.session.admin_username}</span></a></li>
+        <li class="btn btn-inverse"><a href="{:U('UseCode/index',array('search_warn'=>1,'search_visit'=>1))}"><i class="icon icon-bell"></i> <span class="text">待处理回访</span> <span class="label label-important" id="noread_info">{$noread_count|default=0}</span></a>
+        <li class="btn btn-inverse"><a title="" href="{:U('Self/index')}"><i class="icon icon-cog"></i> <span class="text">设置</span></a></li>
+        <li class="btn btn-inverse"><a title="" href="{:U('Index/logout')}"><i class="icon icon-off"></i> <span class="text">注销</span></a></li>
+    </ul>
+</div>

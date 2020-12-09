@@ -1,0 +1,68 @@
+{__NOLAYOUT__}
+<style>
+.form-horizontal .control-label{width:100px;}
+.form-horizontal .controls{margin-left:120px;}
+.form-horizontal .form-actions{padding-left:120px;}
+.select2-results{max-height:300px;}
+</style>
+<div class="widget-box" style="margin:0;">
+    <div class="widget-content nopadding">
+        <form class="form-horizontal add_form" ajax="true" action="{:U('GoodsParam/add_param_value')}" autocomplete="off">   
+            <div class="control-group">
+                <label class="control-label">分类名称：</label>
+                <div class="controls">
+                    <input type="text" name="category_name" id="category_name"  value="{$category_info.category_name}" disabled="disabled"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">配置参数名称：</label>
+                <div class="controls">
+                    <input type="text" name="param_name" id="param_name" value="{$name_info.param_name}" disabled="disabled"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">参数值：</label>
+                <div class="controls">
+                    <input type="text" name="param_value" id="param_value" placeholder="请输入参数值" empty="请输入参数值"/>
+                </div>
+            </div>
+            <div class="form-actions">
+                <input type="hidden" id="param_category_id" name="param_category_id" value="{$category_info.param_category_id}"/>
+                <input type="hidden" id="param_id" name="param_id" value="{$name_info.param_id}"/>
+                <input type="submit" value="提交" class="btn" />
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+$('.add_form').form({
+     start:function() {
+        $('.error').removeClass('error');
+        remove_error();
+    },
+    error:function(data,_this) {
+        if (_this) {
+            error(data,_this);
+            $('.error').removeClass('error');
+            _this.parents('.control-group').addClass('error');
+        }else alert(data);
+    },
+    ajaxcallback:function(data) {
+        if (data.status) {
+            tip_close();
+            location.reload();
+        }else {
+            if (data.data) {
+                var _obj = $('#'+data.data);
+                $('.error').removeClass('error');
+                _obj.parents('.control-group').addClass('error');
+                _obj.focus();
+                error(data.info,_obj);
+            }else {
+                alert(data.info);
+                tip_close();
+            }
+        }
+    }
+});
+</script>

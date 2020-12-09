@@ -1,0 +1,337 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/jquery.gritter.css" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-zh-CN.js"></script>
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.gritter.min.js"></script>
+<style>
+    .controls label{display:inline-block; height:20px; padding:4px 10px 4px 0;margin-bottom:0;}
+</style>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>添加赠品活动</h5><a class="btn btn-success btn-mini" href="{:back_list_url()}"><i class="icon-share-alt icon-white"></i> 返回列表</a></div>
+        <div class="widget-content nopadding">
+        <form class="form-horizontal" method="post" ajax="true" action="{:U('GiftEdit/add')}" id="add_form" autocomplete="off">
+            <div class="control-group">
+                <label class="control-label">活动名称：</label>
+                <div class="controls"><input type="text" name="activity_name" id="activity_name" empty="请输入活动名称" placeholder="请输入活动名称"/></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">促销平台：</label>
+                <div class="controls">
+                    <label><input type="checkbox" name="is_pc" value="1" checked/>PC端</label>
+                    <label><input type="checkbox" name="is_wap" value="1"/>WAP端</label>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">使用有效期：</label>
+                <div class="controls">
+                    <input class="date" style="width: 150px" type="text" name="start_time" id="start_time" placeholder="请输入开始时间"  empty="请输入开始时间"/>
+                    &nbsp;~&nbsp;
+                    <input class="date" style="width: 150px" type="text" name="end_time" id="end_time" placeholder="请输入结束时间" empty="请输入结束时间"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">规则描述：</label>
+                <div class="controls"><textarea id="activity_remark" name="activity_remark" placeholder="请输入规则描述"></textarea></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">添加主品：</label>
+                <div class="controls">
+                    <button class="btn btn-success" id="add_main_goods" type="button"><i class=" icon-plus icon-white"></i> 选择主品</button>
+                     <table class="table table-bordered table-center" style="margin-top: 10px;">
+                        <thead>
+                            <tr>
+                                <th>商品编码</th>
+                                <th>物料编码</th>
+                                <th>商品名称</th>
+                                <th>商家名称</th>
+                                <th>购买数量</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="main_goods_box">
+                            <tr id="main_empty_tr"><td colspan="6">请选择主品</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">添加促品：</label>
+                <div class="controls">
+                    <button class="btn btn-success" id="add_promote_goods" type="button"><i class=" icon-plus icon-white"></i> 选择促品</button>
+                     <table class="table table-bordered table-center" style="margin-top: 10px;">
+                        <thead>
+                            <tr>
+                                <th>商品编码</th>
+                                <th>物料编码</th>
+                                <th>商品名称</th>
+                                <th>商家名称</th>
+                                <th>赠送数量</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="promote_goods_box">
+                            <tr id="promote_empty_tr"><td colspan="6">请选择促品</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">是否捆绑送券：</label>
+                <div class="controls">
+                    <label><input type="radio" name="send_coupon" value="1"/>是</label>
+                    <label><input type="radio" name="send_coupon" value="0" checked/>否</label>
+                </div>
+            </div>
+            <div class="control-group" id="coupon_box" style="display: none;">
+                <label class="control-label">添加券：</label>
+                <div class="controls">
+                    <button class="btn btn-success" id="add_coupon" type="button"><i class=" icon-plus icon-white"></i> 选择券</button>
+                     <table class="table table-bordered table-center" style="margin-top: 10px;">
+                        <thead>
+                            <tr>
+                                <th>优惠券编码</th>
+                                <th>优惠券名称</th>
+                                <th>优惠券类型</th>
+                                <th>金额</th>
+                                <th>使用有效期</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coupon_tbody">
+                            <tr id="coupon_empty_tr"><td colspan="6">请选择优惠券</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="form-actions">
+                <input type="submit" value="提交" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+<script type="text/javascript">
+    $('select').select2();
+    $('input[type=checkbox],input[type=radio]').uniform(); //美化checkbox，radio按钮
+    $(".date").datetimepicker({
+        showSecond: true,
+        timeFormat: 'hh:mm:ss',
+        stepHour: 1,
+        stepMinute: 1,
+        stepSecond: 1
+    });
+    $("#add_form").form({
+        start:function() {
+            $('.error').removeClass('error');
+            remove_error();
+            set_goods_data();
+        },
+        error:function(data,_this) {
+            if (_this) {
+                error(data,_this);
+                $('.error').removeClass('error');
+                _this.parents('.control-group').addClass('error');
+            }else alert(data);
+        },
+        ajaxcallback:function(data) {
+            if (data.status) {
+                    $("#add_form")[0].reset();
+                    set_table_empty();
+                    $('select').select2();
+                    $.uniform.update();
+                    $.gritter.add({
+                        title:	'添加优惠券成功',
+                        text:	'优惠券 '+data.data+' 添加成功。',
+                        sticky: false
+                    });	
+            }else {
+                if (data.data) {
+                    var _obj = $('#'+data.data);
+                    $('.error').removeClass('error');
+                    _obj.parents('.control-group').addClass('error');
+                    _obj.focus();
+                    error(data.info,_obj);
+                }else {
+                    alert(data.info);
+                }
+            }
+        }
+    });
+    
+    /*-----------------------------------------------添加主商品-------------------------------------------*/
+    $("#add_main_goods").click(function(){
+        var _ids = new Array();
+        $(".main_goods_id").each(function(){
+            _ids.push($(this).data('goods_id'));
+        });
+        choose_goods(_ids,'choose_goods_success');
+    });
+    
+    function choose_goods_success(_data){
+        var _ids = new Array();
+        $(".main_goods_id").each(function(){
+            _ids.push($(this).data('goods_id'));
+        });
+        $.post("{:U('Base/get_goods_names')}",{goods_id:_data},function(data){
+            if(data.data){
+               $("#main_empty_tr").remove();
+               $.each(data.data,function(i,item){
+                   if(_ids.indexOf(item.goods_id) == -1){
+                     var _tr = "<tr>" + 
+                       "<td>"+item.goods_code+"</td>" +
+                       "<td>"+item.goods_materiel_code+"</td>" +
+                       "<td>"+item.goods_name+"</td>" +
+                       "<td>"+item.shops_name+"</td>" +
+                       "<td><input type='text' class='goods_buy_num' data-goods_code='"+item.goods_code+"' data-goods_name='"+item.goods_name+"'/></td>" +
+                       "<td><a href='javascript:;' class='btn btn-mini goods_del main_goods_id' data-goods_id='"+item.goods_id+"'><i class='icon-trash'></i> 删除</a></td>" +
+                       "</tr>";
+                    $(_tr).appendTo($("#main_goods_box"));  
+                   }
+                }); 
+            }
+        });
+    }
+    
+    $(".goods_del").live("click",function(){
+        $(this).parents('tr').remove();
+    });
+    /*-----------------------------------------------添加促商品-------------------------------------------*/
+    $("#add_promote_goods").click(function(){
+        var _ids = new Array();
+        $(".promote_goods_id").each(function(){
+            _ids.push($(this).data('goods_id'));
+        });
+        choose_goods(_ids,'choose_promote_goods_success');
+    });
+    
+    function choose_promote_goods_success(_data){
+        var _ids = new Array();
+        $(".promote_goods_id").each(function(){
+            _ids.push($(this).data('goods_id'));
+        });
+        $.post("{:U('Base/get_goods_names')}",{goods_id:_data},function(data){
+            if(data.data){
+                $("#promote_empty_tr").remove();
+               $.each(data.data,function(i,item){
+                   if(_ids.indexOf(item.goods_id) == -1){
+                       var _tr = "<tr>" + 
+                       "<td>"+item.goods_code+"</td>" +
+                       "<td>"+item.goods_materiel_code+"</td>" +
+                       "<td>"+item.goods_name+"</td>" +
+                       "<td>"+item.shops_name+"</td>" +
+                       "<td><input type='text' class='goods_promote_num' data-goods_code='"+item.goods_code+"' data-goods_name='"+item.goods_name+"'/></td>" +
+                       "<td><a href='javascript:;' class='btn btn-mini goods_del promote_goods_id' data-goods_id='"+item.goods_id+"'><i class='icon-trash'></i> 删除</a></td>" +
+                       "</tr>";
+                        $(_tr).appendTo($("#promote_goods_box"));
+                   }
+                }); 
+            }
+        });
+    }
+    
+    $(".goods_del").live("click",function(){
+        $(this).parents('tr').remove();
+    });
+    /*-----------------------------------------------选择优惠券-------------------------------------------*/
+    $("input[name=send_coupon]").change(function(){
+        var _val = $(this).val();
+        if(_val == 1){
+            $("#coupon_box").show();
+        }else{
+            $("#coupon_box").hide();
+        }
+    });
+    $("#add_coupon").click(function(){
+         var _ids = new Array();
+        $(".send_coupon_id").each(function(){
+            _ids.push($(this).data('coupon_id'));
+        });
+        choose_coupon(_ids,'choose_coupon_success');
+    });
+    
+    function choose_coupon_success(_data){
+        var _ids = new Array();
+        $(".send_coupon_id").each(function(){
+            _ids.push($(this).data('coupon_id'));
+        });
+        $.post("{:U('Base/get_coupon_names')}",{coupon_id:_data},function(data){
+            if(data.data){
+                $("#coupon_empty_tr").remove();
+               $.each(data.data,function(i,item){
+                   if(_ids.indexOf(item.coupon_id) == -1){
+                       var _tr = "<tr>" + 
+                       "<td>"+item.coupon_code+"</td>" +
+                       "<td>"+item.coupon_name+"</td>" +
+                       "<td>"+item.coupon_type+"</td>" +
+                       "<td>"+item.coupon_value+"</td>" +
+                       "<td>"+item.valid_start_time+"~"+item.valid_end_time+"</td>" +
+                       "<td><input type='hidden' name='coupon_codes[]' value='"+item.coupon_code+"'/>"+
+                       "<a href='javascript:;' class='btn btn-mini coupon_del send_coupon_id' data-coupon_id='"+item.coupon_id+"'><i class='icon-trash'></i> 删除</a></td>" +
+                       "</tr>";
+                        $(_tr).appendTo($("#coupon_tbody"));
+                   }
+                }); 
+            }
+        });
+    }
+    
+    $(".coupon_del").live("click",function(){
+        $(this).parents('tr').remove();
+    });
+    /*----------------------------------------------设置主品和促品--------------------------------------------------*/
+    function set_goods_data(){
+        $(".hidden_goods_data").remove();
+        var _main_goods_num = $(".goods_buy_num").length;
+        if(!_main_goods_num){
+            alert("没有添加主品，请选择主品");
+            return false;
+        }
+        var _promote_goods_num = $(".goods_promote_num").length;
+        if(!_promote_goods_num){
+            alert("没有添加促品，请选择促品");
+            return false;
+        }
+        
+        $(".goods_buy_num").each(function(){
+            var _buy_num = $(this).val();
+//            if(!_buy_num || !/^\d+$/.test(_buy_num) || _buy_num < 1){
+//                alert($(this).data('goods_name') + '的购买数量不能为空,为大于1的整数');
+//                return false;
+//            }
+            var _data = $(this).data('goods_code') + ',' + _buy_num;
+            $("<input type='hidden' name='goods_buy_num[]' value='"+_data+"' class='hidden_goods_data'/>").appendTo($("#add_form"));
+        });
+        $(".goods_promote_num").each(function(){
+            var _send_num = $(this).val();
+//            if(!_send_num || !/^\d+$/.test(_send_num) || _send_num < 1){
+//                alert($(this).data('goods_name') + '的赠送数量不能为空,为大于1的整数');
+//                return false;
+//            }
+            var _data = $(this).data('goods_code') + ',' + _send_num;
+            $("<input type='hidden' name='goods_promote_num[]' value='"+_data+"' class='hidden_goods_data'/>").appendTo($("#add_form"));
+        });
+    }
+    /*----------------------------------------------设置表单空--------------------------------------------------*/
+    function set_table_empty(){
+        //主品
+        $("#main_goods_box").children('tr').remove();
+        $('<tr id="main_empty_tr"><td colspan="6">请选择主品</td></tr>').appendTo($("#main_goods_box"));
+        //促品
+        $("#promote_goods_box").children('tr').remove();
+        $('<tr id="promote_empty_tr"><td colspan="6">请选择促品</td></tr>').appendTo($("#promote_goods_box"));
+        //赠送券
+        $("input[name='send_coupon']:eq(0)").attr('checked',true);
+        $("input[name='send_coupon']:eq(1)").attr('checked',true);
+        $("#coupon_box").hide();
+        $("#coupon_tbody").children('tr').remove();
+        $('<tr id="coupon_empty_tr"><td colspan="6">请选择优惠券</td></tr>').appendTo($("#coupon_tbody"));
+    }
+</script>

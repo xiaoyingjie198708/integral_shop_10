@@ -1,0 +1,89 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-zh-CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/export.jquery.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>财务总报表</h5></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>商家名称</th>
+                        <th>订单数量</th>
+                        <th>产品数量</th>
+                        <th>订单总金额</th>
+                        <th>收款金额</th>
+                        <th>退款金额</th>
+                        <th>净金额</th>
+                        <th>净积分</th>
+                        <th>净储值卡</th>
+                        <th>优惠券金额</th>
+                        <th>优惠码金额</th>
+<!--                        <th>已回款金额</th>
+                        <th>未回款金额</th>-->
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="13">还没有任何支付订单信息~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                    <tr>
+                        <td>{$info.shops_name}</td>
+                        <td>{$info.order_count|intval}</td>
+                        <td>{$info.goods_number|intval}</td>
+                        <td>{$info.total_value|price_format}</td>
+                        <td>{$info.total_pay_value|price_format}</td>
+                        <td>{$info.reverse_value|price_format}</td>
+                        <td>{$info.pay_value|price_format}</td>
+                        <td>{$info.total_point|intval}</td>
+                        <td>{$info.storage_money|price_format}</td>
+                        <td>{$info.coupon_value|price_format}</td>
+                        <td>{$info.coupon_code_value|price_format}</td>
+<!--                        <td>{$info.pay_value|price_format}</td>
+                        <td>0.00</td>-->
+                        <td>
+                            <a href="{:U('OrderDetailReport/index',array('shops_code'=>$info['shops_code']))}" class="btn btn-mini" target="_blank" onclick="ajax_loading(false);"><i class="icon-eye-open" style="margin-right: 0px;" ></i> 详情</a> 
+                        </td>
+                    </tr>
+                    </volist>
+                    <tr>
+                        <td>合计</td>
+                        <td>{$total_info.order_count|intval}</td>
+                        <td>{$total_info.goods_number|intval}</td>
+                        <td>{$total_info.total_value|price_format}</td>
+                        <td>{$total_info.total_pay_value|price_format}</td>
+                        <td>{$total_info.reverse_value|price_format}</td>
+                        <td>{$total_info.pay_value|price_format}</td>
+                        <td>{$total_info.total_point|intval}</td>
+                        <td>{$total_info.storage_money|price_format}</td>
+                        <td>{$total_info.coupon_value|price_format}</td>
+                        <td>{$total_info.coupon_code_value|price_format}</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+ /*--------------------------------------------------------------------------导出订单-----------------------------------------------------------------*/
+    $("#explode_order").export({
+       'shops_code[]':$("select[name='shops_code[]']").val(),
+       'order_status[]':$("select[name='order_status[]']").val(),
+       'create_start':$("input[name='create_start']").val(),
+       'create_end':$("input[name='create_end']").val(),
+       'pay_start':$("input[name='pay_start']").val(),
+       'pay_end':$("input[name='pay_end']").val(),
+    });  
+</script>

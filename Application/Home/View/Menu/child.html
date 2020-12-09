@@ -1,0 +1,14 @@
+{__NOLAYOUT__}
+<notempty name="parent_menu">
+<div class="btn-group">
+    <a class="btn btn-small" data-id="0">选择菜单</a>
+    <a data-toggle="dropdown" class="btn btn-small dropdown-toggle"><span class="caret" style="margin"></span></a>
+    <ul class="dropdown-menu" style="max-height: 150px;overflow-y: scroll;">
+        <li><a href="javascript:;" data-id="0">选择菜单</a></li>
+        <li class="divider"></li>
+        <volist name="parent_menu" id="parent_m">
+        <li><a href="javascript:;" data-id="{$parent_m.id}">{$parent_m.name}</a></li>
+        </volist>
+    </ul>
+</div>
+</notempty>

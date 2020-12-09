@@ -1,0 +1,37 @@
+<style>.table td{text-align:center;}</style>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box">
+            <ul class="nav nav-tabs">
+                <li class="current_type"><a href="{:U('CouponCode/info',array('coupon_code_id'=>$info['coupon_code_id']))}" >优惠码详情</a></li>
+                <li class=""><a href="{:U('CouponCode/relation_info',array('coupon_code_id'=>$info['coupon_code_id'],'type'=>'info'))}">优惠码关联信息</a></li>
+                <li class="active "><a href="javascript:;">优惠码信息</a></li>
+            </ul>
+            <a class="btn btn-success btn-mini" href="{:back_list_url()}"><i class="icon-share-alt icon-white"></i> 返回列表</a>
+        </div>
+        <div style="margin: 20px"> 优惠码名称：<span>{$info.coupon_code_name}</span></div>
+        <div class="widget-content">		
+            <table class="table table_list table-bordered">
+                <thead>
+                    <tr>
+                        <th>优惠码编码</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                        <th>修改时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <volist name="list" id="code_info">
+                    <tr>
+                        <td>{$code_info.coupon_code}</td>
+                        <td>{$code_info.coupon_status|id2name='code_status',###}</td>
+                        <td>{$code_info.create_time}</td>
+                        <td>{$code_info.update_time}</td>
+                    </tr>
+                </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>

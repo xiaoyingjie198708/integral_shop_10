@@ -1,0 +1,139 @@
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box" style="height:auto;">
+            <ul class="nav nav-tabs" style="overflow:hidden;max-width:90%;min-height:36px;margin:0;">
+                <volist name="return_rules" id="rule_title" key="title_i">
+                <li class="{:set_class(1,$title_i,'active')}" style="border-bottom:1px solid #ddd;border-right:1px solid #ddd;margin:0;"><a style="border:0;" data-toggle="tab" href="#tab_{$title_i}">{$rule_title.name}</a></li>
+                </volist>
+            </ul>
+            <a class="btn btn-success btn-mini" href="javascript:;" id="add_rule"><i class="icon-plus icon-white"></i> 添加权限</a>
+        </div>
+        <div class="widget-content tab-content">
+            <volist name="return_rules" id="rules" key="rules_i">
+            <div id="tab_{$rules_i}" class="tab-pane {:set_class(1,$rules_i,'active')}">
+            <div class="dataTables_wrapper">
+                <div class="accordion" id="collapse-group{$rules_i}" style="margin-bottom:0;">
+                    <volist name="rules.value" id="rule" empty=" 暂无权限">
+                    <div class="accordion-group widget-box rule_all_box"  id="del_{$rule.id}">
+                        <div class="accordion-heading rule_parent_box">
+                            <div class="widget-title">
+                                <span class="icon">
+                                    <input type="checkbox" autocomplete="off" data-id="{$rule.id}" {:set_class(1,$rule['status'],'checked')} class="check_all_btn" />
+                                </span>
+                                <a data-parent="#collapse-group{$rules_i}" href="#collapseG{$rule.id}" data-toggle="collapse" style="display:block;overflow:hidden;">
+                                    <h5 id="name_{$rule.id}">{$rule.name}<notempty name="rule.title">（{$rule.title}）</notempty></h5>
+                                </a>
+                                <div style="position:absolute;right:8px;top:6px;">
+                                    <a href="javascript:;" class="btn btn-mini rule_edit" data-id="{$rule.id}" data-title="{$rule.name}"><i class="icon-edit"></i> 编辑</a>
+                                    <a href="javascript:;" data-id="{$rule.id}" data-title="{$rule.name}" class="btn btn-mini rule_del"><i class="icon-trash"></i> 删除</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapse accordion-body rule_body_box" id="collapseG{$rule.id}">
+                            <div class="widget-content">
+                                <table class="table table_list border-bottom with-check access_list">
+                                    <tbody>
+                                        <volist name="rule.son" id="rule_son">
+                                        <tr id="del_{$rule_son.id}">
+                                            <td><input type="checkbox" data-id="{$rule_son.id}" autocomplete="off" {:set_class(1,$rule_son['status'],'checked')} /></td>
+                                            <td id="name_{$rule_son.id}">{$rule_son.name}<notempty name="rule_son.title">（{$rule_son.title}）</notempty></td>
+                                            <td width="120" style="text-align:right;">
+                                                <a href="javascript:;" class="btn btn-mini rule_edit" data-id="{$rule_son.id}" data-title="{$rule_son.name}"><i class="icon-edit"></i> 编辑</a>
+                                                <a href="javascript:;" data-id="{$rule_son.id}" data-title="{$rule_son.name}" class="btn btn-mini rule_del"><i class="icon-trash"></i> 删除</a>
+                                            </td>
+                                        </tr>
+                                        </volist>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    </volist>
+                </div>
+            </div>
+            </div>
+            </volist>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('.access_list input[type=checkbox],.check_all_btn').live('click',function() {
+        var _this = $(this);        
+        if(_this.data('send') == 'off') return false;
+        var _status = _this.attr('checked') ? 1 : 0;
+        if(!_this.hasClass('check_all_btn')) setCheckBtn();
+        _this.data('send','off');
+        $.post('__URL__/setAccessStatus',{id:_this.data('id'),status:_status},function(data) {
+            _this.data('send','on');
+            if (!data.status) {
+                alert(data.info);
+                if (_status) {
+                    _this.attr('checked',false);
+                    _this.parent().removeClass('checked');
+                }else {
+                    _this.attr('checked',true);
+                    _this.parent().addClass('checked');
+                }
+                if (data.data) {
+                    var _data = data.data;
+                    for (var i=0; i<_data.length; i++) {
+                        var _checked = (_data[i].status == 1 ? true : false)
+                        $('#del_'+_data[i].id).find('input[type=checkbox]').attr('checked',_checked);
+                        if (_checked) $('#del_'+_data[i].id).find('input[type=checkbox]').parent().addClass('checked');
+                        else $('#del_'+_data[i].id).find('input[type=checkbox]').parent().removeClass('checked');
+                        setCheckBtn();
+                    }
+                }
+            }
+            if(!_this.hasClass('check_all_btn')) setCheckBtn();
+        },'json');
+    });
+    function setCheckBtn() {
+        $('.check_all_btn').each(function() {
+            var _body = $(this).parents('.rule_all_box').find('.rule_body_box input[type=checkbox]');
+            if (_body.length) {
+                var _bool = false;
+                _body.each(function() {if ($(this).attr('checked')) {_bool = true;return false;}});
+                $(this).attr('checked',_bool);
+                if (_bool) $(this).parent().addClass('checked');
+                else $(this).parent().removeClass('checked');
+            }
+        });
+    }
+    $('.rule_edit').click(function() {
+        tipwindows($(this).data('title')+' - 编辑',getEditBox($(this).data('id')));    
+    });
+    function getEditBox(_id) {
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post('__URL__/get_rule_info',{id:_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+
+    $('.rule_del').click(function() {
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (confirm('确认删除 '+$(this).data('title')+' 吗？')) {
+            _this.data('send','off');
+            $.post('__URL__/delete',{id:$(this).data('id')},function(data) {
+                _this.data('send','on');
+                if (data.status) $('#del_'+data.data).remove();
+                else alert(data.info);
+            });
+        }
+    });
+    
+    $("#add_rule").click(function () {
+            tipwindows('添加权限', getAddBox(),800,400);
+        });
+        function getAddBox() {
+            var _return = '';
+            $.ajaxSetup({async: false});
+            $.post("{:U('Access/get_add_info')}", {}, function (data) {
+                _return = data.info;
+            }, 'json');
+            return _return;
+        }
+</script>

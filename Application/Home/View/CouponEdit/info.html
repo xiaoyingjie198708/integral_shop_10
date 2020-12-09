@@ -1,0 +1,62 @@
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box">
+        <ul class="nav nav-tabs">
+            <li class="active current_type"><a href="javascript:;" >优惠券详情</a></li>
+            <li class=""><a href="{:U('CouponEdit/relation',array('coupon_code'=>$info['coupon_code'],'type'=>'info'))}">优惠券关联信息</a></li>
+        </ul>
+        <a class="btn btn-success btn-mini" href="{:back_list_url()}"><i class="icon-share-alt icon-white"></i> 返回列表</a></div>
+        <div class="widget-content nopadding">
+            <form class="form-horizontal" method="post" ajax="true" action="{:U('CouponEdit/update')}" id="update_form" autocomplete="off">
+                <div class="control-group">
+                    <label class="control-label">优惠券分类：</label>
+                    <div class="controls">
+                        {$info.coupon_category_type|id2name='coupon_category_type',###}
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">优惠券名称：</label>
+                    <div class="controls">{$info.coupon_name}</div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">类型：</label>
+                    <div class="controls">
+                        {$info.coupon_use_type|id2name='coupon_use_type',###}
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">优惠券金额：</label>
+                    <div class="controls">{$info.coupon_value}</div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">最大领取数：</label>
+                    <div class="controls">{$info.max_count}</div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">使用有效期：</label>
+                    <div class="controls">
+                        {$info.valid_start_time}
+                        &nbsp;~&nbsp;
+                        {$info.valid_end_time}
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">优惠券规则：</label>
+                    <div class="controls">{$info.coupon_desc|default='无'}</div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">PC端：</label>
+                    <div class="controls">
+                        {$info['is_pc'] ? '支持' : '不支持'}
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">WAP端：</label>
+                    <div class="controls">
+                        {$info['is_wap'] ? '支持' : '不支持'}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

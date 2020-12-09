@@ -1,0 +1,269 @@
+{__NOLAYOUT__}
+<div class="container-fluid" style="padding:0;padding-bottom:20px;" id="choose_goods_common_box">
+    <div class="widget-box nomargin">
+        <div class="widget-title"><h5>商品列表</h5><span class="label label-info">共 {$count|default=0} 件</span></div>
+        <div class="widget-content">
+            <div style="margin-top:0;" class="widget-box collapsible widget_box_search">
+                <form autocomplete="off" action="{:U('Base/choose_goods')}" id="choose_goods_common_form" ajax="true" method="post">
+                    <input type="hidden" name="callback" value="{$Think.request.callback|htmlspecialchars}" />
+                    <input type="hidden" name="type" value="{$Think.request.type|htmlspecialchars}" />
+                    <div class="widget-title">
+                        <a href="javascript:;"><span class="icon"><i class="icon-search"></i></span><h5>条件筛选</h5></a>
+                    </div>
+                    <div class="collapse in" style="overflow:visible;">
+                        <div class="widget-content search_box1">
+                            <ul class="search_ul">
+                                <li class="search_li">
+                                    商品分类：
+                                    <div class="btn-group">
+                                        <button data-toggle="dropdown" class="btn" style="min-width:120px;" type="button">{$category_parent_info['goods_category_name']|default="请选择商品分类"}</button>
+                                        <button data-toggle="dropdown" class="btn dropdown-toggle" type="button"><span class="caret"></span></button>
+                                        <input type="hidden" class="category_id_common" value="{$category_parent_info.goods_category_id}" />
+                                        <ul class="dropdown-menu">
+                                            <li><a href="javascript:;" data-value="0">请选择商品分类</a></li>
+                                            <li class="divider"></li>
+                                            <volist name="category_list" id="category">
+                                            <li><a href="javascript:;" data-value="{$category.goods_category_id}">{$category.goods_category_name}</a></li>
+                                            </volist>
+                                        </ul>
+                                    </div>
+                                    <volist name="category_list_other" id="category_other">
+                                    <div class="btn-group">
+                                        <button data-toggle="dropdown" class="btn" style="min-width:120px;" type="button">{$category_other['info']['goods_category_name']|default="请选择商品分类"}</button>
+                                        <button data-toggle="dropdown" class="btn dropdown-toggle" type="button"><span class="caret"></span></button>
+                                        <input type="hidden" class="category_id_common" value="{$category_other['info']['goods_category_id']}" />
+                                        <ul class="dropdown-menu">
+                                            <li><a href="javascript:;" data-value="0">请选择商品分类</a></li>
+                                            <li class="divider"></li>
+                                            <volist name="category_other.list" id="s_other">
+                                            <li><a href="javascript:;" data-value="{$s_other.goods_category_id}">{$s_other.goods_category_name}</a></li>
+                                            </volist>
+                                        </ul>
+                                    </div>
+                                    </volist>
+                                </li>
+                                <li class="search_li">
+                                编码/名称：<input type="text" value="{$Think.request.search|htmlspecialchars}" placeholder="请输入商品编码/名称" name="search">
+                                </li>
+                                <li class="search_li"><input type="hidden" id="category_id" name="category_id" value="{:I('category_id')}" /><button type="submit" class="btn btn-primary"><i class="icon-search icon-white"></i> 筛选</button></li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div style="margin-bottom:5px;overflow:hidden;">
+                <div id="choose_goods_sku_common_ex" style="width:86%;float:left;"></div>
+                <div style="float:right;">
+                    <a href="javascript:;" id="submit_choose_goods" class="btn btn-success">确定</a>
+                    <a href="javascript:;" id="reset_choose_goods_sku" class="btn btn btn-danger">清空</a>
+                </div>
+            </div>            
+            <table class="table table_list table-bordered table-center with-check">
+                <thead>
+                    <tr>
+                        <th>
+                            <if condition="$Think.request.type eq 1">
+                                &nbsp;
+                            <else />
+                                <input type="checkbox" class="choose_goods_common_checkbox_all" />
+                            </if>
+                        </th>
+                        <th>商品编码</th>                        
+                        <th>商品名称</th>                        
+                        <th>商品状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <volist name="goods_list" id="goods">
+                    <tr>
+                        <td>
+                        <if condition="$Think.request.type eq 1">
+                        <input type="radio" class="choose_goods_common_checkbox_info" name="choose_goods_sku_radio" value="{$goods.goods_id}" data-name="{$goods.goods_name}" />
+                        <else />
+                        <input type="checkbox" class="choose_goods_common_checkbox_info" value="{$goods.goods_id}" data-name="{$goods.goods_name}" />
+                        </if>
+                        </td>
+                        <td>{$goods.goods_code}</td>
+                        <td>{$goods.goods_name}</td>
+                        <td>
+                            <span class="badge status" data-id="{$goods.goods_id}" data-status="{$goods.goods_status}">
+                                {:id2name('goods_status',$goods['goods_status'])}
+                            </span>
+                        </td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul id="choose_goods_sku_common_page_box">{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var _choose_box = $('#choose_goods_common_box');
+    var _status_obj = $.parseJSON('{$Think.config.goods_status|json_encode}');
+    _choose_box.find('.search_li').find('li a').die('click').live('click',function() {
+        var _this = $(this);
+        var _parent = _this.parents('.btn-group');
+        _parent.find('button').eq(0).html(_this.html());
+        _parent.find('input[type=hidden]').val(_this.data('value'));
+        set_category_id_common();
+        if(!_this.parent().parent().hasClass('sku_status_box')) choose_goods_sku_common_get_serial(_this);
+    });
+    function set_category_id_common() {
+        var _category_id = '';
+        $(".category_id_common").each(function(){
+            if($(this).val() != '0') _category_id = $(this).val();
+        });
+        $('#category_id').val(_category_id);
+    }
+    function choose_goods_sku_common_get_serial(_this) {
+        $.post("{:U('Base/get_goods_category_common')}",{id:_this.data('value')},function(data) {
+            _this.parents('.search_li').find('.btn-group:gt('+_this.parents('.btn-group').index()+')').remove();
+            if (data.status && data.data) {
+                var _html = '<button data-toggle="dropdown" class="btn" style="min-width:120px;" type="button">请选择商品分类</button><button data-toggle="dropdown" class="btn dropdown-toggle" type="button"><span class="caret"></span></button><input type="hidden" class="category_id_common" value="" />';
+                var _box = $('<div class="btn-group"></div>').html(_html).appendTo(_this.parents('.search_li'));
+                var _ul = $('<ul class="dropdown-menu"></ul>').html('<li><a href="javascript:;" data-value="0">请选择商品分类</a></li><li class="divider"></li>').appendTo(_box);
+                for (var i=0; i<data.data.length; i++) {
+                    $('<li></li>').html('<a href="javascript:;" data-value="'+data.data[i].goods_category_id+'">'+data.data[i].goods_category_name+'</a>').appendTo(_ul);
+                }
+            }
+        },'json');
+    }
+    _choose_box.find('input[type=checkbox],input[type=radio]').uniform();
+    var _badge_class = ['default','default','badge-info','badge-info','badge-success','badge-warning','badge-warning','badge-warning','badge-warning'];
+    _choose_box.find('.badge').each(function() {
+        var _status = $(this).data('status');
+        if(_status > 1) $(this).addClass(_badge_class[_status]);
+    });
+    $('#choose_goods_sku_common_page_box').find('a').click(function() {
+        var _this = $(this);
+        var _href = _this.attr('href');
+        if (_href == 'javascript:;' || _href == '#') return false;
+        $.get(_href,{},function(data) {choose_callback_common(data);},'json');
+        return false;
+    });
+    $('#choose_goods_common_form').submit(function() {
+        $(this).find('input,select').each(function() {
+            if (!$.trim($(this).val())) $(this).removeAttr('name');
+        });
+        $.post($(this).attr('action'),$(this).serialize(),function(data) {choose_callback_common(data);},'json');
+        return false;
+    });
+    function choose_callback_common(data) {
+        $('#choose_goods_common_box').parents('.modal-body').html(data.info);
+    }
+    var _choose_goods_sku_type = '{$Think.request.type}';
+    $('.choose_goods_common_checkbox_info').each(function() {
+        if ($.inArray($(this).val(),_choose_goods_common_goods_ids) != -1) $(this).attr('checked',true);
+        else $(this).attr('checked',false);
+    });
+    if (_choose_goods_common_goods_ids.length > 0 && _choose_goods_common_goods_names.length == 0) {
+        $.ajaxSetup({async:false});
+        $.post("{:U('Base/get_goods_names')}",{goods_id:implode(',',_choose_goods_common_goods_ids)},function(data) {
+            if (data.status && data.data) {
+                for (var i=0; i<data.data.length; i++) {
+                    _choose_goods_common_goods_names.push({id:data.data[i].goods_id,name:data.data[i].goods_name});
+                }
+            }
+        },'json');
+    }
+    reset_checkbox_checked();
+    reset_choose_goods_sku_txt();
+    $('.choose_goods_common_checkbox_all').click(function() {
+        var _checked = $(this).attr('checked') ? true : false;
+        $('.choose_goods_common_checkbox_info').attr('checked',_checked);
+        $.uniform.update();
+        reset_choose_goods_sku();
+    });
+    $('.choose_goods_common_checkbox_info').click(function() {
+        if (_choose_goods_sku_type == 1) {
+            _choose_goods_common_goods_ids = [];
+            _choose_goods_common_goods_names = [];
+            _choose_goods_common_goods_ids.push($(this).val());
+            _choose_goods_common_goods_names.push({id:$(this).val(),name:$(this).attr('data-name')});
+            reset_choose_goods_sku();
+        }else {
+            reset_checkbox_checked();
+            reset_choose_goods_sku();
+        }        
+    });
+    function reset_checkbox_checked() {
+        if ($('.choose_goods_common_checkbox_info').length == $('.choose_goods_common_checkbox_info:checked').length) {
+            $('.choose_goods_common_checkbox_all').attr('checked',true);
+        }else {
+            $('.choose_goods_common_checkbox_all').attr('checked',false);
+        }
+        $.uniform.update();
+    }
+    function reset_choose_goods_sku() {
+        $('.choose_goods_common_checkbox_info').each(function() {
+            if ($(this).attr('checked') == 'checked') {
+                if ($.inArray($(this).val(),_choose_goods_common_goods_ids) == -1) {
+                    _choose_goods_common_goods_ids.push($(this).val());
+                    _choose_goods_common_goods_names.push({id:$(this).val(),name:$(this).attr('data-name')});
+                }
+            }else {
+                for (var i=0; i<_choose_goods_common_goods_ids.length; i++) {
+                    if (_choose_goods_common_goods_ids[i] == $(this).val()) {
+                        _choose_goods_common_goods_ids.splice(i,1);
+                    }
+                }
+                for (var i=0; i<_choose_goods_common_goods_names.length; i++) {
+                    if (_choose_goods_common_goods_names[i].id == $(this).val()) {
+                        _choose_goods_common_goods_names.splice(i,1);
+                    }
+                }
+            }            
+        });
+        reset_choose_goods_sku_txt();
+    }
+    function reset_choose_goods_sku_txt() {
+        var _box = $('#choose_goods_sku_common_ex');
+        _box.html('<div class="btn-group" style="font-size:14px;margin-bottom:10px;">已选择商品（'+_choose_goods_common_goods_names.length+'）：</div>');
+        for (var i=0; i<_choose_goods_common_goods_names.length; i++) {
+            $('<div class="btn-group" style="margin-bottom:10px;"></div>').html('<a href="javascript:;" class="btn">'+_choose_goods_common_goods_names[i].name+'</a><a href="javascript:;" data-id="'+_choose_goods_common_goods_names[i].id+'" class="btn dropdown-toggle" title="取消选择"><span class="icon-remove" style="margin-top:4px;"></span></a>').appendTo(_box);
+        }
+    }
+    $('#choose_goods_sku_common_ex').find('.dropdown-toggle').live('click',function() {
+        var _this = $(this);
+        for (var i=0; i<_choose_goods_common_goods_ids.length; i++) {
+            if (_choose_goods_common_goods_ids[i] == _this.data('id')) {
+                _choose_goods_common_goods_ids.splice(i,1);
+            }
+        }
+        for (var i=0; i<_choose_goods_common_goods_names.length; i++) {
+            if (_choose_goods_common_goods_names[i].id == _this.data('id')) {
+                _choose_goods_common_goods_names.splice(i,1);
+            }
+        }
+        $('.choose_goods_common_checkbox_info').each(function() {
+            if ($.inArray($(this).val(),_choose_goods_common_goods_ids) != -1) $(this).attr('checked',true);
+            else $(this).attr('checked',false);
+        });
+        reset_checkbox_checked();
+        reset_choose_goods_sku_txt();
+        _this.parent().remove();
+    });
+    $('#reset_choose_goods_sku').click(function() {
+        _choose_goods_common_goods_ids = [];
+        _choose_goods_common_goods_names = [];
+        $('.choose_goods_common_checkbox_info').each(function() {
+            if ($.inArray($(this).val(),_choose_goods_common_goods_ids) != -1) $(this).attr('checked',true);
+            else $(this).attr('checked',false);
+        });
+        reset_checkbox_checked();
+        reset_choose_goods_sku_txt();
+    });
+    $('#submit_choose_goods').click(function() {
+        tip_close(function() {
+            try {
+                {$Think.request.callback|htmlspecialchars}(implode(',',_choose_goods_common_goods_ids));
+                _choose_goods_common_goods_ids = [];
+                _choose_goods_common_goods_names = [];
+            }catch (e) {
+                _choose_goods_common_goods_ids = [];
+                _choose_goods_common_goods_names = [];
+            }            
+        });
+    });
+</script>

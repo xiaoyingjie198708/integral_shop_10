@@ -1,0 +1,25 @@
+{__NOLAYOUT__}
+<div class="widget-box  tab-left" style="margin-top:0;">
+    <ul class="nav">
+        <foreach name="Think.config.order_label_type" item="label_type" key="type">
+            <li>
+                <a data-toggle="tab" href="javascript:;" class="toggle_label" data-order_id="{$order_id}" data-type="{$type}">{$label_type}</a>
+            </li>
+        </foreach>
+    </ul>
+    <div id="order_quick_box" class="widget-content tab-content" style="text-align: left;">
+    </div>
+</div>
+<script type="text/javascript">
+    $(".toggle_label").click(function () {
+        var _this = $(this);
+        if (_this.parent().hasClass('active'))
+            return false;
+        $.post("{:U('Order/toggle_label')}", {order_id: _this.data('order_id'), type: _this.data('type')}, function (data) {
+            if (data.status) {
+                $("#order_quick_box").html(data.info);
+            }
+        });
+    });
+    $(".toggle_label").eq(1).trigger('click');
+</script>

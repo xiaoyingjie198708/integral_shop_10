@@ -1,0 +1,52 @@
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>商家列表</h5><a class="btn btn-success btn-mini" href="{:U('Shops/add')}"><i class="icon-plus icon-white"></i> 添加商家</a></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>商家名称</th>
+                        <th>商家别名</th>
+                        <th>商铺编码</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="4">还没有任何商铺信息，请先创建~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                    <tr>
+                        <td>{$info.shops_name}</td>
+                        <td>{$info.alias_name}</td>
+                        <td>{$info.shops_code}</td>
+                        <td>{$info.create_time}</td>
+                        <td>
+                            <a href="{:U('Shops/update',array('shops_code'=>$info['shops_code']))}" class="btn btn-mini"><i class="icon-edit"></i> 编辑</a>&nbsp;
+                            <a href="javascript:;" data-shops_code="{$info.shops_code}" data-title="{$info.shops_name}" class="btn btn-mini delShops"><i class="icon-trash"></i> 删除</a>
+                        </td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+$('.delShops').click(function() {
+    var _this = $(this);
+    if(_this.data('send') == 'off') return false;
+    if (confirm('确认删除 '+$(this).data('title')+' 吗？')) {
+        _this.data('send','off');
+        $.post("{:U('Shops/delete')}",{shops_code:$(this).data('shops_code')},function(data) {
+            _this.data('send','on');
+            if (data.status) location.reload();
+            else alert(data.info);
+        });
+    }
+});
+</script>

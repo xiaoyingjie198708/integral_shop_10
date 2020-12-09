@@ -1,0 +1,78 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-zh-CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/export.jquery.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>商品销售报表</h5></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>订单编号</th>
+                        <th>会员账号</th>
+                        <th>商家名称</th>
+                        <th>商品编号</th>
+                        <th>商品名称</th>
+                        <th>销售价</th>
+                        <th>结算价</th>
+                        <th>购买时间</th>
+                        <th>支付时间</th>
+                        <th>核销时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="10">还没有任何支付订单信息~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                    <tr>
+                        <td><a href="javascript:;" class="quick_view" data-detail_id="{$info.id}">{$info.order_cur_id}</a></td>
+                        <td>{$info.member_account}</td>
+                        <td>{$info.shops_name}</td>
+                        <td>{$info.goods_code}</td>
+                        <td>{$info.goods_name}</td>
+                        <td>{$info.show_price}</td>
+                        <td>{$info.goods_cost_price}</td>
+                        <td>{$info.order_time}</td>
+                        <td>{$info.pay_time}</td>
+                        <td>{$info.use_time}</td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    /*--------------------------------------------------------------------------切换快捷查看-------------------------------------------------------------*/
+    $(".quick_view").toggle(function () {
+        var _this = $(this);
+        if ($(".quick_tr").length > 0)
+            $(".quick_tr").remove();
+        $.post("{:U('GoodsSaleReport/quick_view')}", {detail_id: _this.data('detail_id')}, function (data) {
+            if (data.status) {
+                var _current_tr = _this.parents('tr');
+                var _td_count = _current_tr.find('td').length;
+                _current_tr.after($('<tr class="quick_tr"><td colspan="' + _td_count + '">' + data.info + '</td></tr>'));
+            }
+        });
+    }, function () {
+        $(".quick_tr").remove();
+    });
+    /*--------------------------------------------------------------------------导出订单-----------------------------------------------------------------*/
+    $("#explode_order").export({
+       'shops_code[]':$("select[name='shops_code[]']").val(),
+       'order_status[]':$("select[name='order_status[]']").val(),
+       'pay_start':$("input[name='pay_start']").val(),
+       'pay_end':$("input[name='pay_end']").val(),
+    }); 
+</script>

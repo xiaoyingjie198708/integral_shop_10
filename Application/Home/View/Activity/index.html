@@ -1,0 +1,71 @@
+<script src="__PUBLIC__/js/select2.min.js"></script>
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<div class="container-fluid">
+<div class="widget-box">
+    <div class="widget-title add_box"><h5>活动列表</h5><a class="send_sms btn btn-success btn-mini" href="{:U('Activity/add')}"><i class="icon-plus icon-white"></i> 添加活动</a></div>
+    <div class="widget-content">
+        {$search_box}
+        <table class="table table_list table-bordered data-table table-center">
+            <thead>
+                <tr>
+                    <th>活动名称</th>
+                    <th>活动地址</th>
+                    <th>状态</th>
+                    <th>活动有效期</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+            <volist name='list' id='info'>
+                <tr>
+                    <td>{$info.activity_name}</td>
+                    <td>{$info.activity_url}</td>
+                    <td>
+                        <div class="btn-group change_status">
+                            <a data-id="{$info.activity_id}" data-status="2" class="btn btn-mini {:set_class('2',$info['activity_status'],'btn-success active')}">上架</a>
+                            <a data-id="{$info.activity_id}" data-status="1" class="btn btn-mini {:set_class('1',$info['activity_status'],'active')}">下架</a>
+                        </div>	
+                    </td>
+                    <td>{$info.activity_start_date} - {$info.activity_end_date}</td>
+                    <td>
+                        <a title="编辑" class="store_edit btn btn-mini" href="{:U('Activity/update',array('activity_id'=>$info['activity_id']))}"><i class="icon-edit"></i> 编辑 </a>	
+                        <a title="删除" class="del btn btn-mini" data-title="{$info.activity_name}" data-id="{$info.activity_id}" href="javascript:void(0)"><i class="icon-trash"></i> 删除 </a>
+                    </td>
+                </tr>
+            </volist>
+            </tbody>
+        </table>
+        <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>				
+    </div>
+</div>
+</div>
+<script type="text/javascript">
+$('.change_status a').click(function() {
+    var _this = $(this);
+    if(_this.data('send') == 'off') return false;
+    if (_this.hasClass('active')) return false;
+    _this.data('send','off');
+    $.post("{:U('Activity/change_status')}",{id:_this.data('id'),status:_this.data('status')},function(data) {
+        _this.data('send','on');
+        if(!data.status) alert(data.info);
+        else {
+            _this.parent().find('a').removeClass('active');
+            _this.addClass('active');
+            if (_this.index() == 1) _this.prev().removeClass('btn-success');
+            else _this.addClass('btn-success');
+        }
+    },'json');
+});
+$(".del").click(function(){
+        _this=$(this);
+        if(confirm("您确定要删除 "+_this.data('title')+" 吗")){
+        $.getJSON("{:U('Activity/del')}",{id:_this.data("id")},function(data){
+                if(data.status){
+                        alert(data.info);
+                        location.reload();
+                }else{
+                        alert(data.info);
+                }
+        })}
+});	
+</script>

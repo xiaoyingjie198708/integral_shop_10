@@ -1,0 +1,92 @@
+{__NOLAYOUT__}
+<style>
+.form-horizontal .control-label{width:100px;}
+.form-horizontal .controls{margin-left:120px;}
+.form-horizontal .form-actions{padding-left:120px;}
+</style>
+<div class="widget-box" style="margin:0;">
+    <div class="widget-content nopadding">
+        <form class="form-horizontal" method="post" ajax="true" action="{:U('Access/add')}" id="add_form" autocomplete="off">
+            <div class="control-group">
+                <label class="control-label">父级权限：</label>
+                <div class="controls" id="choose_rule_box">
+                    <div class="btn-group">
+                        <a class="btn btn-small" data-id="0">顶级权限</a>
+                        <a data-toggle="dropdown" class="btn btn-small dropdown-toggle"><span class="caret"></span></a>
+                        <ul class="dropdown-menu" style="max-height:400px;overflow:hidden;overflow-y:auto;">
+                            <li><a href="javascript:;" data-id="0">顶级权限</a></li>
+                            <li class="divider"></li>
+                            <volist name="parent_rule" id="parent_m">
+                            <li><a href="javascript:;" data-id="{$parent_m.id}">{$parent_m.name}<notempty name="parent_m.title">（{$parent_m.title}）</notempty></a></li>
+                            </volist>
+                        </ul>
+                    </div>
+                    <span class="help-inline">选择顶级权限需要手动将权限规则添加到控制器属性的对应模块下</span>
+                    <input type="hidden" id="p_id" name="p_id" value="0" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">权限规则：</label>
+                <div class="controls">
+                    <input type="text" name="name" empty="请输入权限规则" id="name" />
+                    <span class="help-block">验证权限的唯一标识，不可重复，例如：Access/index</span>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">权限名称：</label>
+                <div class="controls">
+                    <input type="text" name="title" empty="请输入权限名称" id="title" />
+                    <span class="help-block">权限的中文名称，例如：权限列表</span>
+                </div>
+            </div>               
+            <div class="control-group">
+                <label class="control-label">权限条件：</label>
+                <div class="controls">
+                    <input type="text" name="condition" id="condition" />
+                    <span class="help-block">权限的其他条件，例如：{id} > 10 and {id} < 100，表示验证用户的ID是否大于10小于100，id字段在用户表里要存在</span>
+                </div>
+            </div>
+            <div class="form-actions">
+                <input type="submit" value="提交" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script type="text/javascript">
+    $("#add_form").form({
+        start:function() {
+            $('.error').removeClass('error');
+            remove_error();
+        },
+        error:function(data,_this) {
+            if (_this) {
+                error(data,_this);
+                $('.error').removeClass('error');
+                _this.parents('.control-group').addClass('error');
+            }else alert(data);
+        },
+        ajaxcallback:function(data) {
+            if (data.status) {
+                 tip_close();
+                window.location.href = "{:U('Access/index')}";
+            }else {
+                if (data.data) {
+                    var _obj = $('#'+data.data);
+                    $('.error').removeClass('error');
+                    _obj.parents('.control-group').addClass('error');
+                    _obj.focus();
+                    error(data.info,_obj);
+                }else {
+                    alert(data.info);
+                }
+            }
+        }
+    });
+    $('.dropdown-menu a').live('click',function() {
+        var _this = $(this);
+        $(this).parents('.btn-group').find('a:first').html(_this.html()).attr('data-id',_this.attr('data-id'));
+        $('#p_id').val(_this.attr('data-id'));
+    });
+
+</script>

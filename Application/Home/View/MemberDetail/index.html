@@ -1,0 +1,60 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+<link type="text/css" href="__PUBLIC__/js/date/css/jquery-ui-timepicker-addon.css" rel="stylesheet" />
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/date/js/jquery-ui-timepicker-zh-CN.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/tip.jquery.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/export.jquery.js"></script>
+<style>
+    .controls label{display:inline-block; height:20px; padding:4px 10px 4px 0;margin-bottom:0;}
+    .tab-left{border:1px solid #ddd; overflow:hidden;background-color:#fff;}
+    .tab-left .nav{float:left;}
+    .tab-left .nav li{float:none;border-bottom:1px solid #ddd;border-right:1px solid #ddd;height:40px;line-height:40px;padding:0 8px;text-align:center;font-weight:bold;background-color:#f9f9f9;}
+    .tab-left .nav li.active{border-right:none;background-color:#fff;color:#444;}
+    .tab-left .nav li a{background-color:#f9f9f9;color:#999;}
+    .tab-left .nav li.active a{color:#444;background-color:#fff;}
+    .tab-left .tab-content{border:none;}
+    .zc_data_list{list-style:none;}
+    .zc_data_list li{float:left; margin:0 8px 8px 0;}
+    .pointer{cursor:pointer;}
+    .warging{border-radius:50%;padding:2px 3px;cursor:pointer;position:absolute;margin-left:4px;}
+</style>
+<style>.select2-results{max-height:218px;overflow:hidden;overflow-y:auto;}</style>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>用户储值卡列表</h5></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>会员账号</th>
+                        <th>储值卡金额（元）</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <volist name="list" id="order">
+                    <tr>
+                        <td>{$order.member_account}</td>
+                        <td>{$order.price_num}</td>
+                        <td>
+                            <a href="{:U('MemberDetail/info',array('member_id'=>$order['member_id']))}" class="btn btn-mini"><i class="icon-eye-open"></i> 查看详情</a>
+                        </td>
+                    </tr>
+                </volist>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $("#explode_order").export({
+       search:$("input[name='search']").val(),
+    });
+</script>

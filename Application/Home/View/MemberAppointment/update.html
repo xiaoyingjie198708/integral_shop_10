@@ -1,0 +1,87 @@
+{__NOLAYOUT__}
+<style>
+.form-horizontal .control-label{width:100px;}
+.form-horizontal .controls{margin-left:120px;}
+.form-horizontal .form-actions{padding-left:120px;}
+</style>
+<div class="widget-box" style="margin:0;">
+    <div class="widget-content nopadding">
+        <form class="form-horizontal add_form" ajax="true" action="{:U('MemberAppointment/update')}" autocomplete="off">   
+            <div class="control-group">
+                <label class="control-label">联系电话：</label>
+                <div class="controls">
+                    <input type="text" name="member_mobile" empty="请输入联系电话" id="member_mobile" value="{$info.member_mobile}" placeholder="请输入联系电话" regex="/^1[3-9]{1}[0-9]{9}$/" regexMsg="格式有误，请重新输入"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">联系人：</label>
+                <div class="controls">
+                    <input type="text" name="member_name" empty="请输入联系人" id="member_name" value="{$info.member_name}" placeholder="请输入联系人"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">商品名称：</label>
+                <div class="controls">
+                    <input type="text" name="goods_desc" empty="请输入商品名称" id="goods_desc" placeholder="请输入商品名称" value="{$info.goods_desc}"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">数量：</label>
+                <div class="controls">
+                    <input type="text" name="goods_num" empty="请输入数量" id="goods_num" placeholder="请输入数量" regex="/^(0|[1-9][0-9]{0,9})?$/" regexMsg="格式有误，请重新输入" value="{$info.goods_num}"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">预约时间：</label>
+                <div class="controls">
+                    <input type="text" name="app_time" id="app_time" placeholder="请选择预约时间" class="date" value="{$info.app_time}" empty="请选择预约时间"/>
+                </div>
+            </div>
+            <div class="form-actions">
+                <input type="hidden" id="id" name="id" value="{$info.id}"/>
+                <input type="submit" value="提交" class="btn" />
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+$(".date").datetimepicker({
+    showSecond: true,
+    timeFormat: 'hh:mm:ss',
+    stepHour: 1,
+    stepMinute: 1,
+    stepSecond: 1
+}).focus(function(){
+    $("#ui-datepicker-div").attr('style','position: fixed; top: 120px; left: 859.5px; display: block; z-index: 999999;')
+});
+$('.add_form').form({
+     start:function() {
+        $('.error').removeClass('error');
+        remove_error();
+    },
+    error:function(data,_this) {
+        if (_this) {
+            error(data,_this);
+            $('.error').removeClass('error');
+            _this.parents('.control-group').addClass('error');
+        }else alert(data);
+    },
+    ajaxcallback:function(data) {
+        if (data.status) {
+            tip_close();
+            location.reload();
+        }else {
+            if (data.data) {
+                var _obj = $('#'+data.data);
+                $('.error').removeClass('error');
+                _obj.parents('.control-group').addClass('error');
+                _obj.focus();
+                error(data.info,_obj);
+            }else {
+                alert(data.info);
+                tip_close();
+            }
+        }
+    }
+});
+</script>

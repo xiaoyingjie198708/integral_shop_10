@@ -1,0 +1,120 @@
+{__NOLAYOUT__}
+<style>
+.form-horizontal .control-label{width:100px;}
+.form-horizontal .controls{margin-left:120px;}
+.form-horizontal .form-actions{padding-left:120px;}
+.controls label{display:inline-block; height:20px; padding:4px 10px 4px 0;margin-bottom:0;}
+</style>
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<div class="widget-box" style="margin:0;">
+    <div class="widget-content nopadding">
+        <form class="form-horizontal" method="post" ajax="true" action="{:U('Menu/add')}" id="add_form" autocomplete="off">
+            <div class="control-group">
+                <label class="control-label">父级菜单：</label>
+                <div class="controls" id="choose_menu_box">
+                    <div class="btn-group">
+                        <a class="btn btn-small" data-id="0">顶级菜单</a>
+                        <a data-toggle="dropdown" class="btn btn-small dropdown-toggle"><span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:;" data-id="0">顶级菜单</a></li>
+                            <li class="divider"></li>
+                            <volist name="parent_menu" id="parent_m">
+                            <li><a href="javascript:;" data-id="{$parent_m.id}">{$parent_m.name}</a></li>
+                            </volist>
+                        </ul>
+                    </div>
+                    <input type="hidden" id="p_id" name="p_id" value="0" />
+                    <input type="hidden" id="path" name="path" value="0" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">菜单名称：</label>
+                <div class="controls"><input type="text" name="name" empty="请输入菜单名称" id="name" /></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">菜单路径：</label>
+                <div class="controls"><input type="text" name="url" id="url" /></div>
+            </div>               
+            <div class="control-group">
+                <label class="control-label">菜单排序：</label>
+                <div class="controls"><input type="text" name="sort" id="sort" /></div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">左边显示：</label>
+                <div class="controls">
+                    <label><input type="radio" name="is_show" value="1" checked="checked"/>是</label>
+                    <label><input type="radio" name="is_show" value="0"/>否</label>
+                </div>
+            </div>
+            <div class="form-actions">
+                <input type="submit" value="提交" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<script type="text/javascript">
+    $('input[type=checkbox],input[type=radio]').uniform(); //美化checkbox，radio按钮
+    $("#add_form").form({
+        start:function() {
+            $('.error').removeClass('error');
+            remove_error();
+        },
+        error:function(data,_this) {
+            if (_this) {
+                error(data,_this);
+                $('.error').removeClass('error');
+                _this.parents('.control-group').addClass('error');
+            }else alert(data);
+        },
+        ajaxcallback:function(data) {
+            if (data.status) {
+                tip_close();
+                window.location.href = "{:U('Menu/index')}";
+            }else {
+                if (data.data) {
+                    var _obj = $('#'+data.data);
+                    $('.error').removeClass('error');
+                    _obj.parents('.control-group').addClass('error');
+                    _obj.focus();
+                    error(data.info,_obj);
+                }else {
+                    alert(data.info);
+                }
+            }
+        }
+    });
+    $('.dropdown-menu a').live('click',function() {
+        var _this = $(this);
+        $(this).parents('.btn-group').find('a:first').html(_this.html()).attr('data-id',_this.attr('data-id'));
+        
+        if (_this.attr('data-id') != '0') {
+            $.post('__URL__/getChildMenu',{id:_this.attr('data-id')},function(data) {
+                if (data.status) {
+                    $('#choose_menu_box').find('.btn-group:gt('+_this.parents('.btn-group').index()+')').remove();
+                    $('#p_id').before($(data.data));                    
+                }
+                var _path = '0';
+                var _data_id = 0;
+                $('#choose_menu_box .btn-group').each(function() {
+                    var _id = $(this).find('a:first').attr('data-id');
+                    if(_id != '0') {_path += '-'+_id;_data_id = _id;}
+                });
+                $('#p_id').val(_data_id);
+                $('#path').val(_path);
+            });
+        }else {
+            $('#choose_menu_box').find('.btn-group:gt('+_this.parents('.btn-group').index()+')').remove();
+            var _path = '0';
+            var _data_id = 0;
+            $('#choose_menu_box .btn-group').each(function() {
+                var _id = $(this).find('a:first').attr('data-id');
+                if(_id != '0') {_path += '-'+_id;_data_id = _id;}
+            });
+            $('#p_id').val(_data_id);
+            $('#path').val(_path);
+        }        
+    });
+
+</script>

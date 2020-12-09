@@ -1,0 +1,26 @@
+{__NOLAYOUT__}
+<div class="container-fluid" style="padding:0;padding-bottom:20px;" id="choose_shops_common_box">
+    <div class="widget-box nomargin">
+        <div class="widget-title"><h5>回访日志</h5><span class="label label-info">共 {$count|default=0} 个</span></div>
+        <div class="widget-content">
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>备注</th>
+                        <th>回访人员</th>                        
+                        <th>回访时间</th>                        
+                    </tr>
+                </thead>
+                <tbody>
+                    <volist name="use_list" id="info">
+                    <tr>
+                        <td>{$info.content}</td>
+                        <td>{$info.realname}</td>
+                        <td>{$info.create_time}</td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

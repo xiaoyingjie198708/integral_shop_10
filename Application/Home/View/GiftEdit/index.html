@@ -1,0 +1,133 @@
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/jquery.uniform.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>赠品编辑列表</h5><a class="btn btn-success btn-mini" href="{:U('GiftEdit/add')}"><i class="icon-plus icon-white"></i> 添加赠品</a></div>
+        <div class="widget-content">
+            {$search_box}
+            <div class="help-block" style="float: left;">
+                提示：任何修改内容，审核通过后，必须在赠品列表中点击启用才有效
+            </div>
+            <div style="float: right;">
+                <a href="javascript:;" class="btn btn-mini bundles_edit"><i class="icon-edit"></i> 编辑</a>
+                <a href="javascript:;" class="btn btn-mini bundles_submit_checked"><i class="icon-wrench"></i> 提交审核</a>
+                <a href="javascript:;" class="btn btn-mini bundles_view"><i class="icon-eye-open" style="margin-right: 0px;"></i> 查看详情</a>
+            </div>
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="checkedAll"/></th>
+                        <th>促销名称</th>
+                        <th>状态</th>
+                        <th>主品商品编码</th>
+                        <th>促品编码</th>
+                        <th>有效期开始时间</th>
+                        <th>有效期结束时间</th>
+                        <th>创建时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <empty name="list">
+                        <td colspan="8">还没有任何赠品信息，请先创建~~~</td>
+                    </empty>
+                    <volist name="list" id="info">
+                    <tr>
+                        <td><input type="checkbox" name="activity_id" value="{$info.activity_id}"/></td>
+                        <td>{$info.activity_name}</td>
+                        <td>{$info.status|id2name='activity_status',###}</td>
+                        <td>{$info.main_goods_code}</td>
+                        <td>{$info.promote_goods_code}</td>
+                        <td>{$info.start_time}</td>
+                        <td>{$info.end_time}</td>
+                        <td>{$info.create_time}</td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('input[type=checkbox]').uniform(); //美化checkbox，radio按钮
+    $("#checkedAll").toggle(function () {
+        $("input[name=activity_id]").each(function () {
+            $(this).parents('span').addClass('checked');
+            $(this).attr('checked', 'checked');
+        });
+    }, function () {
+        $(this).parents('span').removeClass('checked');
+        $("input[name=activity_id]").each(function () {
+            $(this).parents('span').removeClass('checked');
+            $(this).removeAttr('checked');
+        });
+    });
+    $("input[name=activity_id]").click(function () {
+        var _this = $(this);
+        _all_checked = true;
+        var _checked = _this.attr('checked');
+        if (!_checked) {
+            $("#checkedAll").parents('span').removeClass('checked');
+        } else {
+            $("input[name=activity_id]").each(function () {
+                if (!$(this).parents('span').hasClass('checked') && _this.val() != $(this).val()) {
+                    _all_checked = false;
+                }
+            });
+            if (_all_checked && !$("#checkedAll").parents('span').hasClass('checked')) {
+                $("#checkedAll").parents('span').addClass('checked');
+            }
+        }
+    });
+    /*-----------------------------------------------编辑赠品--------------------------------------------*/
+    $(".bundles_edit").click(function(){
+        var _checked_count = $("input[name=activity_id]:checked").length;
+        if(_checked_count == 0){
+            alert("请选择一个赠品活动");
+            return false;
+        }
+        if(_checked_count > 1){
+            alert("一次只能修改一个赠品活动，请取消其它的选择");
+            return false;
+        }
+        var _activity_id = $("input[name=activity_id]:checked").first().val();
+        window.location.href = "{:U('GiftEdit/update')}?activity_id=" + _activity_id;
+    });
+    
+     /*-----------------------------------------------查看赠品-------------------------------------------*/
+    $(".bundles_view").click(function(){
+        var _checked_count = $("input[name=activity_id]:checked").length;
+        if(_checked_count == 0){
+            alert("请选择一个赠品活动");
+            return false;
+        }
+        if(_checked_count > 1){
+            alert("一次只能查看一个赠品活动，请取消其它的选择");
+            return false;
+        }
+        var _activity_id = $("input[name=activity_id]:checked").first().val();
+        window.location.href = "{:U('GiftEdit/info')}?activity_id=" + _activity_id;
+    });
+    /*-----------------------------------------------提交审核-------------------------------------------*/
+    $(".bundles_submit_checked").click(function(){
+        var _checked_count = $("input[name=activity_id]:checked").length;
+        if(_checked_count == 0){
+            alert("请选择一个赠品活动");
+            return false;
+        }
+        var _activity_id = '';
+        $("input[name=activity_id]:checked").each(function(){
+            _activity_id += $(this).val() + ',';
+        });
+        $.post("{:U('GiftEdit/submit_check')}",{activity_ids:_activity_id},function(data){
+            if(data.status){
+                alert(data.info);
+                window.location.reload();
+            }else{
+                alert(data.info);
+            }
+        });
+    });
+</script>

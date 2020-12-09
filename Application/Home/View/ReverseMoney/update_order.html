@@ -1,0 +1,49 @@
+{__NOLAYOUT__}
+<div class="widget-box" style="margin-top:0;">
+    <div class="widget-content">
+        <form class="form-horizontal add_form" ajax="true" action="{:U('ReverseMoney/update_order')}" autocomplete="off">
+            <div class="control-group">
+                <label class="control-label">备注：</label>
+                <div class="controls">
+                    <textarea id='reason' name='reason'></textarea>
+                </div>
+            </div>
+            <div class="form-actions">
+                <input type="hidden" name="order_id" id="order_id" value="{$order_id}" />
+                <input type="hidden" name="order_status" id="order_status" value="{$order_status}" />
+                <input type="submit" value="提交" id="submit_group" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    $(".add_form").form({
+        start: function () {
+        },
+        error: function (data, _this) {
+            if (_this) {
+                error(data, _this);
+                $('.error').removeClass('error');
+                _this.parents('.control-group').addClass('error');
+            } else
+                alert(data);
+        },
+        ajaxcallback: function (data) {
+            if (data.status) {
+                alert("操作成功");
+                tip_close();
+                refresh_label();
+            } else {
+                if (data.data) {
+                    var _obj = $('#' + data.data);
+                    $('.error').removeClass('error');
+                    _obj.parents('.control-group').addClass('error');
+                    _obj.focus();
+                    error(data.info, _obj);
+                } else {
+                    alert(data.info);
+                }
+            }
+        }
+    });
+</script>

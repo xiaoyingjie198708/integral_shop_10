@@ -1,0 +1,199 @@
+{__NOLAYOUT__}
+<div class="container-fluid" style="padding:0;padding-bottom:20px;" id="choose_shops_common_box">
+    <div class="widget-box nomargin">
+        <div class="widget-title"><h5>商铺列表</h5><span class="label label-info">共 {$count|default=0} 个</span></div>
+        <div class="widget-content">
+            <div style="margin-top:0;" class="widget-box collapsible widget_box_search">
+                <form autocomplete="off" action="{:U('Base/choose_shops')}" id="choose_shops_common_form" ajax="true" method="post">
+                    <input type="hidden" name="callback" value="{$Think.request.callback|htmlspecialchars}" />
+                    <input type="hidden" name="type" value="{$Think.request.type|htmlspecialchars}" />
+                    <div class="widget-title">
+                        <a href="javascript:;"><span class="icon"><i class="icon-search"></i></span><h5>条件筛选</h5></a>
+                    </div>
+                    <div class="collapse in" style="overflow:visible;">
+                        <div class="widget-content search_box1">
+                            <ul class="search_ul">
+                                <li class="search_li">
+                                编码/名称：<input type="text" value="{$Think.request.search|htmlspecialchars}" placeholder="请输入商家编码/名称" name="search">
+                                </li>
+                                <li class="search_li"><button type="submit" class="btn btn-primary"><i class="icon-search icon-white"></i> 筛选</button></li>
+                            </ul>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div style="margin-bottom:5px;overflow:hidden;">
+                <div id="choose_shops_common_ex" style="width:86%;float:left;"></div>
+                <div style="float:right;">
+                    <a href="javascript:;" id="submit_choose_shops" class="btn btn-success">确定</a>
+                    <a href="javascript:;" id="reset_choose_shops" class="btn btn btn-danger">清空</a>
+                </div>
+            </div>            
+            <table class="table table_list table-bordered table-center with-check">
+                <thead>
+                    <tr>
+                        <th>
+                            <if condition="$Think.request.type eq 1">
+                                &nbsp;
+                            <else />
+                                <input type="checkbox" class="choose_shops_common_checkbox_all" />
+                            </if>
+                        </th>
+                        <th>商家编码</th>                        
+                        <th>商家名称</th>                        
+                    </tr>
+                </thead>
+                <tbody>
+                    <volist name="shops_list" id="info">
+                    <tr>
+                        <td>
+                        <if condition="$Think.request.type eq 1">
+                            <input type="radio" class="choose_shops_common_checkbox_info" name="choose_goods_sku_radio" value="{$info.shops_id}" data-name="{$info.shops_name}" />
+                        <else />
+                            <input type="checkbox" class="choose_shops_common_checkbox_info" value="{$info.shops_id}" data-name="{$info.shops_name}" />
+                        </if>
+                        </td>
+                        <td>{$info.shops_code}</td>
+                        <td>{$info.shops_name}</td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul id="choose_shops_common_page_box">{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $("#choose_shops_common_box").find('input[type=checkbox],input[type=radio]').uniform();
+    $('#choose_shops_common_page_box').find('a').click(function() {
+        var _this = $(this);
+        var _href = _this.attr('href');
+        if (_href == 'javascript:;' || _href == '#') return false;
+        $.get(_href,{},function(data) {choose_callback_common(data);},'json');
+        return false;
+    });
+    $('#choose_shops_common_form').submit(function() {
+        $(this).find('input,select').each(function() {
+            if (!$.trim($(this).val())) $(this).removeAttr('name');
+        });
+        $.post($(this).attr('action'),$(this).serialize(),function(data) {choose_callback_common(data);},'json');
+        return false;
+    });
+    function choose_callback_common(data) {
+        $('#choose_shops_common_box').parents('.modal-body').html(data.info);
+    }
+    var _choose_goods_sku_type = '{$Think.request.type|htmlspecialchars}';
+    $('.choose_shops_common_checkbox_info').each(function() {
+        if ($.inArray($(this).val(),_choose_shops_common_shops_ids) != -1) $(this).attr('checked',true);
+        else $(this).attr('checked',false);
+    });
+    if (_choose_shops_common_shops_ids.length > 0 && _choose_shops_common_shops_names.length == 0) {
+        $.ajaxSetup({async:false});
+        $.post("{:U('Base/get_shops_names')}",{shops_id:implode(',',_choose_shops_common_shops_ids)},function(data) {
+            if (data.status && data.data) {
+                for (var i=0; i<data.data.length; i++) {
+                    _choose_shops_common_shops_names.push({id:data.data[i].shops_id,name:data.data[i].shops_name});
+                }
+            }
+        },'json');
+    }
+    reset_checkbox_checked();
+    reset_choose_shops_txt();
+    $('.choose_shops_common_checkbox_all').click(function() {
+        var _checked = $(this).attr('checked') ? true : false;
+        $('.choose_shops_common_checkbox_info').attr('checked',_checked);
+        $.uniform.update();
+        reset_choose_shops();
+    });
+    $('.choose_shops_common_checkbox_info').click(function() {
+        if (_choose_goods_sku_type == 1) {
+            _choose_shops_common_shops_ids = [];
+            _choose_shops_common_shops_names = [];
+            _choose_shops_common_shops_ids.push($(this).val());
+            _choose_shops_common_shops_names.push({id:$(this).val(),name:$(this).attr('data-name')});
+            reset_choose_shops();
+        }else {
+            reset_checkbox_checked();
+            reset_choose_shops();
+        }        
+    });
+    function reset_checkbox_checked() {
+        if ($('.choose_shops_common_checkbox_info').length == $('.choose_shops_common_checkbox_info:checked').length) {
+            $('.choose_shops_common_checkbox_all').attr('checked',true);
+        }else {
+            $('.choose_shops_common_checkbox_all').attr('checked',false);
+        }
+        $.uniform.update();
+    }
+    function reset_choose_shops() {
+        $('.choose_shops_common_checkbox_info').each(function() {
+            if ($(this).attr('checked') == 'checked') {
+                if ($.inArray($(this).val(),_choose_shops_common_shops_ids) == -1) {
+                    _choose_shops_common_shops_ids.push($(this).val());
+                    _choose_shops_common_shops_names.push({id:$(this).val(),name:$(this).attr('data-name')});
+                }
+            }else {
+                for (var i=0; i<_choose_shops_common_shops_ids.length; i++) {
+                    if (_choose_shops_common_shops_ids[i] == $(this).val()) {
+                        _choose_shops_common_shops_ids.splice(i,1);
+                    }
+                }
+                for (var i=0; i<_choose_shops_common_shops_names.length; i++) {
+                    if (_choose_shops_common_shops_names[i].id == $(this).val()) {
+                        _choose_shops_common_shops_names.splice(i,1);
+                    }
+                }
+            }            
+        });
+        reset_choose_shops_txt();
+    }
+    function reset_choose_shops_txt() {
+        var _box = $('#choose_shops_common_ex');
+        _box.html('<div class="btn-group" style="font-size:14px;margin-bottom:10px;">已选择商家（'+_choose_shops_common_shops_names.length+'）：</div>');
+        for (var i=0; i<_choose_shops_common_shops_names.length; i++) {
+            $('<div class="btn-group" style="margin-bottom:10px;"></div>').html('<a href="javascript:;" class="btn">'+_choose_shops_common_shops_names[i].name+'</a><a href="javascript:;" data-id="'+_choose_shops_common_shops_names[i].id+'" class="btn dropdown-toggle" title="取消选择"><span class="icon-remove" style="margin-top:4px;"></span></a>').appendTo(_box);
+        }
+    }
+    $('#choose_shops_common_ex').find('.dropdown-toggle').live('click',function() {
+        var _this = $(this);
+        for (var i=0; i<_choose_shops_common_shops_ids.length; i++) {
+            if (_choose_shops_common_shops_ids[i] == _this.data('id')) {
+                _choose_shops_common_shops_ids.splice(i,1);
+            }
+        }
+        for (var i=0; i<_choose_shops_common_shops_names.length; i++) {
+            if (_choose_shops_common_shops_names[i].id == _this.data('id')) {
+                _choose_shops_common_shops_names.splice(i,1);
+            }
+        }
+        $('.choose_shops_common_checkbox_info').each(function() {
+            if ($.inArray($(this).val(),_choose_shops_common_shops_ids) != -1) $(this).attr('checked',true);
+            else $(this).attr('checked',false);
+        });
+        reset_checkbox_checked();
+        reset_choose_shops_txt();
+        _this.parent().remove();
+    });
+    $('#reset_choose_shops').click(function() {
+        _choose_shops_common_shops_ids = [];
+        _choose_shops_common_shops_names = [];
+        $('.choose_shops_common_checkbox_info').each(function() {
+            if ($.inArray($(this).val(),_choose_shops_common_shops_ids) != -1) $(this).attr('checked',true);
+            else $(this).attr('checked',false);
+        });
+        reset_checkbox_checked();
+        reset_choose_shops_txt();
+    });
+    $('#submit_choose_shops').click(function() {
+        tip_close(function() {
+            try {
+                {$Think.request.callback|htmlspecialchars}(implode(',',_choose_shops_common_shops_ids));
+                _choose_shops_common_shops_ids = [];
+                _choose_shops_common_shops_names = [];
+            }catch (e) {
+                _choose_shops_common_shops_ids = [];
+                _choose_shops_common_shops_names = [];
+            }            
+        });
+    });
+</script>

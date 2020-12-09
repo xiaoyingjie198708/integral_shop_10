@@ -1,0 +1,25 @@
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<form class="form-horizontal send_sms_form" ajax="true" action="{:U('OrderDeal/deal_order')}" autocomplete="off">   
+    <div class="control-group">
+        <label class="control-label">订单号码：</label>
+        <div class="controls"><input type="text" name="order_cur_id" id="order_cur_id" placeholder="请输入订单号码" empty="请输入订单号码"/></div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">是否发短信：</label>
+        <div class="controls"><input type="text" name="send_sms" id="send_sms" value="1"/></div>
+    </div>
+    <div class="form-actions">
+        <input type="submit" value="提交" class="btn" />
+    </div>
+</form>
+<script type="text/javascript">
+$('.send_sms_form').form({
+     start:function() {
+    },
+    error:function(data,_this) {
+    },
+    ajaxcallback:function(data) {
+        alert(data.info);
+    }
+});
+</script>

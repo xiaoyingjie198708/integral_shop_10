@@ -1,0 +1,123 @@
+<script src="__PUBLIC__/js/form.jquery.min.js"></script>
+<link rel="stylesheet" href="__PUBLIC__/css/jquery.gritter.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/select2.css" />
+<link rel="stylesheet" href="__PUBLIC__/css/uniform.css" />
+<script type="text/javascript" src="__PUBLIC__/js/select2.min.js"></script>
+<div class="container-fluid">
+    <div class="widget-box">
+        <div class="widget-title add_box"><h5>用户列表</h5><a class="btn btn-success btn-mini" href="javascript:;" id="add_user"><i class="icon-plus icon-white"></i> 添加用户</a></div>
+        <div class="widget-content">
+            {$search_box}
+            <table class="table table_list table-bordered table-center">
+                <thead>
+                    <tr>
+                        <th>用户名</th>
+                        <th>真实姓名</th>
+                        <th>所属分组</th>
+                        <th>帐号状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <volist name="admin_user" id="user">
+                    <tr>
+                        <td>{$user.username}</td>
+                        <td>{$user.realname}</td>
+                        <td>{$user.group_name|trim=###,'、'}</td>
+                        <td>
+                            <div class="btn-group change_status">
+                                <a data-user="{$user.id}" data-status="1" class="btn btn-mini {:set_class('1',$user['status'],'btn-success active')}">ON</a>
+                                <a data-user="{$user.id}" data-status="0" class="btn btn-mini {:set_class('0',$user['status'],'active')}">OFF</a>
+                            </div>
+                        </td>
+                        <td>
+                            <!--<a href="javascript:;" class="btn btn-mini access_edit" data-id="{$user.id}" data-title="{$user.username}"><i class="icon-eye-open"></i> 附加权限</a>&nbsp;-->
+                            <a href="javascript:;" class="btn btn-mini user_edit" data-id="{$user.id}" data-title="{$user.username}"><i class="icon-edit"></i> 编辑</a>&nbsp;
+                            <a href="javascript:;" class="btn btn-mini reset_password" data-id="{$user.id}" data-title="{$user.username}"><i class="icon-lock"></i> 重置密码</a>&nbsp;
+                            <a href="javascript:;" data-id="{$user.id}" data-title="{$user.username}" class="btn btn-mini user_del"><i class="icon-trash"></i> 删除</a>
+                        </td>
+                    </tr>
+                    </volist>
+                </tbody>
+            </table>
+            <notempty name="page"><div class="pagination alternate page"><ul>{$page}</ul></div></notempty>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $("#add_user").click(function () {
+        tipwindows('添加用户', getAddBox());
+    });
+    function getAddBox() {
+        var _return = '';
+        $.ajaxSetup({async: false});
+        $.post("{:U('Admin/get_add_info')}", {}, function (data) {
+            _return = data.info;
+        }, 'json');
+        return _return;
+    }
+    $('.change_status a').click(function() {
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (_this.hasClass('active')) return false;
+        _this.data('send','off');
+        $.post('__URL__/change_user_status',{id:_this.data('user'),status:_this.data('status')},function(data) {
+            _this.data('send','on');
+            if(!data.status) alert(data.info);
+            else {
+                _this.parent().find('a').removeClass('active');
+                _this.addClass('active');
+                if (_this.index() == 1) _this.prev().removeClass('btn-success');
+                else _this.addClass('btn-success');
+            }
+        },'json');
+    });
+    $('.user_edit').click(function() {
+        tipwindows($(this).data('title')+' - 编辑',getEditBox($(this).data('id')));
+    });
+    function getEditBox(_id) {
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post('__URL__/get_user_info',{id:_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+    $('.access_edit').click(function() {
+        tipwindows($(this).data('title')+' - 附加权限',getAccessBox($(this).data('id')),800,500,'',0);
+    });
+    function getAccessBox(_id) {
+        var _return = '';
+        $.ajaxSetup({async:false});
+        $.post('__URL__/set_user_access',{id:_id},function(data){_return = data.info;},'json');
+        return _return;
+    }
+    $('.user_del').click(function() {
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (confirm('确认删除 '+$(this).data('title')+' 吗？')) {
+            _this.data('send','off');
+            $.post('__URL__/delete',{id:$(this).data('id')},function(data) {
+                _this.data('send','on');
+                if (data.status) location.reload();
+                else alert(data.info);
+            });
+        }
+    });
+    $('.reset_password').click(function() {
+        var _this = $(this);
+        if(_this.data('send') == 'off') return false;
+        if (confirm('确认重置 '+_this.data('title')+' 的密码吗？')) {
+            _this.data('send','off');
+            $.post('__URL__/reset_password',{id:$(this).data('id')},function(data) {
+                _this.data('send','on');
+                if (data.status) {
+                    $.gritter.add({
+                        title:	'密码重置成功',
+                        text:	_this.data('title')+' 的密码已经重置，请尽快登录修改。',
+                        sticky: false
+                    });	
+                }
+                else alert(data.info);
+            });
+        }
+    });
+</script>

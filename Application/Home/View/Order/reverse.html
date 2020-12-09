@@ -1,0 +1,67 @@
+{__NOLAYOUT__}
+<div class="widget-box" style="margin-top:0;">
+    <div class="widget-content">
+        <form class="form-horizontal add_form" ajax="true" action="{:U('Order/reverse_order')}" autocomplete="off">
+            <div class="control-group">
+                <label class="control-label">类型：</label>
+                <div class="controls">
+                    <label><input type="radio" name="order_type" value="1" checked/>换货</label>
+                    <label><input type="radio" name="order_type" value="2"/>退货</label>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">操作商品：</label>
+                <div class="controls">
+                    <volist name="goods_list" id="order_goods">
+                        <div>
+                            {$order_goods.goods_name}, {$order_goods.goods_number}, 数量：<input type="text" name="goods_{$order_goods.order_goods_id}" id="goods_{$order_goods.order_goods_id}" style="width: 30px;"/>
+                        </div>
+                    </volist>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">原因：</label>
+                <div class="controls">
+                    <textarea id='reason' name='reason' empty="请输入退换货订单原因"></textarea>
+                </div>
+            </div>
+            <div class="form-actions">
+                <input type="hidden" name="order_id" id="order_id" value="{$order_id}" />
+                <input type="hidden" name="order_goods_id" id="order_goods_id" value="{$order_goods_id}" />
+                <input type="submit" value="提交" id="submit_group" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    $('input[name=order_type]').uniform(); //美化checkbox，radio按钮
+    $(".add_form").form({
+        start: function () {
+        },
+        error: function (data, _this) {
+            if (_this) {
+                error(data, _this);
+                $('.error').removeClass('error');
+                _this.parents('.control-group').addClass('error');
+            } else
+                alert(data);
+        },
+        ajaxcallback: function (data) {
+            if (data.status) {
+                alert("操作成功");
+                tip_close();
+                refresh_label();
+            } else {
+                if (data.data) {
+                    var _obj = $('#' + data.data);
+                    $('.error').removeClass('error');
+                    _obj.parents('.control-group').addClass('error');
+                    _obj.focus();
+                    error(data.info, _obj);
+                } else {
+                    alert(data.info);
+                }
+            }
+        }
+    });
+</script>
